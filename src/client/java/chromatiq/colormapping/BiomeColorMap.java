@@ -1,26 +1,22 @@
 package chromatiq.colormapping;
 
 import chromatiq.properties.ColorMappingProperties;
-import chromatiq.util.ColorConverter;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 
 import java.util.Random;
 
-public class BiomeColorMap implements IChromaticRegistryManager {
+public class BiomeColorMap implements IChromaticRegistryResolver {
     private static final Random RANDOMIZED_GRID_LOC = new Random(47L);
     private final ColorMappingProperties properties;
     private final NativeImage imageColorMapping;
-    private transient final defaultColor;
+    private transient final int defaultColor;
     private transient final ExtendChromaticRegistryManager resolver;
 
     public BiomeColorMap(ColorMappingProperties props, NativeImage colorMapping) {
         properties = props;
         imageColorMapping = colorMapping;
-
-        ColorConverter.argbToRgba(props.getColor());
-
     }
 
     private static boolean WorldOrPositionIsNull(BlockRenderView world, BlockPos pos) {
@@ -31,7 +27,7 @@ public class BiomeColorMap implements IChromaticRegistryManager {
         if(WorldOrPositionIsNull(world, pos)) {
             return colormap.getDefaultColor();
         }
-        return colormap.resolver.resolveExtendedColor(world, pos);
+        return colormap.resolver.(world, pos);
     }
 
     public int getDefaultColor() {

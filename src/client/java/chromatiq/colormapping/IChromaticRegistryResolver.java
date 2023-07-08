@@ -5,6 +5,6 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.world.biome.Biome;
 
 @FunctionalInterface
-public interface IChromaticRegistryManager {
+public interface IChromaticRegistryResolver {
     int getColorRegistryForDynamicPosition(DynamicRegistryManager dynamicRegistryManager, Biome biome, Coordinates coordinates);
 }
