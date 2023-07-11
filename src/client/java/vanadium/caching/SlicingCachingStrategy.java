@@ -1,0 +1,105 @@
+package vanadium.caching;
+
+import com.google.common.util.concurrent.Striped;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import vanadium.blending.BlendingConfig;
+import vanadium.enums.BiomeColorTypes;
+import vanadium.models.Coordinates;
+
+import java.util.concurrent.locks.Lock;
+
+public abstract class SlicingCachingStrategy<T extends BaseCacheStrategy> {
+    public final static int AVAILABLE_BUCKETS = 16;
+    public final Long2ObjectLinkedOpenHashMap<T>[] hashMapStorageContainer;
+    public final Lock[] locks;
+
+    public final int totalSlices;
+    public int sliceSize;
+    public SlicingCachingStrategy(int count) {
+        this.totalSlices = count;
+        int countPerBucket = count / AVAILABLE_BUCKETS;
+        hashMapStorageContainer = new Long2ObjectLinkedOpenHashMap[AVAILABLE_BUCKETS];
+
+        for (int i = 0; i < AVAILABLE_BUCKETS; ++i) {
+            hashMapStorageContainer[i] = new Long2ObjectLinkedOpenHashMap<>(countPerBucket);
+        }
+
+        locks = new Lock[AVAILABLE_BUCKETS];
+        Striped<Lock> stripedLocks = Striped.lock(AVAILABLE_BUCKETS);
+
+        for(int i = 0; i < AVAILABLE_BUCKETS; ++i) {
+            locks[i] = stripedLocks.get(i);
+        }
+    }
+
+    public abstract T createSlice(int sliceSize, int salt);
+
+    public final void redistributeSlices(int sliceSize) {
+        this.sliceSize = sliceSize;
+
+        int countPerBucket = this.totalSlices / AVAILABLE_BUCKETS;
+
+        for(int i = 0; i < AVAILABLE_BUCKETS; ++i) {
+            Lock stripedLock = locks[i];
+
+            if(stripedLock.tryLock()) {
+                try {
+                    Long2ObjectLinkedOpenHashMap<T> hash = hashMapStorageContainer[i];
+
+                    hash.clear();
+
+                    for(int index = 0; index < countPerBucket; ++index) {
+                        T slice = createSlice(sliceSize, index);
+
+                        hash.put(slice.getCacheKey(), slice);
+                    }
+                } finally {
+                    stripedLock.unlock();
+                }
+                continue;
+            }
+
+            throw new RuntimeException("Could not acquire lock for bucket " + i);
+        }
+    }
+
+    public final void invalidateAllCachesInRadius(int blendedRadius){
+        this.sliceSize = BlendingConfig.getSliceSize(blendedRadius);
+
+        redistributeSlices(sliceSize);
+    }
+
+    public final void releaseSliceFromCache(T slice) {
+        slice.releaseReference();
+    }
+
+    public final T getOrInitSlice(int sliceSize, Coordinates sliceCoordinates, BiomeColorTypes colorType, boolean shouldTryLocking) {
+        long key = ColorBlendingCache.getChunkCacheKey(sliceCoordinates, colorType);
+
+        int bucketIndex = getBucketIndex(sliceCoordinates);
+
+        Striped<Lock> stripedLock = Striped.lock(AVAILABLE_BUCKETS);
+        Long2ObjectLinkedOpenHashMap<T> hash = hashMapStorageContainer[bucketIndex];
+
+        T slice = null;
+        long stamp = 0;
+
+
+        if(slice.getSize() == sliceSize && stripedLock.get()) {
+            slice.acquireReference();
+        } else {
+            slice = createSlice(sliceSize, 0);
+        }
+
+    }
+
+    private int getBucketIndex(Coordinates coordinates) {
+        return (coordinates.x() ^ coordinates.y() ^ coordinates.z()) & (AVAILABLE_BUCKETS - 1);
+    }
+
+    private int getStripe(long key) {
+        return (int) (key % locks.length);
+    }
+
+
+}

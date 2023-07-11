@@ -7,6 +7,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.world.biome.source.BiomeSources;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypeRegistrar;
 import net.minecraft.world.dimension.DimensionTypes;
@@ -36,7 +37,7 @@ public class Vanadium implements ClientModInitializer {
 
     public static Identifier getBiomeId(DynamicRegistryManager manager, Biome biome) {
 
-        Identifier biomeId = Registries.BIOME.getId(biome);
+        Identifier biomeId = ;
 
         if(biomeId == null){
             return BiomeKeys.PLAINS.getValue();
