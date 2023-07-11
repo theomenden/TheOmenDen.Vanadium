@@ -59,7 +59,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation "maven.modrinth:sodium:${project.sodium_version}"
-	modCompileOnly 'maven.modrinth:indium:1.0.7+mc1.19'
+	modCompileOnly 'maven.modrinth:indium:1.0.21+mc1.20.1'
 	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}") {
 		transitive = false
 	}
