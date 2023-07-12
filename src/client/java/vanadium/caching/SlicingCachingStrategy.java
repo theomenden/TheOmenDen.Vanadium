@@ -8,7 +8,7 @@ import vanadium.models.Coordinates;
 
 import java.util.concurrent.locks.Lock;
 
-public abstract class SlicingCachingStrategy<T extends BaseCacheStrategy> {
+public abstract class SlicingCachingStrategy<T extends BaseSlice> {
     public final static int AVAILABLE_BUCKETS = 16;
     public final Long2ObjectLinkedOpenHashMap<T>[] hashMapStorageContainer;
     public final Lock[] locks;
@@ -78,19 +78,30 @@ public abstract class SlicingCachingStrategy<T extends BaseCacheStrategy> {
 
         int bucketIndex = getBucketIndex(sliceCoordinates);
 
-        Striped<Lock> stripedLock = Striped.lock(AVAILABLE_BUCKETS);
+        Lock stripedLock = locks[bucketIndex];
         Long2ObjectLinkedOpenHashMap<T> hash = hashMapStorageContainer[bucketIndex];
 
         T slice = null;
-        long stamp = 0;
 
+        if (shouldTryLocking && stripedLock.tryLock()) {
+            try {
+                slice = hash.getAndMoveToFirst(key);
+                if (slice == null || slice.getSize() != sliceSize) {
+                    slice = createSlice(sliceSize,0);
+                    hash.putAndMoveToFirst(key, slice);
+                } else {
+                    slice.acquireReference();
+                    hash.remove(key);
+                    hash.putAndMoveToFirst(key, slice);
+                }
 
-        if(slice.getSize() == sliceSize && stripedLock.get()) {
-            slice.acquireReference();
-        } else {
-            slice = createSlice(sliceSize, 0);
+                slice.setCacheKey(key);
+                slice.invalidateCacheData();
+            } finally {
+                stripedLock.unlock();
+            }
         }
-
+        return slice;
     }
 
     private int getBucketIndex(Coordinates coordinates) {

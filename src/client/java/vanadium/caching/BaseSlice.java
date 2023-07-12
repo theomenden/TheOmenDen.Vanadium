@@ -1,10 +1,8 @@
 package vanadium.caching;
 
-import vanadium.models.Coordinates;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class BaseCacheStrategy {
+public abstract class BaseSlice {
     private long key;
     private int size;
     private int salt;
@@ -12,41 +10,37 @@ public abstract class BaseCacheStrategy {
 
     private AtomicInteger referenceCount = new AtomicInteger();
 
-    public BaseCacheStrategy() {
-        this.size = 0;
-        this.salt = 0;
-
-        this.markInvalid();
-    }
-
-    public BaseCacheStrategy(int size, int salt) {
+    public BaseSlice(int size, int salt) {
         this.size = Math.max(size, 0);
         this.salt = Math.max(salt, 0);
 
-        this.markInvalid();
+        this.markCacheInvalid();
     }
 
-    public abstract void invalidateRegionCacheData(Coordinates minimumCoordinates, Coordinates maximumCoordinates);
-    public abstract void invalidCacheData();
+    public abstract void invalidateCacheData();
 
-    public long getCacheKey() {
+    public final long getCacheKey() {
         return key;
     }
 
-    public int getSize() {
+    public final int getSize() {
         return size;
     }
 
-    public int getSalt() {
+    public final int getSalt() {
         return salt;
     }
 
-    public int getAge() {
+    public final int getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public final void setAge(int age) {
         this.age = age;
+    }
+
+    public final void setCacheKey(long key) {
+        this.key = key;
     }
 
     public final int getReferenceCount() {
@@ -65,7 +59,7 @@ public abstract class BaseCacheStrategy {
         return ((this.key ^ this.salt)) == ColorBlendingCache.INVALID_CHUNK_KEY;
     }
 
-    public final void markInvalid() {
+    public final void markCacheInvalid() {
         this.key = ColorBlendingCache.INVALID_CHUNK_KEY ^ salt;
     }
 }
