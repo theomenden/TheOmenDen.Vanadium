@@ -17,7 +17,7 @@ public abstract class SlicingCachingStrategy<T extends BaseSlice> {
     public int sliceSize;
     public SlicingCachingStrategy(int count) {
         this.totalSlices = count;
-        int countPerBucket = count / AVAILABLE_BUCKETS;
+        var countPerBucket = count / AVAILABLE_BUCKETS;
         hashMapStorageContainer = new Long2ObjectLinkedOpenHashMap[AVAILABLE_BUCKETS];
 
         for (int i = 0; i < AVAILABLE_BUCKETS; ++i) {
@@ -25,7 +25,7 @@ public abstract class SlicingCachingStrategy<T extends BaseSlice> {
         }
 
         locks = new Lock[AVAILABLE_BUCKETS];
-        Striped<Lock> stripedLocks = Striped.lock(AVAILABLE_BUCKETS);
+        var stripedLocks = Striped.lock(AVAILABLE_BUCKETS);
 
         for(int i = 0; i < AVAILABLE_BUCKETS; ++i) {
             locks[i] = stripedLocks.get(i);

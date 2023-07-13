@@ -10,8 +10,8 @@ public class BlendingChunk {
     public int invalidationCounter;
     public AtomicInteger referenceCounter = new AtomicInteger();
     public long invalidationKey;
-    BlendingChunk next;
-    BlendingChunk previous;
+    public BlendingChunk next;
+    public BlendingChunk previous;
 
     public BlendingChunk() {
         this.data = new int[4096];

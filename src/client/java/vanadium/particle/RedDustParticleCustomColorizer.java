@@ -10,7 +10,7 @@ public class RedDustParticleCustomColorizer extends DustParticleEffect {
 
     @Override
     public Vector3f getColor() {
-        if(Chromatiq.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
+        if(Vanadium.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
             int rgbIndex = getFullColorIndex();
             float redAmount = ((rgbIndex >> 16) & 0xff) / 255.0f;
             float greenAmount = ((rgbIndex >> 8) & 0xff) / 255.0f;
@@ -23,13 +23,13 @@ public class RedDustParticleCustomColorizer extends DustParticleEffect {
 
     @Override
     public float getScale() {
-        if(Chromatiq.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
+        if(Vanadium.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
             return ((getFullColorIndex() >> 24) & 0xff) / 255.0f;
         }
         return super.getScale();
     }
 
     private int getFullColorIndex() {
-        return Chromatiq.REDSTONE_COLOR_MAPPINGS.getboundColorIndex(15);
+        return Vanadium.REDSTONE_COLOR_MAPPINGS.getboundColorIndex(15);
     }
 }

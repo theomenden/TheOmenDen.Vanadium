@@ -25,14 +25,14 @@ public abstract class RedstoneWireMixin extends Block {
 
     @Inject(method= "getWireColor", at = @At("HEAD"), cancellable = true)
     private static void onWireColorChange(int power, CallbackInfoReturnable<Integer> cir){
-       if(Chromatiq.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
-           info.setReturnValue(Chromatiq.REDSTONE_COLOR_MAPPINGS.getboundColorForPower(power));
+       if(Vanadium.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
+           info.setReturnValue(Vanadium.REDSTONE_COLOR_MAPPINGS.getboundColorForPower(power));
        }
     }
 
-    @Inject(
+    @Inject (
             method= "randomDisplayTick",
-            at = @At(
+            at = @At (
                     value = "FIELD",
                     target="Lnet/minecraft/block/Block;randomDisplayTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V",
                     ordinal = 0
@@ -41,11 +41,11 @@ public abstract class RedstoneWireMixin extends Block {
             cancellable = true
     )
     private void onRandomDisplayTick(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
-        if(Chromatiq.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
+        if(Vanadium.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
             double x = pos.getX() + 0.5 + (random.nextFloat() - 0.5)*0.2;
             double y = ((float)pos.getY() + 0.0625f);
             double z = pos.getZ() + 0.5 + (random.nextFloat() - 0.5)*0.2;
-            int color = Chromatiq.REDSTONE_COLOR_MAPPINGS.getboundColorForPower(power);
+            int color = Vanadium.REDSTONE_COLOR_MAPPINGS.getboundColorForPower(power);
             float r = ((color >> 16) & 0xff) / 255.0f;
             float g = ((color >> 8) & 0xff) / 255.0f;
             float b = (color & 0xff) / 255.0f;
