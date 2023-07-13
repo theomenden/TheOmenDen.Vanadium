@@ -1,3 +1,5 @@
+package vanadium.fluids;
+
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.VertexConsumer;
@@ -8,10 +10,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import org.jetbrains.annotations.Nullable;
 
-public class ChromatiqFluidRenderHandler implements FluidRenderHandler {
+public class VanadiumFluidRenderHandler implements FluidRenderHandler {
     private final FluidRenderHandler _delegate;
 
-    public ChromatiqFluidRenderHandler(FluidRenderHandler delegate) {
+    public VanadiumFluidRenderHandler(FluidRenderHandler delegate) {
         _delegate = delegate;
     }
 
