@@ -1,5 +1,7 @@
 package vanadium.mixin.client;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import me.jellysquid.mods.sodium.client.world.biome.BlockColorCache;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
@@ -9,7 +11,9 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.ColorResolver;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.client.color.block.BlockColorProvider;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,9 +29,9 @@ import java.util.function.Supplier;
 @Mixin(value = ClientWorld.class)
 public abstract class ClientWorldMixin extends World {
 
-    @Unique
-    private final Object2ObjectArrayMap<ColorResolver, BlockTintCache> tintCaches = new Object2ObjectArrayMap<>();
-
+    @Shadow
+    private final Object2ObjectArrayMap<ColorResolver, BlockColorCache> colorCache = new Object2ObjectArrayMap<>();
+    
     @Unique
     private final BlendingCache blendedColorCache = new BlendingCache(1024);
 
@@ -54,7 +58,6 @@ public abstract class ClientWorldMixin extends World {
         blendedColorCache.invalidateAllChunks();
 
         int blendingRadius = VanadiumBlendClient.getBiomeBlendingRadius();
-
         chunkColorCache.invalidateAllCachesInRadius(blendingRadius);
     }
 

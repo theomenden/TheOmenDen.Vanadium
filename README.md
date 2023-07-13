@@ -1,4 +1,4 @@
-# Vanadium
+# **Vanadium**
 
 <details>
 <summary>Quick Facts </summary>
@@ -36,4 +36,4 @@ caches colors and allows for smoother blending between different biomes, waters,
 </ul>
 </details>
 
-# THIS MOD WILL NOT WORK WITHOUT INDIUM. Please include indium in your modlists.
+### **THIS MOD WILL NOT WORK WITHOUT INDIUM. Please include indium in your modlists.**

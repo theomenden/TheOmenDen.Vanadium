@@ -1,4 +1,4 @@
-package vanadium.mixin.sodium.color;
+package vanadium.mixin.client;
 
 public class SodiumItemsColorsMixin {
 }

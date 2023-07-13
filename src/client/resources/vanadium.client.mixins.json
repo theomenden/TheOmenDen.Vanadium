@@ -3,6 +3,12 @@
 	"package": "vanadium.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
+		"ClientWorldMixin",
+		"BlockColorCacheMixin",
+		"LeverMixin",
+		"RedstoneWireMixin",
+		"BlockColorsAccessor",
+		"BlockRenderCacheMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -1,4 +1,4 @@
-package vanadium.mixin.blocks;
+package vanadium.mixin.client;
 
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.jellysquid.mods.sodium.client.world.WorldSlice;

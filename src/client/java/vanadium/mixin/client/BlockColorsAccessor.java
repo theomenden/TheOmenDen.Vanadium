@@ -1,4 +1,4 @@
-package vanadium.mixin.blocks;
+package vanadium.mixin.client;
 
 import net.minecraft.client.color.block.BlockColorProvider;
 import net.minecraft.client.color.block.BlockColors;

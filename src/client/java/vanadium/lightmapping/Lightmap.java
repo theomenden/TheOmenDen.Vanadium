@@ -52,7 +52,7 @@ public class Lightmap {
         if (scale == 0) {
             rationalizedValue = 0x00ffffff;
         } else {
-            int inverseScale =255 / scale;
+            int inverseScale = 255 / scale;
             rationalizedValue = 0xff000000 | (inverseScale * red) << 16 | (inverseScale * green) << 8 | (inverseScale * blue);
         }
         return rationalizedValue;

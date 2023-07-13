@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1",
+  "id": "vanadium",
+  "version": "${version}",
+  "name": "Vanadium",
+  "description": "A simple custom colors implementation with some level of naive caching.",
+  "authors": [
+    "The Omen Den",
+    "Andrew Beers (Alu)"
+  ],
+  "contact": {
+    "homepage": "https://github.com/theomenden/TheOmenDen.Vanadium",
+    "sources": "https://github.com/theomenden/TheOmenDen.Vanadium",
+    "issues": "https://github.com/theomenden/TheOmenDen.Vanadium/issues"
+  },
+  "license":"MIT",
+  "icon": "assets/vanadiumElement.png",
+  "mixins": [
+    "vanadium.client.mixins.json"
+  ],
+  "depends": {
+    "sodium": "",
+    "java": ">=17"
+  }
+}
