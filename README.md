@@ -16,9 +16,9 @@ Vanadium went through a few other names including panchromium and erythronium</l
 <details>
 <summary>Inspirations</summary>
 <ul>
- <li>Sodium Blending Registry</li>
-<li>Better Biome Blend</li>
-<li>Colormatic</li>
+ <li><a href="https://modrinth.com/mod/sodium-blendingregistry">Sodium Blending Registry</a></li>
+<li><a href="https://modrinth.com/mod/better-biome-blend">Better Biome Blend</a></li>
+<li><a href="https://modrinth.com/mod/colormatic">Colormatic</a></li>
 </ul>
 </details>
 <details>
