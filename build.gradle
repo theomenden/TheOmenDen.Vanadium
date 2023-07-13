@@ -4,6 +4,15 @@ plugins {
 	id 'java-library'
 	id 'com.modrinth.minotaur' version '2.+'
 	id "com.github.johnrengelman.shadow" version "8.1.1"
+  	id "org.sonarqube" version "4.2.1.3168"
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "theomenden_TheOmenDen.Vanadium"
+    property "sonar.organization", "theomenden"
+    property "sonar.host", "https://sonarcloud.io"
+  }
 }
 
 repositories {
