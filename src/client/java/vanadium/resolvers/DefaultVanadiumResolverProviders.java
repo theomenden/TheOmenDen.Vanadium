@@ -1,5 +1,6 @@
 package vanadium.resolvers;
 
+import net.minecraft.fluid.Fluid;
 import vanadium.Vanadium;
 import vanadium.mixin.client.BlockColorsAccessor;
 import vanadium.models.Coordinates;
@@ -14,10 +15,10 @@ import net.minecraft.util.math.Vec3i;
 public record DefaultVanadiumResolverProviders {
 
     public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER;
-    public static final VanadiumResolverProvider<BlockState> BLOCK_PROVIDER;
-    public static final VanadiumResolverProvider<BlockState> SKY_PROVIDER;
-    public static final VanadiumResolverProvider<BlockState> SKY_FOG_PROVIDER;
-    public static final VanadiumResolverProvider<BlockState> FLUID_FOG_PROVIDER;
+    public static final VanadiumResolverProvider<Block> BLOCK_PROVIDER;
+    public static final VanadiumResolverProvider<Identifier> SKY_PROVIDER;
+    public static final VanadiumResolverProvider<Identifier> SKY_FOG_PROVIDER;
+    public static final VanadiumResolverProvider<Fluid> FLUID_FOG_PROVIDER = key -> (manager, biome, coordinates) -> -1;
 
 
     private static VanadiumResolver resolveByBlockState(BlockState key) {
