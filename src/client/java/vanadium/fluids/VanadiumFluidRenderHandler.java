@@ -11,33 +11,33 @@ import net.minecraft.world.BlockRenderView;
 import org.jetbrains.annotations.Nullable;
 
 public class VanadiumFluidRenderHandler implements FluidRenderHandler {
-    private final FluidRenderHandler _delegate;
+    private final FluidRenderHandler delegate;
 
     public VanadiumFluidRenderHandler(FluidRenderHandler delegate) {
-        _delegate = delegate;
+        this.delegate = delegate;
     }
 
     @Override
     public Sprite[] getFluidSprites(@Nullable BlockRenderView view, @Nullable BlockPos pos, FluidState state) {
-        return _delegate.getFluidSprites(view, pos, state);
+        return this.delegate.getFluidSprites(view, pos, state);
     }
 
     @Override
     public int getFluidColor(@Nullable BlockRenderView view, @Nullable BlockPos pos, FluidState state) {
         var blockState = state.getBlockState();
-        if(Biome.isCustomColored(blockState)) {
-            return BiomeColormaps.getBiomeColor(blockState, view, pos);
+        if(BiomeColorMappings.isCustomColored(blockState)) {
+            return BiomeColormappings.getBiomeColor(blockState, view, pos);
         }
-        return _delegate.getFluidColor(view, pos, state);
+        return this.delegate.getFluidColor(view, pos, state);
     }
 
     @Override
     public void renderFluid(BlockPos pos, BlockRenderView world, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
-        _delegate.renderFluid(pos, world, vertexConsumer, blockState, fluidState);
+        this.delegate.renderFluid(pos, world, vertexConsumer, blockState, fluidState);
     }
 
     @Override
     public void reloadTextures(SpriteAtlasTexture textureAtlas) {
-        _delegate.reloadTextures(textureAtlas);
+        delegate.reloadTextures(textureAtlas);
     }
 }

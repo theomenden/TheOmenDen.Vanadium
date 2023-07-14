@@ -1,5 +1,6 @@
 package vanadium.resolvers;
 
+import vanadium.Vanadium;
 import vanadium.mixin.client.BlockColorsAccessor;
 import vanadium.models.Coordinates;
 import net.minecraft.block.Block;
@@ -12,14 +13,14 @@ import net.minecraft.util.math.Vec3i;
 
 public record DefaultVanadiumResolverProviders {
 
-    public static final IVanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER;
-    public static final IVanadiumResolverProvider<BlockState> BLOCK_PROVIDER;
-    public static final IVanadiumResolverProvider<BlockState> SKY_PROVIDER;
-    public static final IVanadiumResolverProvider<BlockState> SKY_FOG_PROVIDER;
-    public static final IVanadiumResolverProvider<BlockState> FLUID_FOG_PROVIDER;
+    public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER;
+    public static final VanadiumResolverProvider<BlockState> BLOCK_PROVIDER;
+    public static final VanadiumResolverProvider<BlockState> SKY_PROVIDER;
+    public static final VanadiumResolverProvider<BlockState> SKY_FOG_PROVIDER;
+    public static final VanadiumResolverProvider<BlockState> FLUID_FOG_PROVIDER;
 
 
-    private static IVanadiumResolver resolveByBlockState(BlockState key) {
+    private static VanadiumResolver resolveByBlockState(BlockState key) {
         return (manager, biome, coordinates) -> {
             var colorProvider = ((BlockColorsAccessor)MinecraftClient.getInstance()
                     .getBlockColors())
@@ -38,19 +39,19 @@ public record DefaultVanadiumResolverProviders {
             return -1;
         };
     }
-    private static IVanadiumResolver resolveByBlock(Block key) {
+    private static VanadiumResolver resolveByBlock(Block key) {
         return resolveByBlockState(key.getDefaultState());
     }
 
-    private static IVanadiumResolver resolveBySky(Identifier key) {
+    private static VanadiumResolver resolveBySky(Identifier key) {
         return (manager, biome, coordinates) -> {
            int color = 0;
 
-           if(Chromatiq.SKY_COLORS.hasCustomColorMapping()
-           && key.equals(Chromatiq.OVERWORLD_ID)) {
-               color = Chromatiq.SKY_COLORS.getColorMapping.getColor(manager, biome, new Coordinates(coordinates.x(), coordinates.y(), coordinates.y()));
+           if(Vanadium.SKY_COLORS.hasCustomColorMapping()
+           && key.equals(Vanadium.OVERWORLD_ID)) {
+               color = Vanadium.SKY_COLORS.getColorMapping.getColor(manager, biome, new Coordinates(coordinates.x(), coordinates.y(), coordinates.y()));
            } else {
-               color = Chromatiq.COLOR_PROPERTIES.getProperties().getDimensionSky(key);
+               color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionSky(key);
 
                if(color == 0) {
                    color = biome.getSkyColor();
@@ -60,15 +61,15 @@ public record DefaultVanadiumResolverProviders {
         };
     }
 
-    private static IVanadiumResolver resolveByFog(Identifier key) {
+    private static VanadiumResolver resolveByFog(Identifier key) {
         return (manager, biome, coordinates) -> {
             int color = 0;
 
-            if(Chromatiq.FOG_COLORS.hasCustomColorMapping()
-            && key.equals(Chromatiq.OVERWORLD_ID)) {
-                color = 0xff000000 | Chromatiq.FOG_COLORS.getColorMapping.getColor(manager, biome, (Coordinates)coordinates);
+            if(Vanadium.FOG_COLORS.hasCustomColorMapping()
+            && key.equals(Vanadium.OVERWORLD_ID)) {
+                color = 0xff000000 | Vanadium.FOG_COLORS.getColorMapping.getColor(manager, biome, (Coordinates)coordinates);
             } else {
-                color = Chromatiq.COLOR_PROPERTIES.getProperties().getDimensionFog(key);
+                color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionFog(key);
 
                 if(color == 0) {
                     color = biome.getFogColor();

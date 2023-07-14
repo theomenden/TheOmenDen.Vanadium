@@ -5,7 +5,7 @@
 	"client": [
 		"ClientWorldMixin",
 		"BlockColorCacheMixin",
-		"LeverMixin",
+      "vanadium.mixin.block.LeverMixin",
 		"RedstoneWireMixin",
 		"BlockColorsAccessor",
 		"BlockRenderCacheMixin"

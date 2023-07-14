@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1",
+  "schemaVersion": 1,
   "id": "vanadium",
   "version": "${version}",
   "name": "Vanadium",
@@ -19,7 +19,26 @@
     "vanadium.client.mixins.json"
   ],
   "depends": {
-    "sodium": "",
+    "fabricloader": ">=0.14.21",
+    "minecraft": "~1.20.1",
+    "fabric-api": "*",
+    "sodium": ">=0.4.10",
+    "mod-menu": ">=7.0.1",
     "java": ">=17"
+  },
+  "custom": {
+    "modmenu": {
+       "links": {
+         "vanadium.discord": "https://discord.gg/" ,
+         "vanadium.github": "https://github.com/theomenden/TheOmenDen.Vanadium"
+       },
+      "parent": {
+        "id": "vanadium",
+        "name": "Vanadium",
+        "description": "A simple custom colors implementation with some level of naive caching.",
+        "icon": "assets/vanadiumElement.png"
+      },
+      "update_checker": true
+    }
   }
 }

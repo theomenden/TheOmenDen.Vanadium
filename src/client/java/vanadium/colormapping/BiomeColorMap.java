@@ -1,13 +1,17 @@
 package vanadium.colormapping;
 
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.world.biome.Biome;
+import vanadium.models.Coordinates;
 import vanadium.properties.ColorMappingProperties;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
+import vanadium.resolvers.VanadiumRegistryResolver;
 
 import java.util.Random;
 
-public class BiomeColorMap implements IVanadiumRegistryResolver {
+public class BiomeColorMap implements VanadiumRegistryResolver {
     private static final Random RANDOMIZED_GRID_LOC = new Random(47L);
     private final ColorMappingProperties properties;
     private final NativeImage imageColorMapping;
@@ -44,5 +48,10 @@ public class BiomeColorMap implements IVanadiumRegistryResolver {
         }
 
         return imageColorMapping.getColor(x, y);
+    }
+
+    @Override
+    public int getColorRegistryForDynamicPosition(DynamicRegistryManager dynamicRegistryManager, Biome biome, Coordinates coordinates) {
+        return 0;
     }
 }
