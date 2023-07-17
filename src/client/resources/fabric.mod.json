@@ -26,6 +26,7 @@
     "mod-menu": ">=7.0.1",
     "java": ">=17"
   },
+  "accessWidener" : "vanadium.accesswidener",
   "custom": {
     "modmenu": {
        "links": {

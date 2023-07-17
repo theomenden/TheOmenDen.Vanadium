@@ -1,10 +1,14 @@
 package vanadium.util;
 
+import vanadium.models.VanadiumColor;
+
 public final class ColorConverter {
     private static final int WHITE_RGB = 0xFFFFFF;
     private static final int WHITE_ARGB = 0xFFFFFFFF;
     private static final float[] WHITE_HSL = {0f, 0f, 1f};
     private static final String WHITE_HEX = "#FFFFFF";
+
+    private static final float saturationRatio = 1/255.0f;
 
     private ColorConverter() {
     }
@@ -14,9 +18,9 @@ public final class ColorConverter {
         int green = (rgb >> 8) & 0xFF;
         int blue = rgb & 0xFF;
 
-        float redNormalized = red / 255f;
-        float greenNormalized = green / 255f;
-        float blueNormalized = blue / 255f;
+        float redNormalized = red * saturationRatio;
+        float greenNormalized = green * saturationRatio;
+        float blueNormalized = blue * saturationRatio;
 
         float max = Math.max(redNormalized, Math.max(greenNormalized, blueNormalized));
         float min = Math.min(redNormalized, Math.min(greenNormalized, blueNormalized));

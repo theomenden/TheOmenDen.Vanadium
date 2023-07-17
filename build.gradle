@@ -48,9 +48,9 @@ base {
 
 loom {
     splitEnvironmentSourceSets()
-
+	accessWidenerPath = file("src/client/resources/vanadium.accesswidener")
 	mods {
-		"chromatiq" {
+		"vanadium" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

@@ -1,4 +1,4 @@
-package vanadium.mixin.client;
+package vanadium.mixin.fabricapi;
 
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;

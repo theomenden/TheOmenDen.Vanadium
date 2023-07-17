@@ -50,7 +50,7 @@ public record DefaultVanadiumResolverProviders {
 
            if(Vanadium.SKY_COLORS.hasCustomColorMapping()
            && key.equals(Vanadium.OVERWORLD_ID)) {
-               color = Vanadium.SKY_COLORS.getColorMapping.getColor(manager, biome, new Coordinates(coordinates.x(), coordinates.y(), coordinates.y()));
+               color = Vanadium.SKY_COLORS.getColorMapping().getColor(manager, biome, new Coordinates(coordinates.x(), coordinates.y(), coordinates.y()));
            } else {
                color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionSky(key);
 
@@ -68,7 +68,7 @@ public record DefaultVanadiumResolverProviders {
 
             if(Vanadium.FOG_COLORS.hasCustomColorMapping()
             && key.equals(Vanadium.OVERWORLD_ID)) {
-                color = 0xff000000 | Vanadium.FOG_COLORS.getColorMapping.getColor(manager, biome, (Coordinates)coordinates);
+                color = 0xff000000 | Vanadium.FOG_COLORS.getColorMapping().getColor(manager, biome, (Coordinates)coordinates);
             } else {
                 color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionFog(key);
 

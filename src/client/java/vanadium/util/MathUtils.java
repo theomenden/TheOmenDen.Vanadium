@@ -10,7 +10,7 @@ public class MathUtils {
     public static final RandomGenerator RANDOM = RandomGenerator.getDefault();
     public static final float PI2 = (float) (Math.PI * 2);
     public static final int ALPHA = 255 << 24;
-    public static final float PHI = (float) (Math.PI * (3 - Math.sqrt(5)) / 2);
+    public static final float PHI = (float) (Math.PI * (3 - Math.sqrt(5)) * 0.5);
 
     public static int createColor(int r, int g, int b) {
         int rgb = (r << 16) | (g << 8) | b;

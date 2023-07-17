@@ -25,8 +25,15 @@ public class ConfigurableColorBlender implements ColorBlender {
     }
 
     @Override
-    public <T> int[] getColors(BlockRenderView blockRenderView, BlockPos blockPos, ModelQuadView modelQuadView, ColorSampler<T> colorSampler, T t) {
-        return new int[0];
+    public <T> int[] getColors(BlockRenderView blockRenderView, BlockPos blockPos, ModelQuadView modelQuadView, ColorSampler<T> colorSampler, T state) {
+        ColorBlender colorBlender;
+        if(state instanceof State<?,?> s && isSmoothBlendingEnabled(s)) {
+            colorBlender = this.smoothBlender;
+        } else {
+            colorBlender = this.flatBlender;
+        }
+
+        return colorBlender.getColors(blockRenderView, blockPos, modelQuadView, colorSampler, state);
     }
 
     private static boolean isSmoothBlendingEnabled(State<?,?> state) {

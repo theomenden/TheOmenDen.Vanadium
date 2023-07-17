@@ -3,24 +3,39 @@ package vanadium.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.block.MapColor;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import vanadium.adapters.*;
+import vanadium.enums.Format;
+import vanadium.exceptions.InvalidColorMappingException;
+import vanadium.models.ColorMapNativePropertyImage;
+import vanadium.models.GridEntry;
+import vanadium.models.VanadiumColor;
 import vanadium.properties.ApplicableBlockStates;
+import vanadium.properties.ColorMappingProperties;
 
-import java.util.HashMap;
+import java.io.*;
+import java.nio.ByteOrder;
+import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class GsonUtils {
     public static final Gson PROPERTY_GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new StringIdentifiableTypeAdapterFactory())
             .registerTypeAdapter(Identifier.class, new IdentifierTypeAdapter())
-            .registerTypeAdapter(ApplicableBlockStates.class, new ApplicableBlockStatesTypeAdapter())
-            .registerTypeAdapter(HexColor.class, new HexColorAdapter())
+            .registerTypeAdapter(ApplicableBlockStates.class, new ApplicableBlockStatesAdapter())
+            .registerTypeAdapter(VanadiumColor.class, new VanadiumColorAdapter())
             .registerTypeAdapter(MapColor.class, new MaterialColorAdapter())
-            .registerTypeAdapter(Formatting.class, new ChatFormattingAdapter())
+            .registerTypeAdapter(Formatting.class, new ChatFormatAdapter())
             .registerTypeAdapter(GridEntry.class, new GridEntryAdapter())
             .create();
 
@@ -37,38 +52,77 @@ public class GsonUtils {
         return path;
     }
 
+    public static Reader getJsonReader(InputStream inputStream,
+                                       Identifier identifier,
+                                       Function<String, String> keyMapper,
+                                       Predicate<String> arrayValues) throws IOException {
+        if (!identifier
+                .getPath()
+                .endsWith(".properties")) {
+            return new InputStreamReader(inputStream);
+        }
 
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        return new StringReader(GsonUtils.toJsonString(properties, keyMapper, arrayValues));
+
+    }
+
+    public static ColorMapNativePropertyImage loadColorMapping(ResourceManager resourceManager, Identifier identifier, boolean isCustom) {
+        ColorMappingProperties properties = ColorMappingProperties.load(resourceManager, identifier,isCustom);
+
+        if(properties.getFormat() == Format.FIXED) {
+            return new ColorMapNativePropertyImage(properties, null);
+        }
+
+        try(InputStream inputStream = resourceManager.getResourceOrThrow(properties.getSource()).getInputStream()) {
+            NativeImage image = NativeImage.read(inputStream);
+            if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+                IntStream.range(0, image.getWidth())
+                         .forEach(xPixelCoord ->
+                                 IntStream
+                                         .range(0, image.getHeight())
+                                         .forEach(yPixelCoord -> {
+                                              int pixel = image.getColor(xPixelCoord, yPixelCoord);
+                                              int temporaryPixel = (pixel &0xff0000) >>16;
+                                              temporaryPixel |= (pixel &0x0000ff) <<16;
+                                              pixel &= ~(0xff0000 |0x0000ff);
+                                              pixel |= temporaryPixel;
+                                              image.setColor(xPixelCoord, yPixelCoord, pixel);
+                                          }));
+            }
+        } catch(IOException e) {
+            throw new InvalidColorMappingException(e);
+        }
+    }
 
     private static String toJsonString(Properties properties, Function<String, String> keyMappingFunction, Predicate<String> arrayValue) {
-        Map<String, Object> propertyMap = new HashMap<>();
+        Map<String, Object> propertyMap = properties.stringPropertyNames().stream()
+                                                    .collect(Collectors.toMap(
+                                                            property -> property,
+                                                            property -> {
+                                                                String[] keys = property.split("\\.");
+                                                                String nestedKey = keyMappingFunction.apply(keys[keys.length -1]);
+                                                                String propertyValue = properties.getProperty(property);
+                                                                Object value = arrayValue.test(nestedKey)
+                                                                        ? propertyValue.split("\\s+")
+                                                                        : propertyValue;
+                                                                return Map.of(nestedKey, value);
+                                                            },
+                                                            (value1, value2) -> {
+                                                                if (value1 instanceof Object[] && value2 instanceof Object[]) {
+                                                                    return Stream
+                                                                            .concat(Arrays.stream((Object[]) value1), Arrays.stream((Object[]) value2))
+                                                                            .toArray();
+                                                                } else {
+                                                                    return new Object[]{value1, value2};
+                                                                }
+                                                            },
+                                                            LinkedHashMap::new ));
 
-        for(String property : properties.stringPropertyNames()) {
-            String[] keys = property.split("\\.");
-            Map<String, Object> nestedProperty = propertyMap;
-            int i;
-
-            for(i = 0; i<keys.length - 1; i++) {
-                String key = keyMappingFunction.apply(keys[i]);
-                Object temporaryComputed = nestedProperty.computeIfAbsent(key, k -> new HashMap<>());
-
-                if(temporaryComputed instanceof Map<?,?>) {
-                    nestedProperty = (Map<String, Object>) temporaryComputed;
-                } else {
-                    Map<String, Object> newNestedProperty = new HashMap<>();
-                    newNestedProperty.put("", temporaryComputed);
-                    nestedProperty.put(key, newNestedProperty);
-                    nestedProperty = newNestedProperty;
-                }
-            }
-            String key = keyMappingFunction.apply(keys[i]);
-            String propertyValue = properties.getProperty(property);
-            Object value = arrayValue.test(key)
-                    ? propertyValue.split("\\s+")
-                    : propertyValue;
-            nestedProperty.merge(key, value, GsonUtils::mergeCompoundKeys);
-        }
         return PROPERTY_GSON.toJson(propertyMap);
     }
+
 
     private static Object mergeCompoundKeys(Object existingValue, Object newValue) {
         if(existingValue  instanceof Map<?,?>) {
