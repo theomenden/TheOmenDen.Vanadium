@@ -4,6 +4,7 @@ import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import vanadium.Vanadium;
 
 import java.util.Set;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 public final class BiomeNameTracer {
-    private static final Logger log = LogManager.getLogger(Vanadium.MOD_ID);
+    private static final Logger log = LogManager.getLogger(Vanadium.MODID);
     private static final Set<Identifier> REMOVED_BIOMES = createRemovedBiomeSet();
     private static final Map<Identifier, Identifier> RENAMED_BIOMES = createRenamedBiomeMap();
 
