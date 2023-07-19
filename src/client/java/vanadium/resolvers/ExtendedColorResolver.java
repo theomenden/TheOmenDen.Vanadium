@@ -20,7 +20,7 @@ public class ExtendedColorResolver implements ColorResolver {
         this.wrappedResolver = createResolver(storage, key, fallbackResolver);
     }
 
-    ExtendedColorResolver(VanadiumResolver wrappedResolver) {
+    public ExtendedColorResolver(VanadiumResolver wrappedResolver) {
         this.yPosition = ThreadLocal.withInitial(CoordinateY::new);
         this.wrappedResolver = wrappedResolver;
     }
