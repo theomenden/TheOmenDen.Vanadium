@@ -14,23 +14,23 @@ import vanadium.util.GsonUtils;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
-
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Collectors;
 
 public class CustomBiomeColorMappingResource implements SimpleSynchronousResourceReloadListener {
     private static final Logger LOGGER = LogManager.getLogger(Vanadium.MODID);
-    private static final Pattern ID_PATTERN = Pattern.compile("[a-z0-9_/.-]+");
+    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[a-zAZ0-9_/.-]+");
 
     private final Identifier identifier;
     private final Identifier optifineIdentifier;
-    private final Identifier additionalOptifineIdentifier;
+    private final Identifier colormaticIdentifier;
+    private final Identifier otherOptifineIdentifier;
 
-    public CustomBiomeColorMappingResource(Identifier identifier) {
-        this.identifier = identifier;
+    public CustomBiomeColorMappingResource() {
+        this.identifier = new Identifier(Vanadium.MODID, "colormap/custom");
+        this.colormaticIdentifier = new Identifier(Vanadium.COLORMATIC_ID, "colormap/custom");
         this.optifineIdentifier = new Identifier("minecraft", "optifine/colormap/custom");
-        this.additionalOptifineIdentifier = new Identifier("minecraft", "optifine/colormap/blocks");
+        this.otherOptifineIdentifier = new Identifier("minecraft", "optifine/colormap/blocks");
     }
-
 
     @Override
     public Identifier getFabricId() {
@@ -40,50 +40,42 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
     @Override
     public void reload(ResourceManager manager) {
         BiomeColorMappings.resetColorMappings();
-        addColormapping(manager, additionalOptifineIdentifier, false);
-        addColormapping(manager, optifineIdentifier, false);
-        addColormapping(manager, identifier, true);
+        addColorMappings(manager, otherOptifineIdentifier, false);
+        addColorMappings(manager, optifineIdentifier, false);
+        addColorMappings(manager, colormaticIdentifier, true);
+        addColorMappings(manager, identifier, true);
     }
 
-    private static void addColormapping(ResourceManager manager, Identifier directory, boolean isJson) {
-        String fileExtension = isJson ? ".json" : ".properties";
+    private static void addColorMappings(ResourceManager manager, Identifier directory, boolean isInJson) {
+        String extension = isInJson? ".json" : ".properties";
+        Collection<Identifier> files = manager.findResources(directory.getPath(),
+                                                      id -> id.getNamespace().equals(directory.getNamespace())
+                                                              && (id.getPath().endsWith(extension) || id.getPath().endsWith(".png")))
+                                              .keySet()
+                                              .stream()
+                                              .map(id -> {
+                                                  String path = id.getPath();
+                                                  if(path.endsWith(".png")) {
+                                                      String standardizedPath = path.substring(0, path.length() - 4) + extension;
+                                                      return new Identifier(id.getNamespace(), standardizedPath);
+                                                  }
+                                                  return id;
+                                              })
+                                              .distinct()
+                                              .collect(Collectors.toList());
 
-        Collection<Identifier> filesToScan = manager
-                .findResources(directory.getPath(),
-                        id -> id
-                                .getNamespace()
-                                .equals(directory.getNamespace())
-                                && (id
-                                .getPath()
-                                .endsWith(fileExtension)
-                                || id
-                                .getPath()
-                                .endsWith("png")))
-                .keySet()
-                .stream()
-                .map(id -> {
-                    String path = id.getPath();
-                    if (path.endsWith(".png")) {
-                        String newPath = path.substring(0, path.length() - 4) + fileExtension;
-                        return new Identifier(directory.getNamespace(), newPath);
-                    }
-                    return id;
-                })
-                .distinct()
-                .collect(toList());
-
-        filesToScan.forEach(id -> {
-            if (!ID_PATTERN
-                    .matcher(id.getPath())
+        files.forEach(file -> {
+            if (!IDENTIFIER_PATTERN
+                    .matcher(file.getPath())
                     .matches()) {
-                LOGGER.warn("Colormapping definition file '{}' does not name a valid resource location. Check with the resource pack author to create an issue, or for asking for a fix.", id);
+                LOGGER.warn("Invalid identifier in custom biome color mappings file: " + file);
             }
             try {
-                ColorMapNativePropertyImage pi = GsonUtils.loadColorMapping(manager, id, true);
-                BiomeColorMap colorMapping = new BiomeColorMap(pi.colormapProperties(), pi.nativeImage());
+                ColorMapNativePropertyImage propertyImage = GsonUtils.loadColorMapping(manager, file, true);
+                BiomeColorMap colorMapping = new BiomeColorMap(propertyImage.colormapProperties(), propertyImage.nativeImage());
                 BiomeColorMappings.addBiomeColorMapping(colorMapping);
             } catch (InvalidColorMappingException e) {
-                LOGGER.warn("Error parsing {} : {}", id, e.getMessage());
+                LOGGER.error("Unable to parse Colormapping {}:{} ", file, e.getMessage());
             }
         });
     }

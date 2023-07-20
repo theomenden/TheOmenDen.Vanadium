@@ -1,22 +1,21 @@
 package vanadium;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.source.BiomeSources;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.dimension.DimensionTypeRegistrar;
 import net.minecraft.world.dimension.DimensionTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.resources.*;
 
 public class Vanadium implements ClientModInitializer {
-    private static final Logger _logger = LogManager.getLogger(Vanadium.class);
+    private static final Logger LOGGER = LogManager.getLogger(Vanadium.class);
     public static final String MODID = "vanadium";
     public static final String COLORMATIC_ID = "colormatic";
     public static final Identifier OVERWORLD_ID = DimensionTypes.OVERWORLD_ID;
@@ -39,7 +38,7 @@ public class Vanadium implements ClientModInitializer {
     public static final GlobalLightMappingResource LIGHTMAP_PROPERTIES = new GlobalLightMappingResource(new Identifier(MODID, "lightmap.json"));
     public static final LightMappingResource LIGHTMAPS = new LightMappingResource(new Identifier(MODID, "lightmap"));
     public static final GlobalColorResource COLOR_PROPERTIES = new GlobalColorResource(new Identifier(MODID, "color"));
-    private static final VanadiumConfig config = VanadiumConfig.DefaultConfiguration;
+    private static VanadiumConfig config = new VanadiumConfig();
 
     public static VanadiumConfig getCurrentConfiguration() {
         return config;
@@ -80,6 +79,34 @@ public class Vanadium implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        VanadiumConfig.deserializeConfigFromJsonAsync()
+                .thenAccept((deserializedConfig) -> {
+                    LOGGER.info("Vanadium configuration initialized...");
+                    config = deserializedConfig;
+                }).exceptionally(ex -> {
+                    LOGGER.error("Vanadium configuration failed to initialize, using default configuration:  {}...", ex.getMessage());
+                    config = VanadiumConfig.INSTANCE;
+                    return null;
+                }).join();
+
+        ResourceManagerHelper client = ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES);
+        client.registerReloadListener(WATER_COLORS);
+        client.registerReloadListener(UNDERWATER_COLORS);
+        client.registerReloadListener(UNDERLAVA_COLORS);
+        client.registerReloadListener(FOG_COLORS);
+        client.registerReloadListener(BIRCH_COLORS);
+        client.registerReloadListener(SPRUCE_COLORS);
+        client.registerReloadListener(REDSTONE_COLORS);
+        client.registerReloadListener(PUMPKIN_STEM_COLORS);
+        client.registerReloadListener(MELON_STEM_COLORS);
+        client.registerReloadListener(MYCELIUM_PARTICLE_COLORS);
+        client.registerReloadListener(LAVA_DROP_COLORS);
+        client.registerReloadListener(DURABILITY_COLORS);
+        client.registerReloadListener(EXPERIENCE_ORB_COLORS);
+        client.registerReloadListener(LIGHTMAP_PROPERTIES);
+        client.registerReloadListener(LIGHTMAPS);
+
+        LOGGER.info("Vanadium initialized!");
 
     }
 }

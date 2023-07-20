@@ -52,7 +52,7 @@ public final class ColorBlending {
 
     public static void generateColors(World world,
                                       ColorResolver colorResolver,
-                                      BiomeColorTypes colorType,
+                                      int colorType,
                                       ColorCache colorCache,
                                       BlendingChunk blendingChunk,
                                       Coordinates coordinates) {

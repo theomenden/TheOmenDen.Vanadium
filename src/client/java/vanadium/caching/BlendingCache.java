@@ -38,7 +38,7 @@ public class BlendingCache {
 
         for(int z = -1; z <=1; ++z){
             for(int x = -1; x <=1; ++x){
-               var key = ColorBlendingCache.getChunkCacheKey(new Coordinates(chunkXCoord + x, 0, chunkZCoord + z), BiomeColorTypes.GRASS);
+               var key = ColorBlendingCache.getChunkCacheKey(new Coordinates(chunkXCoord + x, 0, chunkZCoord + z), BiomeColorTypes.INSTANCE.grass());
 
                BlendingChunk firstChunkToBlendAgainst = invalidatedHashedChunks.get(key);
 
@@ -125,8 +125,12 @@ public class BlendingCache {
 
         invalidatedHashedChunks.remove(chunk.invalidationKey);
     }
+    public BlendingChunk getOrInitializeChunk(Coordinates coordinates, int biomeColorType) {
+        return getOrInitializeChunk(coordinates.x(), coordinates.y(), coordinates.z(), biomeColorType);
+    }
 
-    public BlendingChunk getOrInitializeChunk(int chunkXCoord, int chunkYCoord, int chunkZCoord, BiomeColorTypes biomeColorType) {
+
+    public BlendingChunk getOrInitializeChunk(int chunkXCoord, int chunkYCoord, int chunkZCoord, int biomeColorType) {
         var key = ColorBlendingCache.getChunkCacheKey(new Coordinates(chunkXCoord, chunkYCoord, chunkZCoord), biomeColorType);
 
         lock.lock();
@@ -150,7 +154,7 @@ public class BlendingCache {
             removeChunkFromInvalidation(chunk);
         }
 
-        var invalidationKey = ColorBlendingCache.getChunkCacheKey(new Coordinates(chunkXCoord, 0, chunkZCoord), BiomeColorTypes.GRASS);
+        var invalidationKey = ColorBlendingCache.getChunkCacheKey(new Coordinates(chunkXCoord, 0, chunkZCoord), BiomeColorTypes.INSTANCE.grass());
 
         chunk.key = key;
         chunk.invalidationCounter = invalidationCounter;

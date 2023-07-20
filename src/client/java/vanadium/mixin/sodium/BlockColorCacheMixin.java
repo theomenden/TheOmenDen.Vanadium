@@ -1,4 +1,4 @@
-package vanadium.mixin.client;
+package vanadium.mixin.sodium;
 
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.jellysquid.mods.sodium.client.world.WorldSlice;
@@ -6,7 +6,6 @@ import me.jellysquid.mods.sodium.client.world.biome.BlockColorCache;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.biome.ColorResolver;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.chunk.ChunkSection;
 import org.apache.commons.lang3.Range;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -16,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vanadium.util.ColorCacheUtils;
+import vanadium.util.SodiumColorBlendingUtils;
 
 @Mixin(value = BlockColorCache.class)
 public class BlockColorCacheMixin {
@@ -26,7 +26,7 @@ public class BlockColorCacheMixin {
     @Unique
     private int vanadium$baseZ;
     @Unique
-    private Reference2ReferenceOpenHashMap<ColorResolver, int[]> vanadiumColors;
+    private Reference2ReferenceOpenHashMap<ColorResolver, int[]> vanadium$Colors;
 
     @Shadow
     private WorldSlice slice;
@@ -39,7 +39,7 @@ public class BlockColorCacheMixin {
         this.vanadium$baseY = pos.getY();
         this.vanadium$baseZ = pos.getZ();
 
-        this.vanadiumColors = new Reference2ReferenceOpenHashMap<>();
+        this.vanadium$Colors = new Reference2ReferenceOpenHashMap<>();
     }
 
     /**
@@ -48,7 +48,7 @@ public class BlockColorCacheMixin {
      */
     @Overwrite(remap = false)
     public int getColor(ColorResolver resolver, int x, int y, int z) {
-        int[] colors = this.vanadiumColors.computeIfAbsent(resolver, k -> new int[4096]);
+        int[] colors = this.vanadium$Colors.computeIfAbsent(resolver, k -> new int[4096]);
 
         int blockX = Range.between(0,15).fit(x - this.vanadium$baseX);
         int blockY = Range.between(0,15).fit(x - this.vanadium$baseY);
@@ -60,6 +60,14 @@ public class BlockColorCacheMixin {
 
         if(color == 0) {
             BiomeAccess biomeManager = slice.getBiomeAccess();
+
+            SodiumColorBlendingUtils.generateColors(
+                    biomeManager,
+                    resolver,
+                    x,
+                    y,
+                    z,
+                    colors);
 
             color = colors[index];
         }

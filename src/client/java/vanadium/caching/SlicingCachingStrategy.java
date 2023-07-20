@@ -7,6 +7,7 @@ import vanadium.enums.BiomeColorTypes;
 import vanadium.models.Coordinates;
 
 import java.util.concurrent.locks.Lock;
+import java.util.stream.IntStream;
 
 public abstract class SlicingCachingStrategy<T extends BaseSlice> {
     public final static int AVAILABLE_BUCKETS = 16;
@@ -20,16 +21,16 @@ public abstract class SlicingCachingStrategy<T extends BaseSlice> {
         var countPerBucket = count / AVAILABLE_BUCKETS;
         hashMapStorageContainer = new Long2ObjectLinkedOpenHashMap[AVAILABLE_BUCKETS];
 
-        for (int i = 0; i < AVAILABLE_BUCKETS; ++i) {
-            hashMapStorageContainer[i] = new Long2ObjectLinkedOpenHashMap<>(countPerBucket);
-        }
+        IntStream
+                .range(0, AVAILABLE_BUCKETS)
+                .forEach(i -> hashMapStorageContainer[i] = new Long2ObjectLinkedOpenHashMap<>(countPerBucket));
 
         locks = new Lock[AVAILABLE_BUCKETS];
         var stripedLocks = Striped.lock(AVAILABLE_BUCKETS);
 
-        for(int i = 0; i < AVAILABLE_BUCKETS; ++i) {
-            locks[i] = stripedLocks.get(i);
-        }
+        IntStream
+                .range(0, AVAILABLE_BUCKETS)
+                .forEach(i -> locks[i] = stripedLocks.get(i));
     }
 
     public abstract T createSlice(int sliceSize, int salt);
@@ -73,7 +74,7 @@ public abstract class SlicingCachingStrategy<T extends BaseSlice> {
         slice.releaseReference();
     }
 
-    public final T getOrInitSlice(int sliceSize, Coordinates sliceCoordinates, BiomeColorTypes colorType, boolean shouldTryLocking) {
+    public final T getOrInitSlice(int sliceSize, Coordinates sliceCoordinates, int colorType, boolean shouldTryLocking) {
         long key = ColorBlendingCache.getChunkCacheKey(sliceCoordinates, colorType);
 
         int bucketIndex = getBucketIndex(sliceCoordinates);

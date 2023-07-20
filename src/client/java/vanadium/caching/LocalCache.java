@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 public final class LocalCache {
     public ColorResolver latestColorResolver;
     public BlendingChunk lastBlendedChunk;
-    public BiomeColorTypes lastColorType;
+    public int lastColorType;
 
     public BlendingChunk[] blendedChunks = new BlendingChunk[3];
     public int blendedChunksCount = 3;
@@ -27,21 +27,21 @@ public final class LocalCache {
         return resolved;
     }
 
-    public void putChunkInBlendedCache(BlendingCache cache, BlendingChunk chunk, BiomeColorTypes colorType, ColorResolver resolver) {
-        BlendingChunk previousChunk = this.blendedChunks[colorType.ordinal()];
+    public void putChunkInBlendedCache(BlendingCache cache, BlendingChunk chunk, int colorType, ColorResolver resolver) {
+        BlendingChunk previousChunk = this.blendedChunks[colorType];
 
         this.latestColorResolver = resolver;
         this.lastBlendedChunk = chunk;
         this.lastColorType = colorType;
 
-        cache.releaseChunkFromCache(previousChunk);
+        cache.releaseChunk(previousChunk);
 
-        this.blendedChunks[colorType.ordinal()] = chunk;
+        this.blendedChunks[colorType] = chunk;
     }
 
-    public void reallocateBlendedChunkyArray(BiomeColorTypes colorType) {
+    public void reallocateBlendedChunkyArray(int colorType) {
         int oldBlendedChunksCount = this.blendedChunksCount;
-        int newBlendedChunksCount = colorType.ordinal()+ 1;
+        int newBlendedChunksCount = colorType + 1;
 
         if(newBlendedChunksCount > oldBlendedChunksCount) {
             BlendingChunk[] oldBlendedChunks = this.blendedChunks;

@@ -19,7 +19,6 @@ public class SodiumColorBlendingUtils {
     public static void generateColors(
             BiomeAccess biomeManager,
             ColorResolver resolver,
-            BlendingBuffer buffer,
             int x,
             int z,
             int y,

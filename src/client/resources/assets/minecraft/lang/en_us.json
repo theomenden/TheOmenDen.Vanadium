@@ -1,0 +1,12 @@
+{
+  "options.vanadiumBlendingRadius.17": "17x17 (Burly)",
+  "options.vanadiumBlendingRadius.19": "19x19 (Extensive)",
+  "options.vanadiumBlendingRadius.21": "21x21 (Elephantine)",
+  "options.vanadiumBlendingRadius.23": "23x23 (Enormous)",
+  "options.vanadiumBlendingRadius.25": "25x25 (Mammoth)",
+  "options.vanadiumBlendingRadius.27": "27x27 (Immense)",
+  "options.vanadiumBlendingRadius.29": "29x29 (Brobdingnagian)",
+  "options.vanadiumBlendingRadiusTooltip": "Vanadium defaults and uses 29x29",
+  "v.biomeBlendRadius" : "Vanadium Biome Blending",
+  "v.biomeBlendRadius.tooltip" : "Controls the blend radius used by Vanadium"
+}

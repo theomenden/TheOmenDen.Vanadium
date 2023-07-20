@@ -16,14 +16,14 @@ public final class ColorCacheUtils {
         return getArrayIndex(dimension, coordinates.x(), coordinates.y(), coordinates.z());
     }
 
-    public static long getChunkKey(int chunkX, int chunkY, int chunkZ, BiomeColorTypes colorType) {
+    public static long getChunkKey(int chunkX, int chunkY, int chunkZ, int colorType) {
         return ((long)(chunkX & PRESERVED_30_BITS)) |
                ((long)(chunkZ & PRESERVED_30_BITS) << 26) |
                ((long)(chunkY & 0x1F) << 52) |
-               ((long)(colorType.ordinal() << 57));
+               ((long)(colorType << 57));
     }
 
-    public static long getChunkKey(Coordinates coordinates, BiomeColorTypes colorType) {
+    public static long getChunkKey(Coordinates coordinates, int colorType) {
         return getChunkKey(coordinates.x(), coordinates.y(), coordinates.z(), colorType);
     }
 }

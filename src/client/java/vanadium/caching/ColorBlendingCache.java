@@ -15,10 +15,10 @@ public final class ColorBlendingCache {
         return x + y * dimension + z * (int)Math.pow(dimension, 2);
     }
 
-    public static long getChunkCacheKey(Coordinates coordinates, BiomeColorTypes colorType) {
+    public static long getChunkCacheKey(Coordinates coordinates, int colorType) {
         return ((long)(coordinates.x() & representationSize)) |
                 ((long)(coordinates.z() & representationSize) << 26) |
                 ((long)(coordinates.y() & 0x1F) << 52) |
-                ((long)colorType.ordinal() << 57);
+                ((long)colorType << 57);
     }
 }

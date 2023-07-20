@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import vanadium.Vanadium;
 
 
 @Mixin(RedstoneWireBlock.class)
@@ -25,8 +26,8 @@ public abstract class RedstoneWireMixin extends Block {
 
     @Inject(method= "getWireColor", at = @At("HEAD"), cancellable = true)
     private static void onWireColorChange(int power, CallbackInfoReturnable<Integer> cir){
-       if(Vanadium.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
-           info.setReturnValue(Vanadium.REDSTONE_COLOR_MAPPINGS.getboundColorForPower(power));
+       if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
+           cir.setReturnValue(Vanadium.REDSTONE_COLORS.getColorAtIndex(power));
        }
     }
 
@@ -34,18 +35,18 @@ public abstract class RedstoneWireMixin extends Block {
             method= "randomDisplayTick",
             at = @At (
                     value = "FIELD",
-                    target="Lnet/minecraft/block/Block;randomDisplayTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V",
+                    target="Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;",
                     ordinal = 0
             ),
             locals = LocalCapture.CAPTURE_FAILHARD,
             cancellable = true
     )
-    private void onRandomDisplayTick(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
-        if(Vanadium.REDSTONE_COLOR_MAPPINGS.hasCustomColors()) {
+    private void onRandomDisplayTick(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci, int power) {
+        if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
             double x = pos.getX() + 0.5 + (random.nextFloat() - 0.5)*0.2;
             double y = ((float)pos.getY() + 0.0625f);
             double z = pos.getZ() + 0.5 + (random.nextFloat() - 0.5)*0.2;
-            int color = Vanadium.REDSTONE_COLOR_MAPPINGS.getboundColorForPower(power);
+            int color = Vanadium.REDSTONE_COLORS.getColorAtIndex(power);
             float r = ((color >> 16) & 0xff) / 255.0f;
             float g = ((color >> 8) & 0xff) / 255.0f;
             float b = (color & 0xff) / 255.0f;
