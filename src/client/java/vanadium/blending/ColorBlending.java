@@ -1,11 +1,14 @@
 package vanadium.blending;
 
+import com.ibm.icu.impl.Utility;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.ColorResolver;
 import org.apache.commons.lang3.Range;
+import vanadium.VanadiumBlendingClient;
 import vanadium.caching.ColorCache;
-import vanadium.enums.BiomeColorTypes;
 import vanadium.models.Coordinates;
+import vanadium.util.LinearCongruentialGenerator;
+import vanadium.util.MathUtils;
 
 public final class ColorBlending {
     public static final int SAMPLE_X_SEED = 1664525;
@@ -50,13 +53,26 @@ public final class ColorBlending {
         return result;
     }
 
+    public static int getRandomSamplePosition(int minimum, int blockSizeLogBase2, int seed) {
+        int blockMask = MathUtils.lowerBitMask(blockSizeLogBase2);
+
+        int seededValue = (minimum ^ seed) + seed;
+
+        int random = LinearCongruentialGenerator.generateRandomNoise(seededValue)
+                                                .findFirst()
+                                                .getAsInt();
+
+        int offset = random & blockMask;
+        return minimum + offset;
+    }
+
     public static void generateColors(World world,
                                       ColorResolver colorResolver,
                                       int colorType,
                                       ColorCache colorCache,
                                       BlendingChunk blendingChunk,
                                       Coordinates coordinates) {
-        final int blendingRadius = VanadiumClient.getBlendingRadiusForBiome();
+        final int blendingRadius = VanadiumBlendingClient.getBlendingRadiusForBiome();
         if(Range.between(BlendingConfig.BIOME_MINIMUM_BLENDING_RADIUS, BlendingConfig.BIOME_MAXIMUM_BLENDING_RADIUS)
                 .contains(blendingRadius)) {
             BlendingBuffer blendingBuffer = acquireBlendingBuffer(blendingRadius);

@@ -2,7 +2,7 @@ package vanadium.resolvers;
 
 import net.minecraft.fluid.Fluid;
 import vanadium.Vanadium;
-import vanadium.mixin.client.BlockColorsAccessor;
+import vanadium.mixin.block.BlockColorsAccessor;
 import vanadium.models.Coordinates;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

@@ -6,8 +6,8 @@
 		"ClientWorldMixin",
       "vanadium.mixin.sodium.BlockColorCacheMixin",
       "vanadium.mixin.block.LeverMixin",
-		"RedstoneWireMixin",
-		"BlockColorsAccessor",
+      "vanadium.mixin.block.RedstoneWireMixin",
+		"vanadium.mixin.block.BlockColorsAccessor",
 		"BlockRenderCacheMixin"
 	],
 	"injectors": {

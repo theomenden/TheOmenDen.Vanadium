@@ -1,12 +1,10 @@
 package vanadium.colormapping;
 
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
@@ -16,11 +14,9 @@ import vanadium.models.Coordinates;
 import vanadium.models.VanadiumColor;
 import vanadium.properties.ColorMappingProperties;
 import vanadium.resolvers.ExtendedColorResolver;
-import vanadium.resolvers.VanadiumRegistryResolver;
 import vanadium.resolvers.VanadiumResolver;
 import vanadium.util.ColumnBounds;
 
-import java.util.Random;
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
 

@@ -1,9 +1,7 @@
 package vanadium.util;
 
-import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.Range;
 
-import java.util.Random;
 import java.util.random.RandomGenerator;
 
 public class MathUtils {
@@ -22,6 +20,13 @@ public class MathUtils {
         green = Range.between(0,255).fit(green);
         blue = Range.between(0,255).fit(blue);
         return createColor(red, green, blue);
+    }
+
+    public static int lowerBitMask(int bitCount)
+    {
+        int result = (1 << bitCount) - 1;
+
+        return result;
     }
 
     public static double radiansToDegrees(float measurementInRadians) {

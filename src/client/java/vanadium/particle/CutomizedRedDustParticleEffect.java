@@ -33,6 +33,6 @@ public class CutomizedRedDustParticleEffect extends DustParticleEffect {
     }
 
     private int getFullPoweredColor() {
-        return Vanadium.REDSTONE_COLORS.getColorBounded(115);
+        return Vanadium.REDSTONE_COLORS.getColorAtIndex(15);
     }
 }

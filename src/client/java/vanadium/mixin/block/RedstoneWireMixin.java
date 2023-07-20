@@ -1,4 +1,4 @@
-package vanadium.mixin.client;
+package vanadium.mixin.block;
 
 
 import net.minecraft.block.Block;
