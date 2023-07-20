@@ -34,11 +34,11 @@ public class VanadiumConfigScreen extends Screen {
     }
 
     private static String getTranslationKey(String key) {
-        return "options.chromatiq." + key;
+        return "options.vanadium." + key;
     }
 
     private static String getTooltipKey(String key) {
-        return key+".tooltip";
+        return key+ ".tooltip";
     }
 
     private ButtonWidget.ToolTipSupplier createDefaultTooltipSupplier(StringVisitable text) {

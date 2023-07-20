@@ -1,4 +1,20 @@
 {
+  "vanadium.config.title": "Vanadium Configuration",
+  "vanadium.config.title.subtitle": "Vanadium Options",
+  "vanadium.config.category.fog": "Fog & Sky",
+  "vanadium.config.category.light": "Lighting",
+  "vanadium.config.option.clearSky": "Clear Skies",
+  "vanadium.config.option.clearSky.desc": "Use the sky color for fog.",
+  "vanadium.config.option.clearVoid": "Clear Void",
+  "vanadium.config.option.clearVoid.desc": "Don't render the void, even when below sea level.",
+  "vanadium.config.option.blendSkyLight": "Smooth Transitions",
+  "vanadium.config.option.blendSkyLight.desc": "Blend sky light smoothly during sunrise and sunset.",
+  "vanadium.config.option.flickerBlockLight": "Block Light Flicker",
+  "vanadium.config.option.flickerBlockLight.desc": "Allow block light to flicker.",
+  "vanadium.config.option.relativeBlockLightIntensity": "Block Light Intensity",
+  "vanadium.config.option.relativeBlockLightIntensity.desc": "The intensity of block light relative to sky light. Lower values make block light dimmer in ambient light.",
+  "vanadium.config.biomeBlendRadius" : "Vanadium Biome Blending",
+  "vanadium.config.biomeBlendRadius.tooltip" : "Controls the blend radius used by Vanadium",
   "options.vanadiumBlendingRadius.17": "17x17 (Burly)",
   "options.vanadiumBlendingRadius.19": "19x19 (Extensive)",
   "options.vanadiumBlendingRadius.21": "21x21 (Elephantine)",
@@ -6,7 +22,5 @@
   "options.vanadiumBlendingRadius.25": "25x25 (Mammoth)",
   "options.vanadiumBlendingRadius.27": "27x27 (Immense)",
   "options.vanadiumBlendingRadius.29": "29x29 (Brobdingnagian)",
-  "options.vanadiumBlendingRadiusTooltip": "Vanadium defaults and uses 29x29",
-  "v.biomeBlendRadius" : "Vanadium Biome Blending",
-  "v.biomeBlendRadius.tooltip" : "Controls the blend radius used by Vanadium"
+  "options.vanadiumBlendingRadiusTooltip": "Vanadium defaults and uses 29x29"
 }
