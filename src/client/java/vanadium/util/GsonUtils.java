@@ -69,7 +69,7 @@ public class GsonUtils {
     }
 
     public static ColorMapNativePropertyImage loadColorMapping(ResourceManager resourceManager, Identifier identifier, boolean isCustom) {
-        ColorMappingProperties properties = ColorMappingProperties.load(resourceManager, identifier,isCustom);
+        ColorMappingProperties properties = ColorMappingProperties.loadProperties(resourceManager, identifier,isCustom);
 
         if(properties.getFormat() == Format.FIXED) {
             return new ColorMapNativePropertyImage(properties, null);

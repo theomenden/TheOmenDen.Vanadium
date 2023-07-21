@@ -9,7 +9,7 @@ public final class VanadiumColorResolverCustomCompatibility {
     public static final ReentrantLock lock = new ReentrantLock();
     public static final ConcurrentHashMap<ColorResolver, Integer> currentKnownColorResolvers = new ConcurrentHashMap<>();
 
-    public static int nextColorResolverId = BiomeColorTypes.FOLIAGE.ordinal() + 1;
+    public static int nextColorResolverId = BiomeColorTypes.INSTANCE.foliage() + 1;
 
     public static int nextColorResolverId() {
         int result = nextColorResolverId++;

@@ -202,11 +202,11 @@ public class ColorMappingProperties {
      }
 
      if(settings.format == null) {
-         settings.format = Vanadium.COLOR_PROPERTIES.getProperties().getDefaultFormatting();
+         settings.format = Vanadium.COLOR_PROPERTIES.getProperties().getDefaultFormat();
      }
 
      if(settings.layout == null) {
-         settings.layout = Vanadium.COLOR_PROPERTIES.getProperties().getDefaultLayout();
+         settings.layout = Vanadium.COLOR_PROPERTIES.getProperties().getDefaultColumnLayout();
      }
 
      if(isCustom

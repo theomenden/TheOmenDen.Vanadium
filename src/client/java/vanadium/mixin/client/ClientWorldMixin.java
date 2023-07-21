@@ -8,6 +8,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
@@ -27,6 +28,7 @@ import vanadium.blending.BlendingChunk;
 import vanadium.blending.BlendingConfig;
 import vanadium.blending.ColorBlending;
 import vanadium.caching.BlendingCache;
+import vanadium.caching.ColorBlendingCache;
 import vanadium.caching.ColorCache;
 import vanadium.caching.LocalCache;
 import vanadium.enums.BiomeColorTypes;
@@ -60,66 +62,72 @@ public abstract class ClientWorldMixin extends World {
     }
 
     @Inject(method="reloadColor", at = @At("HEAD"))
-    public void onClearColorCaches(CallbackInfo ci) {
+    public void onReloadColorCaches(CallbackInfo ci) {
         vanadium$blendedColorCache.invalidateAllChunks();
 
-        int blendingRadius = VanadiumBlendingClient.vanadiumBlendingRadius.getValue();
+        int blendingRadius = VanadiumBlendingClient.getBlendingRadius();
         vanadium$chunkColorCache.invalidateAllCachesInRadius(blendingRadius);
     }
 
-    public int getBlockTint(BlockPos blockPosition, ColorResolver colorResolver) {
+    @Inject(method="resetChunkColor", at= @At("HEAD"))
+    public void onResetChunkColor(ChunkPos chunkPos, CallbackInfo ci) {
+        vanadium$blendedColorCache.invalidateChunk(chunkPos.x, chunkPos.z);
+    }
 
-        Coordinates coordinates = new Coordinates(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-        Coordinates chunkCoordinates = new Coordinates(coordinates.x() >> 4, coordinates.y() >> 4, coordinates.z() >> 4);
-        Coordinates blockCoordinates = new Coordinates(coordinates.x() & 15, coordinates.y() & 15, coordinates.z() & 15);
+
+    /**
+     * @author
+     * @reason
+     */
+    @Overwrite
+    public int getColor(BlockPos blockPosIn, ColorResolver colorResolverIn) {
+        final Coordinates baseCoordinates = new Coordinates(blockPosIn.getX(), blockPosIn.getY(), blockPosIn.getZ());
+        final Coordinates chunkCoordinates = new Coordinates(baseCoordinates.x() >> 4, baseCoordinates.y() >> 4, baseCoordinates.z() >> 4);
+        final Coordinates blockCoordinates = new Coordinates(baseCoordinates.x() & 15, baseCoordinates.y() & 15, baseCoordinates.z() & 15);
 
         LocalCache localCache = vanadium$threadLocalCache.get();
 
         BlendingChunk chunk = null;
         int colorType;
 
-        if(localCache.latestColorResolver == colorResolver) {
+        if(localCache.latestColorResolver == colorResolverIn) {
             colorType = localCache.lastColorType;
-            long key = ColorCacheUtils.getChunkKey(chunkCoordinates, colorType);
+            long key = ColorBlendingCache.getChunkCacheKey(chunkCoordinates, colorType);
 
             if(localCache.lastBlendedChunk.key == key) {
                 chunk = localCache.lastBlendedChunk;
             }
         } else {
+            colorType = calculateColorType(colorResolverIn, localCache);
 
-            colorType = calculateColorType(colorResolver);
+            long key = ColorBlendingCache.getChunkCacheKey(chunkCoordinates, colorType);
 
+            BlendingChunk cachedChunk = localCache.blendedChunks[colorType];
+
+            if(cachedChunk.key == key) {
+                chunk = cachedChunk;
+            }
         }
 
         if(chunk == null) {
             chunk = vanadium$blendedColorCache.getOrInitializeChunk(chunkCoordinates, colorType);
 
-            localCache.putChunkInBlendedCache(vanadium$blendedColorCache, chunk, colorType, colorResolver);
+            localCache.putChunkInBlendedCache(vanadium$blendedColorCache, chunk, colorType, colorResolverIn);
         }
 
-        int index = ColorCacheUtils.getArrayIndex(16, blockCoordinates);
+        int index = ColorBlendingCache.getArrayIndex(16, blockCoordinates);
 
         int color = chunk.data[index];
 
         if(color == 0) {
-            ColorBlending.generateColors(this, colorResolver, colorType, vanadium$chunkColorCache, chunk, coordinates );
-
-            color = chunk.data[index];
+            ColorBlending.generateColors(this, colorResolverIn, colorType, vanadium$chunkColorCache, chunk, baseCoordinates);
         }
 
         return color;
     }
 
-    @Inject(method = "isChunkLoaded", at = @At("HEAD"))
-    public void isChunkLoaded(int x, int z, CallbackInfoReturnable<Boolean> cir) {
-        if (this.getChunkManager().isChunkLoaded(x, z)) {
-            cir.setReturnValue(true);
 
-
-        }
-    }
-
-    private static int calculateColorType(ColorResolver colorResolver) {
+    private static int calculateColorType(ColorResolver colorResolver, LocalCache localCache) {
         if(colorResolver == BiomeColors.GRASS_COLOR) {
             return BiomeColorTypes.INSTANCE.grass();
         }
@@ -132,6 +140,12 @@ public abstract class ClientWorldMixin extends World {
             return BiomeColorTypes.INSTANCE.foliage();
         }
 
-        return VanadiumColorResolverCustomCompatibility.getcolorType(colorResolver);
+        int resolvedColorType = VanadiumColorResolverCustomCompatibility.getcolorType(colorResolver);
+
+        if(resolvedColorType >= localCache.blendedChunksCount) {
+            localCache.reallocateBlendedChunkyArray(resolvedColorType);
+        }
+
+        return resolvedColorType;
     }
 }

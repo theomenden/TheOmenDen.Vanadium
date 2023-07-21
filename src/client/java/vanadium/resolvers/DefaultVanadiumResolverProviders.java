@@ -12,14 +12,17 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
-public record DefaultVanadiumResolverProviders {
+public final class DefaultVanadiumResolverProviders {
 
-    public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER;
-    public static final VanadiumResolverProvider<Block> BLOCK_PROVIDER;
-    public static final VanadiumResolverProvider<Identifier> SKY_PROVIDER;
-    public static final VanadiumResolverProvider<Identifier> SKY_FOG_PROVIDER;
+    public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER = DefaultVanadiumResolverProviders::resolveByBlockState;
+    public static final VanadiumResolverProvider<Block> BLOCK_PROVIDER = DefaultVanadiumResolverProviders::resolveByBlock;
+    public static final VanadiumResolverProvider<Identifier> SKY_PROVIDER = DefaultVanadiumResolverProviders::resolveBySky;
+    public static final VanadiumResolverProvider<Identifier> SKY_FOG_PROVIDER = DefaultVanadiumResolverProviders::resolveByFog;
     public static final VanadiumResolverProvider<Fluid> FLUID_FOG_PROVIDER = key -> (manager, biome, coordinates) -> -1;
 
+    private DefaultVanadiumResolverProviders() {
+
+    }
 
     private static VanadiumResolver resolveByBlockState(BlockState key) {
         return (manager, biome, coordinates) -> {
@@ -50,7 +53,7 @@ public record DefaultVanadiumResolverProviders {
 
            if(Vanadium.SKY_COLORS.hasCustomColorMapping()
            && key.equals(Vanadium.OVERWORLD_ID)) {
-               color = Vanadium.SKY_COLORS.getColorMapping().getColor(manager, biome, new Coordinates(coordinates.x(), coordinates.y(), coordinates.y()));
+               color = Vanadium.SKY_COLORS.getColorMapping().getColorAtCoordinatesForBiomeByManager(manager, biome, coordinates);
            } else {
                color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionSky(key);
 
@@ -68,7 +71,7 @@ public record DefaultVanadiumResolverProviders {
 
             if(Vanadium.FOG_COLORS.hasCustomColorMapping()
             && key.equals(Vanadium.OVERWORLD_ID)) {
-                color = 0xff000000 | Vanadium.FOG_COLORS.getColorMapping().getColor(manager, biome, (Coordinates)coordinates);
+                color = 0xff000000 | Vanadium.FOG_COLORS.getColorMapping().getColorAtCoordinatesForBiomeByManager(manager, biome, coordinates);
             } else {
                 color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionFog(key);
 

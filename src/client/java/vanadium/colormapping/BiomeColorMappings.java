@@ -48,20 +48,27 @@ public final class BiomeColorMappings {
         colorMappingsByState.addColorMapping(biomeColorMap, properties.getApplicableBlockStates(), biomes);
         colorMappingsByBlock.addColorMapping(biomeColorMap, properties.getApplicableBlocks, biomes);
 
-        for(Map.Entry<Identifier, Collection<Identifier>> entry: properties.getApplicableSpecialIds()
-                                                                           .entrySet()) {
-            switch(entry.getKey().toString()) {
-                case "vanadium:sky", "colormatic:sky" -> skyColorMappings.addColorMapping(biomeColorMap, entry.getValue(), biomes);
-                case "vanadium:sky_fog", "colormatic:sky_fog" -> skyFogColorMappings.addColorMapping(biomeColorMap, entry.getValue(), biomes);
-                case "vanadium:fluid_fog", "colormatic:fluid_fog" -> {
-                    Collection<Fluid> fluids = entry.getValue()
-                                                    .stream()
-                                                    .map(Registries.FLUID::get)
-                                                    .collect(Collectors.toList());
-                    colorMappingsByFluidFog.addColorMapping(biomeColorMap, fluids, biomes);
-                }
-            }
-        }
+        properties
+                .getApplicableSpecialIds()
+                .entrySet()
+                .forEach(entry -> {
+                    switch (entry
+                            .getKey()
+                            .toString()) {
+                        case "vanadium:sky", "colormatic:sky" ->
+                                skyColorMappings.addColorMapping(biomeColorMap, entry.getValue(), biomes);
+                        case "vanadium:sky_fog", "colormatic:sky_fog" ->
+                                skyFogColorMappings.addColorMapping(biomeColorMap, entry.getValue(), biomes);
+                        case "vanadium:fluid_fog", "colormatic:fluid_fog" -> {
+                            Collection<Fluid> fluids = entry
+                                    .getValue()
+                                    .stream()
+                                    .map(Registries.FLUID::get)
+                                    .collect(Collectors.toList());
+                            colorMappingsByFluidFog.addColorMapping(biomeColorMap, fluids, biomes);
+                        }
+                    }
+                });
     }
 
     public static void resetColorMappings() {

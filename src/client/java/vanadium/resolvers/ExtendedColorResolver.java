@@ -56,7 +56,7 @@ public class ExtendedColorResolver implements ColorResolver {
 
             var colorMapping = storedData.lastColorMapping;
             return colorMapping != null
-                    ? colorMapping.getColorRegistryForDynamicPosition(manager, biome, coordinates)
+                    ? colorMapping.getColorAtCoordinatesForBiomeByManager(manager, biome, coordinates)
                     : fallbackResolver.getColorAtCoordinatesForBiomeByManager(manager, biome, coordinates);
         };
     }

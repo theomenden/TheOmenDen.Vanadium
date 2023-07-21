@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.processing.SupportedAnnotationTypes;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -37,6 +38,7 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
 
 
     @Override
+    @SuppressWarnings("Deprecated")
     public CompletableFuture<int[]> load(ResourceManager manager, Profiler profiler, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -59,6 +61,7 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
         return colorMapping != null;
     }
 
+    @SuppressWarnings("Deprecated")
     @Nullable
     private int[] attemptToLoadFromOptifineDirectory(ResourceManager manager) {
         try {

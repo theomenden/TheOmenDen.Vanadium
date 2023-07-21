@@ -1,21 +1,37 @@
 package vanadium.mixin.client;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.gui.screen.option.SimpleOptionsScreen;
 import net.minecraft.client.gui.screen.option.VideoOptionsScreen;
+import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.Text;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import vanadium.VanadiumBlendingClient;
 
 @Mixin(value = VideoOptionsScreen.class)
-public abstract class VideoOptionsScreenMixin extends SimpleOptionsScreen {
-    @Shadow
-    private SimpleOption option;
+public abstract class VideoOptionsScreenMixin extends GameOptionsScreen {
+    @Unique
+    @Final
+    protected GameOptions gameOptions;
 
+    public VideoOptionsScreenMixin(Screen screen, GameOptions options, Text title) {
+        super(screen,options,title);
+    }
 
-    public VideoOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title, SimpleOption<?>[] options) {
-        super(parent, gameOptions, title, options);
+    @ModifyArg(method = "init",
+    at = @At(value = "INVOKE",
+    target = "Lnet/minecraft/client/gui/screen/option/VideoOptionsScreen;getOptions(Lnet/minecraft/client/option/GameOptions;)[Lnet/minecraft/client/option/SimpleOption;"))
+    protected GameOptions onInit(GameOptions gameOptions) {
+
+        if(gameOptions.getBiomeBlendRadius() == this.gameOptions.getBiomeBlendRadius()) {
+            gameOptions.getBiomeBlendRadius().setValue(VanadiumBlendingClient.getBlendingRadius());
+        }
+
+        return gameOptions;
     }
 }

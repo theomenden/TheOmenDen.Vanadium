@@ -1,5 +1,6 @@
 package vanadium.properties;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.registry.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
@@ -40,7 +41,7 @@ private DefaultColumns(){}
     throw new IllegalStateException(message);
 }
 
-public static ColumnBounds getOptifineBoundaries(RegistryKey<Biome> biomeKey, Registry<Biome> biomeRegistry) {
+public static ColumnBounds getOptifineBoundaries(RegistryKey<Biome> biomeKey, Registry<? extends Codec> biomeRegistry) {
     var bounds = currentColumns.get(biomeKey.getValue());
 
     if(bounds!= null){
@@ -51,7 +52,7 @@ public static ColumnBounds getOptifineBoundaries(RegistryKey<Biome> biomeKey, Re
     return new ColumnBounds(rawId, 1);
 }
 
-public static ColumnBounds getLegacyBoundaries(RegistryKey<Biome> biomeKey, Registry<Biome> biomeRegistry, boolean isUsingOptifine) {
+public static ColumnBounds getLegacyBoundaries(RegistryKey<Biome> biomeKey, Registry<? extends Codec> biomeRegistry, boolean isUsingOptifine) {
     var bounds = legacyColumns.get(biomeKey.getValue());
 
     if(bounds!= null){
