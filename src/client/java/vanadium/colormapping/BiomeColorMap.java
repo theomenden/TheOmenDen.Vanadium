@@ -1,13 +1,19 @@
 package vanadium.colormapping;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Lifecycle;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.*;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryOwner;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.world.biome.source.BiomeSource;
 import org.apache.commons.lang3.Range;
 import vanadium.Vanadium;
 import vanadium.models.Coordinates;
@@ -49,7 +55,7 @@ public class BiomeColorMap implements VanadiumResolver {
                 float rain = Range.between(0.0F, 1.0F).fit(biome.weather.downfall());
                 return getColorMap(temp, rain);
             case GRID:
-                ColumnBounds columnBounds = properties.getColumn(Vanadium.getBiomeKey(manager, biome), manager.get(RegistryKeys.BIOME_SOURCE));
+                ColumnBounds columnBounds = properties.getColumn(Vanadium.getBiomeKey(manager, biome), manager.get(RegistryKeys.BIOME));
                 @SuppressWarnings({"removal", "deprecation"})
                 double fraction = Biome.FOLIAGE_NOISE.sample(coordinates.x() * 0.0225, coordinates.z() * 0.0225, false);
                 fraction = (fraction + 1.0) * 0.5;
@@ -65,6 +71,10 @@ public class BiomeColorMap implements VanadiumResolver {
                 return getDefaultColor();
         }
         throw new AssertionError();
+    }
+
+    public ColorMappingProperties getProperties() {
+        return properties;
     }
 
     public int getDefaultColor() {
@@ -99,7 +109,8 @@ public class BiomeColorMap implements VanadiumResolver {
             case VANILLA: return this.imageColorMapping.getColor(128,128);
             case GRID:
                 try{
-                int x = properties.getColumn(BiomeKeys.PLAINS, Registries.BIOME_SOURCE).Column();
+                    SimpleDefaultedRegistry<Biome> biomeRegistry = new SimpleDefaultedRegistry<>(BiomeKeys.PLAINS.getValue().toString(), RegistryKeys.BIOME, Lifecycle.stable(), false);
+                int x = properties.getColumn(BiomeKeys.PLAINS, biomeRegistry ).Column();
                 int y = Range.between(0, imageColorMapping.getHeight() - 1).fit(63 - properties.getYOffset());
                 return imageColorMapping.getColor(x, y);
             } catch(IllegalArgumentException e) {
@@ -110,5 +121,4 @@ public class BiomeColorMap implements VanadiumResolver {
         }
         throw new AssertionError("Unknown color mapping format: " + properties.getFormat());
     }
-
 }

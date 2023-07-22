@@ -46,7 +46,7 @@ public final class BiomeColorMappings {
         ColorMappingProperties properties = biomeColorMap.getProperties();
         Set<Identifier> biomes = properties.getApplicableBiomes();
         colorMappingsByState.addColorMapping(biomeColorMap, properties.getApplicableBlockStates(), biomes);
-        colorMappingsByBlock.addColorMapping(biomeColorMap, properties.getApplicableBlocks, biomes);
+        colorMappingsByBlock.addColorMapping(biomeColorMap, properties.getApplicableBlocks(), biomes);
 
         properties
                 .getApplicableSpecialIds()

@@ -1,7 +1,5 @@
 package vanadium.util;
 
-import org.apache.commons.lang3.Range;
-
 import java.util.random.RandomGenerator;
 
 public class MathUtils {
@@ -9,24 +7,21 @@ public class MathUtils {
     public static final float PI2 = (float) (Math.PI * 2);
     public static final int ALPHA = 255 << 24;
     public static final float PHI = (float) (Math.PI * (3 - Math.sqrt(5)) * 0.5);
+    public static final float INV_255 = 1.0f/255.0f;
+    public static final float INV_12_92 = 1.0f/12.92f;
+    public static final float INV_1_055 = 1.0f/1.055f;
+    public static final double INV_2_4 = 1.0/2.4;
 
-    public static int createColor(int r, int g, int b) {
-        int rgb = (r << 16) | (g << 8) | b;
-        return ColorConverter.rgbToArgb(rgb, ALPHA);
-    }
 
-    public static int getColorClamp(int red, int green, int blue) {
-        red = Range.between(0,255).fit(red);
-        green = Range.between(0,255).fit(green);
-        blue = Range.between(0,255).fit(blue);
-        return createColor(red, green, blue);
-    }
-
-    public static int lowerBitMask(int bitCount)
+    public static int createLowerBitMask(int bitCount)
     {
         int result = (1 << bitCount) - 1;
 
         return result;
+    }
+
+    public static int getLowerBits(int value, int bitCount) {
+        return value & createLowerBitMask(bitCount);
     }
 
     public static double radiansToDegrees(float measurementInRadians) {

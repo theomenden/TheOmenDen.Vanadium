@@ -1,15 +1,14 @@
 package vanadium;
 
-import com.mojang.brigadier.CommandDispatcher;
-import me.jellysquid.mods.sodium.client.gui.options.control.ControlElement;
-import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
-import net.minecraft.client.option.SimpleOption;
+import me.jellysquid.mods.sodium.client.gui.options.Option;
+import vanadium.resources.VanadiumOptionsStorage;
 
 public final class VanadiumBlendingClient {
 
-    public static SimpleOption<Integer> vanadiumBiomeBlendRadius = new SimpleOption<>();
+    private static final VanadiumOptionsStorage  vanadiumOptions = new VanadiumOptionsStorage();
+    public static Option<Integer> vanadiumBiomeBlendRadius;
 
     public static int getBlendingRadius() {
-        return vanadiumBiomeBlendRadius.get();
+        return vanadiumBiomeBlendRadius.getValue().intValue();
     }
 }

@@ -74,7 +74,13 @@ public abstract class SlicingCachingStrategy<T extends BaseSlice> {
         slice.releaseReference();
     }
 
-    public final T getOrInitSlice(int sliceSize, Coordinates sliceCoordinates, int colorType, boolean shouldTryLocking) {
+    public final T getOrInitSliceByCoordinates(int slizeSize, int x, int y, int z, int colorType, boolean shouldTryLocking)
+     {
+        Coordinates sliceCoordinates = new Coordinates(x, y, z);
+
+        return getOrInitSlice(sliceSize, sliceCoordinates, colorType, shouldTryLocking);
+    }
+    public final T getOrInitSlice(int sliceSize, Coordinates sliceCoordinates, int colorType, boolean shouldTryLocking){
         long key = ColorBlendingCache.getChunkCacheKey(sliceCoordinates, colorType);
 
         int bucketIndex = getBucketIndex(sliceCoordinates);

@@ -91,6 +91,12 @@ public class GsonUtils {
                                               image.setColor(xPixelCoord, yPixelCoord, pixel);
                                           }));
             }
+
+            if(properties.getFormat() == Format.VANILLA
+            && (image.getWidth() != 256 || image.getHeight() != 256)) {
+                throw new InvalidColorMappingException("Vanilla Colormap dimensions must be 256x256");
+            }
+            return new ColorMapNativePropertyImage(properties, image);
         } catch(IOException e) {
             throw new InvalidColorMappingException(e);
         }

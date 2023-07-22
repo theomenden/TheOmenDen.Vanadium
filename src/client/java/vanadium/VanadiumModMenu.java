@@ -5,6 +5,6 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 public class VanadiumModMenu implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return parent -> new VanadiumConfigScreen(parent);
+        return parent -> new VanadiumConfigScreen(parent, VanadiumConfig.INSTANCE);
     }
 }
