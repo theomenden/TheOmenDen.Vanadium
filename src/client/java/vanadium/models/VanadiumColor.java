@@ -1,7 +1,6 @@
 package vanadium.models;
 
 import org.apache.commons.lang3.Range;
-import vanadium.util.ColorConverter;
 
 public record VanadiumColor(int rgb) {
 

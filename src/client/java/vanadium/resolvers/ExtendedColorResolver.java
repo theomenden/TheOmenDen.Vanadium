@@ -2,6 +2,8 @@ package vanadium.resolvers;
 
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +13,7 @@ import vanadium.models.NonBlockingThreadLocal;
 import vanadium.util.ColorMappingStorage;
 
 public class ExtendedColorResolver implements ColorResolver {
-    @Nullable private static  DynamicRegistryManager registryManager;
+    @Nullable private static  RegistryAccess.ImmutableRegistryAccess registryManager;
     private final ThreadLocal<CoordinateY> yPosition;
     private final VanadiumResolver wrappedResolver;
 
@@ -25,9 +27,9 @@ public class ExtendedColorResolver implements ColorResolver {
         this.wrappedResolver = wrappedResolver;
     }
 
-    public int resolveExtendedColor( world, BlockPos position) {
+    public int resolveExtendedColor(BlockAndTintGetter world, BlockPos position) {
         this.yPosition.get().y = position.getY();
-        return world.getColor(position, this);
+        return world.getBlockTint(position, this);
     }
 
     public VanadiumResolver getWrappedResolver() {
@@ -41,7 +43,7 @@ public class ExtendedColorResolver implements ColorResolver {
                 new Coordinates((int)x, this.yPosition.get().y, (int)z));
     }
 
-    public static void setRegistryManager(@Nullable DynamicRegistryManager manager) {
+    public static void setRegistryManager(@Nullable RegistryAccess.ImmutableRegistryAccess manager) {
         registryManager = manager;
     }
 

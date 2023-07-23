@@ -1,8 +1,8 @@
 package vanadium.enums;
 
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
-public enum ColoredParticle implements StringIdentifiable {
+public enum ColoredParticle implements StringRepresentable {
     WATER("water"),
     LAVA("lava"),
     PORTAL("portal");
@@ -14,7 +14,7 @@ public enum ColoredParticle implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.name;
     }
 }

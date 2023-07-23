@@ -2,10 +2,12 @@ package vanadium.properties;
 
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -114,7 +116,7 @@ public class ColorMappingProperties {
         return this.yOffset;
     }
 
-    public ColumnBounds getColumn(Biomes biomeKey, Registry<Biome> biomeRegistry){
+    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, Registry<Biome> biomeRegistry){
         if(this.format != Format.GRID) {
             throw new IllegalStateException("Column layout is not set to GRID");
         }

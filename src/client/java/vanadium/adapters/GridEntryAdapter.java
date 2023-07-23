@@ -5,7 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import vanadium.models.GridEntry;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class GridEntryAdapter extends TypeAdapter<GridEntry> {
                 throw new JsonSyntaxException("Null value not allowed");
             }
             case STRING -> {
-                Identifier biomeIdentifier = this.identifierAdapter.read(jsonReader);
+                ResourceLocation biomeIdentifier = this.identifierAdapter.read(jsonReader);
                 GridEntry gridEntry= new GridEntry();
                 gridEntry.biomes = ImmutableList.of(biomeIdentifier);
                 return gridEntry;
@@ -61,8 +61,8 @@ public class GridEntryAdapter extends TypeAdapter<GridEntry> {
         return gridEntry;
     }
 
-    private List<Identifier> readBiomes(JsonReader in) throws IOException {
-        List<Identifier> biomes = new ArrayList<>();
+    private List<ResourceLocation> readBiomes(JsonReader in) throws IOException {
+        List<ResourceLocation> biomes = new ArrayList<>();
         in.beginArray();
         while (in.hasNext()) {
             biomes.add(this.identifierAdapter.read(in));

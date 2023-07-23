@@ -1,15 +1,14 @@
 package vanadium.util;
 
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.world.biome.Biome;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 import vanadium.Vanadium;
 import vanadium.colormapping.BiomeColorMap;
 import vanadium.resolvers.ExtendedColorResolver;
-import vanadium.resolvers.VanadiumRegistryResolver;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import net.minecraft.util.Identifier;
 import vanadium.resolvers.VanadiumResolver;
 import vanadium.resolvers.VanadiumResolverProvider;
 
@@ -19,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 public final class ColorMappingStorage<K> {
-    private final Table<K, Identifier, BiomeColorMap> colorMappings;
+    private final Table<K, ResourceLocation, BiomeColorMap> colorMappings;
     private final Map<K, BiomeColorMap> fallbackColorMappings;
     private final Map<K, ExtendedColorResolver> managers;
     private final Map<K, VanadiumResolver> defaultResolvers;
@@ -34,7 +33,7 @@ public final class ColorMappingStorage<K> {
     }
 
     @Nullable
-    public BiomeColorMap getBiomeColorMapping(DynamicRegistryManager registryManager, K key, Biome biome) {
+    public BiomeColorMap getBiomeColorMapping(RegistryAccess.ImmutableRegistryAccess registryManager, K key, Biome biome) {
         BiomeColorMap resolvedMap = this.colorMappings.get(key, Vanadium.getBiomeId(registryManager, biome));
 
         if(resolvedMap == null) {
@@ -66,7 +65,7 @@ public final class ColorMappingStorage<K> {
         return !colorMappings.row(key).isEmpty() || fallbackColorMappings.containsKey(key);
     }
 
-    public void addColorMapping(BiomeColorMap colorMapping, Collection<? extends K> keys, Set<? extends Identifier> biomes) {
+    public void addColorMapping(BiomeColorMap colorMapping, Collection<? extends K> keys, Set<? extends ResourceLocation> biomes) {
         if(biomes.isEmpty()) {
             keys.forEach(key -> {
                 fallbackColorMappings.put(key, colorMapping);
@@ -74,7 +73,7 @@ public final class ColorMappingStorage<K> {
             });
         } else {
             keys.forEach(key -> {
-                for (Identifier biomeId : biomes) {
+                for (ResourceLocation biomeId : biomes) {
                     colorMappings.put(key, biomeId, colorMapping);
                 }
                 managers.put(key, new ExtendedColorResolver(this, key, defaultResolvers.computeIfAbsent(key, defaultResolverProvider::create)));

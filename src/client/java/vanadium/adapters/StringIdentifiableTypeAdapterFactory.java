@@ -8,17 +8,29 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory {
     @Override
+    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+        Class<? super T> cls = typeToken.getRawType();
+        if(cls.isEnum()) {
+            Class<?>[] implemented = cls.getInterfaces();
+
+            if (Arrays
+                    .stream(implemented)
+                    .anyMatch(iface -> iface == StringRepresentable.class)) {
+                return (TypeAdapter<T>) new StringIdentifiableTypeAdapter<>(cls);
+            }
+        }
         return null;
     }
 
-    private static class StringIdentifiableTypeAdapter<T extends Enum<T> & StringIdentifiable> extends TypeAdapter<T> {
+    private static class StringIdentifiableTypeAdapter<T extends Enum<T> & StringRepresentable> extends TypeAdapter<T> {
         private final T[] values;
 
         public StringIdentifiableTypeAdapter(Class<?> cls) {
@@ -30,7 +42,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
             if(value == null) {
                 jsonWriter.nullValue();
             } else {
-                jsonWriter.value(value.asString());
+                jsonWriter.value(value.getSerializedName());
             }
         }
 
@@ -42,7 +54,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
             }
             String name = jsonReader.nextString();
             for(T value : values) {
-                if(value.asString().equals(name)) {
+                if(value.getSerializedName().equals(name)) {
                     return value;
                 }
             }

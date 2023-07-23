@@ -1,6 +1,12 @@
 accessWidener  v2  named
 
+accessible class net/minecraft/client/Options$FieldAccess
+
+accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
+
+accessible field net/minecraft/world/level/biome/Biome climateSettings Lnet/minecraft/world/level/biome/Biome$ClimateSettings;
+
 accessible field net/minecraft/client/Options biomeBlendRadius Lnet/minecraft/client/OptionInstance;
 mutable field net/minecraft/client/Options biomeBlendRadius Lnet/minecraft/client/OptionInstance;
 
-accessible class net/minecraft/client/Options$FieldAccess
+
