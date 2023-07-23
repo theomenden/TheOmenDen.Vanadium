@@ -1,16 +1,16 @@
 package vanadium.models;
 
+import net.minecraft.server.packs.resources.ResourceManager;
+import org.intellij.lang.annotations.Identifier;
 import org.jetbrains.annotations.Nullable;
 import vanadium.colormapping.BiomeColorMap;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 import vanadium.exceptions.InvalidColorMappingException;
 import vanadium.util.GsonUtils;
 
 import java.io.IOException;
 
-public class BiomeColorMappingResourceReloadListener  implements SimpleSynchronousResourceReloadListener {
+public class BiomeColorMappingResourceReloadListener implements SimpleSynchronousResourceReloadListener {
     private final Identifier biomeColormapId;
     private final Identifier optifineId;
     private BiomeColorMap colorMapping;

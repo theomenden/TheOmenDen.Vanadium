@@ -1,19 +1,15 @@
 package vanadium.colormapping;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.registry.*;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryOwner;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import org.apache.commons.lang3.Range;
 import vanadium.Vanadium;
 import vanadium.models.Coordinates;
@@ -47,15 +43,15 @@ public class BiomeColorMap implements VanadiumResolver {
     }
 
     @Override
-    public int getColorAtCoordinatesForBiomeByManager(DynamicRegistryManager manager, Biome biome, Coordinates coordinates) {
+    public int getColorAtCoordinatesForBiomeByManager(RegistryAccess manager, Biome biome, Coordinates coordinates) {
         switch(properties.getFormat()) {
             case VANILLA:
-                float temp = biome.getTemperature();
+                float temp = biome.getBaseTemperature();
                 temp = Range.between(0.0F, 1.0F).fit(temp);
-                float rain = Range.between(0.0F, 1.0F).fit(biome.weather.downfall());
+                float rain = Range.between(0.0F, 1.0F).fit(biome..getPrecipitationAt(BlockPos.ZERO));
                 return getColorMap(temp, rain);
             case GRID:
-                ColumnBounds columnBounds = properties.getColumn(Vanadium.getBiomeKey(manager, biome), manager.get(RegistryKeys.BIOME));
+                ColumnBounds columnBounds = properties.getColumn(Vanadium.getBiomeKey(manager, biome), manager.get(Registries.BIOME));
                 @SuppressWarnings({"removal", "deprecation"})
                 double fraction = Biome.FOLIAGE_NOISE.sample(coordinates.x() * 0.0225, coordinates.z() * 0.0225, false);
                 fraction = (fraction + 1.0) * 0.5;
@@ -66,7 +62,7 @@ public class BiomeColorMap implements VanadiumResolver {
                 y += gridRandom.nextInt(variance * 2 + 1) - variance;
                 x %= imageColorMapping.getWidth();
                 y = Range.between(0, imageColorMapping.getHeight() - 1).fit(y);
-                return imageColorMapping.getColor(x,y);
+                return imageColorMapping.getPixelRGBA(x,y);
             case FIXED:
                 return getDefaultColor();
         }
@@ -101,16 +97,16 @@ public class BiomeColorMap implements VanadiumResolver {
             return 0xffff00ff;
         }
 
-        return imageColorMapping.getColor(x, y);
+        return imageColorMapping.getPixelRGBA(x, y);
     }
 
     private int computeDefaultColor(ColorMappingProperties properties) {
         switch(properties.getFormat()) {
-            case VANILLA: return this.imageColorMapping.getColor(128,128);
+            case VANILLA: return this.imageColorMapping.getPixelRGBA(128,128);
             case GRID:
                 try{
-                    SimpleDefaultedRegistry<Biome> biomeRegistry = new SimpleDefaultedRegistry<>(BiomeKeys.PLAINS.getValue().toString(), RegistryKeys.BIOME, Lifecycle.stable(), false);
-                int x = properties.getColumn(BiomeKeys.PLAINS, biomeRegistry ).Column();
+                    ResourceLocation<Biome> biomeRegistry = ResourceLocation.tryBuild(Biomes.PLAINS.toString(), Registries.BIOME, Lifecycle.stable(), false);
+                int x = properties.getColumn(Biomes.PLAINS, biomeRegistry).Column();
                 int y = Range.between(0, imageColorMapping.getHeight() - 1).fit(63 - properties.getYOffset());
                 return imageColorMapping.getColor(x, y);
             } catch(IllegalArgumentException e) {

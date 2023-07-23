@@ -1,7 +1,7 @@
 package vanadium.models;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import vanadium.properties.ColorMappingProperties;
-import net.minecraft.client.texture.NativeImage;
 
 public record ColorMapNativePropertyImage(ColorMappingProperties colormapProperties, NativeImage nativeImage) {
 }

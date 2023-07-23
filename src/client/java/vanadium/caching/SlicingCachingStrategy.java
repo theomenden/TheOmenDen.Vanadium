@@ -18,7 +18,7 @@ public abstract class SlicingCachingStrategy<T extends BaseSlice> {
     public int sliceSize;
     public SlicingCachingStrategy(int count) {
         this.totalSlices = count;
-        var countPerBucket = count / AVAILABLE_BUCKETS;
+        int countPerBucket = count / AVAILABLE_BUCKETS;
         hashMapStorageContainer = new Long2ObjectLinkedOpenHashMap[AVAILABLE_BUCKETS];
 
         IntStream

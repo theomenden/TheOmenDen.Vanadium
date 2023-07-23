@@ -1,12 +1,12 @@
 package vanadium.util;
 
-import net.minecraft.world.biome.ColorResolver;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.biome.BiomeManager;
 import vanadium.blending.BlendingBuffer;
 
 public class SodiumColorBlendingUtils {
     public static void gatherColors(
-            BiomeAccess biomeManager,
+            BiomeManager biomeManager,
             ColorResolver resolver,
             BlendingBuffer buffer,
             int x,
@@ -17,7 +17,7 @@ public class SodiumColorBlendingUtils {
     }
 
     public static void generateColors(
-            BiomeAccess biomeManager,
+            BiomeManager biomeManager,
             ColorResolver resolver,
             int x,
             int z,

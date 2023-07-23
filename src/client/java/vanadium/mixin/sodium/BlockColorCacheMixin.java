@@ -3,9 +3,10 @@ package vanadium.mixin.sodium;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.jellysquid.mods.sodium.client.world.WorldSlice;
 import me.jellysquid.mods.sodium.client.world.biome.BlockColorCache;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.biome.ColorResolver;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.biome.BiomeManager;
 import org.apache.commons.lang3.Range;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -33,7 +34,7 @@ public class BlockColorCacheMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void constructorTail(WorldSlice slice, int radius, CallbackInfo ci) {
-        ChunkSectionPos pos = slice.getOrigin();
+        SectionPos pos = slice.getOrigin();
 
         this.vanadium$baseX = pos.getX();
         this.vanadium$baseY = pos.getY();
@@ -59,7 +60,7 @@ public class BlockColorCacheMixin {
         int color = colors[index];
 
         if(color == 0) {
-            BiomeAccess biomeManager = slice.getBiomeAccess();
+            BiomeManager biomeManager = slice.getBiomeAccess();
 
             SodiumColorBlendingUtils.generateColors(
                     biomeManager,

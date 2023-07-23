@@ -53,7 +53,7 @@ base {
 
 loom {
     splitEnvironmentSourceSets()
-	//accessWidenerPath = file("src/client/resources/vanadium.accesswidener")
+	accessWidenerPath = file("src/client/resources/vanadium.accesswidener")
 	mods {
 		"vanadium" {
 			sourceSet sourceSets.main
@@ -71,7 +71,6 @@ dependencies {
 		parchment("org.parchmentmc.data:parchment-1.20.1:2023.07.16@zip")
 	}
 
-
 	//"net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
@@ -84,7 +83,6 @@ dependencies {
 		transitive = false
 	}
 
-// https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305
 	implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
 

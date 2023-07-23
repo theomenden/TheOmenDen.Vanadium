@@ -5,7 +5,7 @@ import me.jellysquid.mods.sodium.client.gui.options.*;
 import me.jellysquid.mods.sodium.client.gui.options.control.ControlValueFormatter;
 import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
 import me.jellysquid.mods.sodium.client.gui.options.storage.MinecraftOptionsStorage;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,8 +30,8 @@ public class SodiumGameOptionsPagesMixin {
     private static void quality(CallbackInfoReturnable<OptionPage> cir, List<OptionGroup> groups) {
         groups.add(OptionGroup.createBuilder()
                 .add(OptionImpl.createBuilder(int.class, vanillaOpts)
-                        .setName(Text.translatable("vanadium.BlendRadius"))
-                               .setTooltip(Text.translatable("vanadium.BlendRadius.tooltip"))
+                        .setName(Component.translatable("vanadium.biomeBlendRadius"))
+                               .setTooltip(Component.translatable("vanadium.biomeBlendRadius.tooltip"))
                         .setControl(option -> new SliderControl(option, 0, 14, 1, ControlValueFormatter.biomeBlend()))
                         .setBinding((options, value) -> VanadiumBlendingConfiguration.getBlendingRadius(), options -> VanadiumBlendingConfiguration.getBlendingRadius())
                         .setImpact(OptionImpact.LOW)

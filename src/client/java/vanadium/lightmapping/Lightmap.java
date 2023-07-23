@@ -1,19 +1,19 @@
 package vanadium.lightmapping;
 
-import net.minecraft.client.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 public class Lightmap {
     private static final Logger log = LogManager.getLogger(Lightmap.class);
 
-    private final NativeImage _lightmap;
+    private final NativeImage lightmap;
 
     public Lightmap(NativeImage lightmap) {
-        _lightmap = lightmap;
+        this.lightmap = lightmap;
     }
 
     public int getBlockColorForLightLevel(int lightLevel, float flicker, float nightVision) {
-        int width = _lightmap.getWidth();
+        int width = lightmap.getWidth();
         int positionX = (int)(flicker * width) % width;
 
         if(positionX < 0) {
@@ -26,24 +26,24 @@ public class Lightmap {
 
     private int getPixelAtPositionWithGivenLightLevel(int x, int y, float nightVision) {
         if(nightVision <=0.0f) {
-            return _lightmap.getColor(x, y);
+            return lightmap.getPixelRGBA(x, y);
         }
         if(nightVision >=1.0f) {
-            if (_lightmap.getHeight() !=64) {
+            if (lightmap.getHeight() !=64) {
                 return getRationalizedValue(x, y);
             }  else {
-                return _lightmap.getColor(x, y +32);
+                return lightmap.getPixelRGBA(x, y +32);
             }
         }
-        int normalColor = _lightmap.getColor(x, y);
-        int nightVisionColor = (_lightmap.getHeight() !=64)
+        int normalColor = lightmap.getPixelRGBA(x, y);
+        int nightVisionColor = (lightmap.getHeight() !=64)
                 ? getRationalizedValue(x, y)
-                : _lightmap.getColor(x, y +32);
+                : lightmap.getPixelRGBA(x, y +32);
         return mergeColorsBasedOnNightVisionFactors(normalColor, nightVisionColor, nightVision);
     }
 
     private int getRationalizedValue(int x, int y) {
-        int color = _lightmap.getColor(x, y);
+        int color = lightmap.getPixelRGBA(x, y);
         int red = (color >>16) &0xff;
         int green = (color >>8) &0xff;
         int blue = color & 0xff;

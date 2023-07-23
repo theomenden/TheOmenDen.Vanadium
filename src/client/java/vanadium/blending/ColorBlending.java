@@ -1,19 +1,22 @@
 package vanadium.blending;
 
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.ColorResolver;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import org.jetbrains.annotations.Nullable;
 import vanadium.configuration.VanadiumBlendingConfiguration;
 import vanadium.caching.ColorBlendingCache;
 import vanadium.caching.ColorCache;
 import vanadium.caching.ColorSlice;
 import vanadium.models.Coordinates;
+import vanadium.models.NonBlockingThreadLocal;
 import vanadium.util.ColorConverter;
 import vanadium.util.LinearCongruentialGenerator;
 import vanadium.util.MathUtils;
@@ -25,7 +28,7 @@ public final class ColorBlending {
     public static final int SAMPLE_SEED_Y = 214013;
     public static final int SAMPLE_SEED_Z = 16807;
 
-    public static final ThreadLocal<BlendingBuffer> threadLocalBlendBuffer = new ThreadLocal<>();
+    public static final ThreadLocal<BlendingBuffer> threadLocalBlendBuffer = new NonBlockingThreadLocal<>();
 
     public static BlendingBuffer acquireBlendBuffer(int blendRadius)
     {
@@ -125,17 +128,29 @@ public final class ColorBlending {
         return result;
     }
 
-    public static Biome getDefaultBiome(ClientWorld world)
+    @Nullable
+    public static Biome getDefaultBiome(Level world)
     {
-        return world.getRegistryManager().get(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS);
+        Holder<Biome> biomeHolder = world.registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS);
+
+        if(biomeHolder.isBound()) {
+            return biomeHolder.value();
+        }
+
+        return null;
     }
 
-    public static Biome getBiomeAtPositionOrDefault(World world, BlockPos blockPosition)
+    public static Biome getBiomeAtPositionOrDefault(Level world, BlockPos blockPosition)
     {
-        return world.getBiomeAccess().getBiome(blockPosition).value();
+        Holder<Biome> biomeHolder = world.getBiome(blockPosition);
+        
+        if(biomeHolder.isBound()) {
+            return biomeHolder.value();
+        }
+        return getDefaultBiome(world);
     }
 
-    public static Biome  getBiomeAtPositionOrDefaultOrThrow(World world, BlockPos blockPos)
+    public static Biome  getBiomeAtPositionOrThrow(Level world, BlockPos blockPos)
     {
         Biome result = getBiomeAtPositionOrDefault(world, blockPos);
 
@@ -147,14 +162,11 @@ public final class ColorBlending {
         return result;
     }
 
-    public static int
-    getColorAtPosition(World world, BlockPos blockPos, float posX, float posZ, ColorResolver colorResolver)
+    public static int getColorAtPosition(Level world, BlockPos blockPos, float posX, float posZ, ColorResolver colorResolver)
     {
-        Biome biome = getBiomeAtPositionOrDefaultOrThrow(world, blockPos);
+        Biome biome = getBiomeAtPositionOrThrow(world, blockPos);
 
-        int result = colorResolver.getColor(biome, posX, posZ);
-
-        return result;
+        return colorResolver.getColor(biome, posX, posZ);
     }
 
     public static int getRandomSamplePosition(int min, int blockSizeLog2, int seed)
@@ -169,7 +181,7 @@ public final class ColorBlending {
     }
 
     public static void gatherColorsForSlice(
-            World         world,
+            Level         world,
             ColorResolver colorResolver,
             ColorSlice colorSlice,
             BlendingBuffer blendBuffer,
@@ -180,7 +192,7 @@ public final class ColorBlending {
             int           sliceY,
             int           sliceZ)
     {
-        BlockPos.Mutable blockPos = new BlockPos.Mutable();
+        BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
         final int blendRadius = blendBuffer.blendingRadius;
 
@@ -281,7 +293,7 @@ public final class ColorBlending {
     }
 
     private static void setColorBitsToCenterColor(
-            World         world,
+            Level         world,
             ColorResolver colorResolver,
             BlendingBuffer   blendBuffer,
             int           sliceX,
@@ -301,7 +313,7 @@ public final class ColorBlending {
     }
 
     public static boolean neighborChunksAreLoaded(
-            World   world,
+            Level   world,
             int           sliceSizeLog2,
             int           sliceX,
             int           sliceZ)
@@ -329,10 +341,9 @@ public final class ColorBlending {
 
                     if (neighborChunkX != prevChunkX)
                     {
-                        Chunk chunk = world.getChunk(neighborChunkX, neighborChunkZ, ChunkStatus.BIOMES, false);
+                        ChunkAccess chunk = world.getChunk(neighborChunkX, neighborChunkZ, ChunkStatus.BIOMES, false);
 
-                        if (chunk == null)
-                        {
+                        if (chunk == null) {
                             result = false;
                             break;
                         }
@@ -349,7 +360,7 @@ public final class ColorBlending {
     }
 
     public static void gatherColorsToBlendBuffer(
-            World         world,
+            Level         world,
             ColorResolver colorResolver,
             int           colorType,
             ColorCache    colorCache,
@@ -825,14 +836,14 @@ public final class ColorBlending {
     }
 
     public static void gatherColorsDirectly(
-            World         world,
+            Level         world,
             ColorResolver colorResolver,
             BlendingChunk    blendChunk,
             int           requestX,
             int           requestY,
             int           requestZ)
     {
-        BlockPos.Mutable blockPos = new BlockPos.Mutable();
+        BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
         final int sliceSizeLog2 = BlendingConfig.getSliceSizeLog2(0);
         final int sliceSize     = BlendingConfig.getSliceSize(0);
@@ -888,14 +899,14 @@ public final class ColorBlending {
     }
 
     public static void generateColors(
-            World world,
+            Level world,
             ColorResolver colorResolver,
             int           colorType,
             ColorCache    colorCache,
             BlendingChunk blendChunk,
             Coordinates coordinates)
     {
-        final int blendRadius = VanadiumBlendingConfiguration.getBlendingRadius();
+        final int blendRadius = VanadiumBlendingConfiguration.getBiomeBlendingRadius();
 
         if (blendRadius >  BlendingConfig.BIOME_MINIMUM_BLENDING_RADIUS &&
                 blendRadius <= BlendingConfig.BIOME_MAXIMUM_BLENDING_RADIUS)

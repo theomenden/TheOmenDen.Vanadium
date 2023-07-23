@@ -1,6 +1,6 @@
 package vanadium.resolvers;
 
-import net.minecraft.world.biome.ColorResolver;
+import net.minecraft.world.level.ColorResolver;
 import vanadium.enums.BiomeColorTypes;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;

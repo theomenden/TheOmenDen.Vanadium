@@ -5,7 +5,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -16,9 +16,9 @@ import static java.util.Map.entry;
 public class MaterialColorAdapter extends TypeAdapter<MapColor> {
     private static final Map<String, MapColor> MATERIAL_COLORS = Map.ofEntries(
         entry("air", MapColor.CLEAR),
-        entry("grass", MapColor.PALE_GREEN),
-        entry("sand", MapColor.PALE_YELLOW),
-        entry("cloth", MapColor.WHITE_GRAY),
+        entry("grass", MapColor.COLOR_LIGHT_GREEN),
+        entry("sand", MapColor.COLOR_YELLOW),
+        entry("cloth", MapColor.COLOR_GRAY),
         entry("tnt", MapColor.BRIGHT_RED),
         entry("ice", MapColor.PALE_PURPLE),
         entry("iron", MapColor.IRON_GRAY),

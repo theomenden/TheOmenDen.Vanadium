@@ -2,11 +2,11 @@ package vanadium.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.block.MapColor;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.ChatFormatting;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.material.MapColor;
 import vanadium.adapters.*;
 import vanadium.enums.Format;
 import vanadium.exceptions.InvalidColorMappingException;
@@ -31,15 +31,15 @@ import java.util.stream.Stream;
 public class GsonUtils {
     public static final Gson PROPERTY_GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new StringIdentifiableTypeAdapterFactory())
-            .registerTypeAdapter(Identifier.class, new IdentifierTypeAdapter())
+            .registerTypeAdapter(ResourceLocation.class, new ResourceLocationTypeAdapter())
             .registerTypeAdapter(ApplicableBlockStates.class, new ApplicableBlockStatesAdapter())
             .registerTypeAdapter(VanadiumColor.class, new VanadiumColorAdapter())
             .registerTypeAdapter(MapColor.class, new MaterialColorAdapter())
-            .registerTypeAdapter(Formatting.class, new ChatFormatAdapter())
+            .registerTypeAdapter(ChatFormatting.class, new ChatFormatAdapter())
             .registerTypeAdapter(GridEntry.class, new GridEntryAdapter())
             .create();
 
-    public static String resolveRelativeIdentifier(String path, Identifier identifier) {
+    public static String resolveRelativeResourceLocation(String path, ResourceLocation identifier) {
         if(path.startsWith("./")) {
             String thisPath = identifier.toString();
             path = thisPath.substring(0, thisPath.lastIndexOf('/')) + path.substring(1);
@@ -53,7 +53,7 @@ public class GsonUtils {
     }
 
     public static Reader getJsonReader(InputStream inputStream,
-                                       Identifier identifier,
+                                       ResourceLocation identifier,
                                        Function<String, String> keyMapper,
                                        Predicate<String> arrayValues) throws IOException {
         if (!identifier
@@ -68,7 +68,7 @@ public class GsonUtils {
 
     }
 
-    public static ColorMapNativePropertyImage loadColorMapping(ResourceManager resourceManager, Identifier identifier, boolean isCustom) {
+    public static ColorMapNativePropertyImage loadColorMapping(ResourceManager resourceManager, ResourceLocation identifier, boolean isCustom) {
         ColorMappingProperties properties = ColorMappingProperties.loadProperties(resourceManager, identifier,isCustom);
 
         if(properties.getFormat() == Format.FIXED) {
@@ -83,12 +83,12 @@ public class GsonUtils {
                                  IntStream
                                          .range(0, image.getHeight())
                                          .forEach(yPixelCoord -> {
-                                              int pixel = image.getColor(xPixelCoord, yPixelCoord);
+                                              int pixel = image.getPixelRGBA(xPixelCoord, yPixelCoord);
                                               int temporaryPixel = (pixel &0xff0000) >>16;
                                               temporaryPixel |= (pixel &0x0000ff) <<16;
                                               pixel &= ~(0xff0000 |0x0000ff);
                                               pixel |= temporaryPixel;
-                                              image.setColor(xPixelCoord, yPixelCoord, pixel);
+                                              image.setPixelRGBA(xPixelCoord, yPixelCoord, pixel);
                                           }));
             }
 

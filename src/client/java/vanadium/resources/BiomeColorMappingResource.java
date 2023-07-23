@@ -1,8 +1,8 @@
 package vanadium.resources;
 
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
 import vanadium.colormapping.BiomeColorMap;
 import vanadium.exceptions.InvalidColorMappingException;
@@ -10,18 +10,18 @@ import vanadium.models.ColorMapNativePropertyImage;
 import vanadium.util.GsonUtils;
 
 public class BiomeColorMappingResource implements SimpleSynchronousResourceReloadListener {
-    private final Identifier identifier;
-    private final Identifier optifineId;
+    private final ResourceLocation identifier;
+    private final ResourceLocation optifineId;
     private BiomeColorMap mapping;
 
-    public BiomeColorMappingResource(Identifier identifier) {
-        this.identifier = new Identifier(identifier.getNamespace(), identifier.getPath() +".json");
-        this.optifineId = new Identifier("minecraft", "optifine/" + identifier.getPath() +".properties");
+    public BiomeColorMappingResource(ResourceLocation identifier) {
+        this.identifier = new ResourceLocation(identifier.getNamespace(), identifier.getPath() +".json");
+        this.optifineId = new ResourceLocation("minecraft", "optifine/" + identifier.getPath() +".properties");
 
     }
 
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return this.identifier;
     }
 
@@ -36,20 +36,6 @@ public class BiomeColorMappingResource implements SimpleSynchronousResourceReloa
         return this.mapping;
     }
 
-    @Override
-    public void reload(ResourceManager manager) {
-        ColorMapNativePropertyImage propertyImage;
-
-        try {
-            propertyImage = GsonUtils.loadColorMapping(manager, this.identifier, false);
-        } catch(InvalidColorMappingException e) {
-            propertyImage = checkForOptifineColorMap(manager);
-        }
-        this.mapping = propertyImage != null
-                ? new BiomeColorMap(propertyImage.colormapProperties(), propertyImage.nativeImage())
-                : null;
-    }
-
     @Nullable
     private ColorMapNativePropertyImage checkForOptifineColorMap(ResourceManager manager) {
         try {
@@ -57,5 +43,19 @@ public class BiomeColorMappingResource implements SimpleSynchronousResourceReloa
         } catch(InvalidColorMappingException e) {
             return null;
         }
+    }
+
+    @Override
+    public void onResourceManagerReload(ResourceManager resourceManager) {
+        ColorMapNativePropertyImage propertyImage;
+
+        try {
+            propertyImage = GsonUtils.loadColorMapping(resourceManager, this.identifier, false);
+        } catch(InvalidColorMappingException e) {
+            propertyImage = checkForOptifineColorMap(resourceManager);
+        }
+        this.mapping = propertyImage != null
+                ? new BiomeColorMap(propertyImage.colormapProperties(), propertyImage.nativeImage())
+                : null;
     }
 }

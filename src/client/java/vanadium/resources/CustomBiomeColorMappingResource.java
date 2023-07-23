@@ -1,8 +1,8 @@
 package vanadium.resources;
 
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.Vanadium;
@@ -20,35 +20,27 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
     private static final Logger LOGGER = LogManager.getLogger(Vanadium.MODID);
     private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[a-zAZ0-9_/.-]+");
 
-    private final Identifier identifier;
-    private final Identifier optifineIdentifier;
-    private final Identifier colormaticIdentifier;
-    private final Identifier otherOptifineIdentifier;
+    private final ResourceLocation identifier;
+    private final ResourceLocation optifineIdentifier;
+    private final ResourceLocation colormaticIdentifier;
+    private final ResourceLocation otherOptifineIdentifier;
 
     public CustomBiomeColorMappingResource() {
-        this.identifier = new Identifier(Vanadium.MODID, "colormap/custom");
-        this.colormaticIdentifier = new Identifier(Vanadium.COLORMATIC_ID, "colormap/custom");
-        this.optifineIdentifier = new Identifier("minecraft", "optifine/colormap/custom");
-        this.otherOptifineIdentifier = new Identifier("minecraft", "optifine/colormap/blocks");
+        this.identifier = new ResourceLocation(Vanadium.MODID, "colormap/custom");
+        this.colormaticIdentifier = new ResourceLocation(Vanadium.COLORMATIC_ID, "colormap/custom");
+        this.optifineIdentifier = new ResourceLocation("minecraft", "optifine/colormap/custom");
+        this.otherOptifineIdentifier = new ResourceLocation("minecraft", "optifine/colormap/blocks");
     }
 
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return identifier;
     }
 
-    @Override
-    public void reload(ResourceManager manager) {
-        BiomeColorMappings.resetColorMappings();
-        addColorMappings(manager, otherOptifineIdentifier, false);
-        addColorMappings(manager, optifineIdentifier, false);
-        addColorMappings(manager, colormaticIdentifier, true);
-        addColorMappings(manager, identifier, true);
-    }
 
-    private static void addColorMappings(ResourceManager manager, Identifier directory, boolean isInJson) {
+    private static void addColorMappings(ResourceManager manager, ResourceLocation directory, boolean isInJson) {
         String extension = isInJson? ".json" : ".properties";
-        Collection<Identifier> files = manager.findResources(directory.getPath(),
+        Collection<ResourceLocation> files = manager.listResources(directory.getPath(),
                                                       id -> id.getNamespace().equals(directory.getNamespace())
                                                               && (id.getPath().endsWith(extension) || id.getPath().endsWith(".png")))
                                               .keySet()
@@ -57,7 +49,7 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
                                                   String path = id.getPath();
                                                   if(path.endsWith(".png")) {
                                                       String standardizedPath = path.substring(0, path.length() - 4) + extension;
-                                                      return new Identifier(id.getNamespace(), standardizedPath);
+                                                      return new ResourceLocation(id.getNamespace(), standardizedPath);
                                                   }
                                                   return id;
                                               })
@@ -78,5 +70,14 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
                 LOGGER.error("Unable to parse Colormapping {}:{} ", file, e.getMessage());
             }
         });
+    }
+
+    @Override
+    public void onResourceManagerReload(ResourceManager resourceManager) {
+        BiomeColorMappings.resetColorMappings();
+        addColorMappings(resourceManager, otherOptifineIdentifier, false);
+        addColorMappings(resourceManager, optifineIdentifier, false);
+        addColorMappings(resourceManager, colormaticIdentifier, true);
+        addColorMappings(resourceManager, identifier, true);
     }
 }

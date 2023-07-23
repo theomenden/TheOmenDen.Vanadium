@@ -18,6 +18,7 @@
   "mixins": [
     "vanadium.client.mixins.json"
   ],
+  "accessWidener": "vanadium.accesswidener",
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": "^1.20.1",
@@ -26,7 +27,6 @@
     "mod-menu": ">=7.0.1",
     "java": ">=17"
   },
-  "accessWidener" : "vanadium.accesswidener",
   "custom": {
     "modmenu": {
        "links": {

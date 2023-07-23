@@ -1,29 +1,30 @@
 package vanadium.resources;
 
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import vanadium.properties.LightMappingProperties;
 
 public class GlobalLightMappingResource implements SimpleSynchronousResourceReloadListener {
-    private final Identifier identifier;
+    private final ResourceLocation identifier;
     private LightMappingProperties properties;
 
-    public GlobalLightMappingResource(Identifier identifier) {
+    public GlobalLightMappingResource(ResourceLocation identifier) {
         this.identifier = identifier;
     }
 
     public LightMappingProperties getProperties() {
-        return properties;
+        return this.properties;
     }
 
     @Override
-    public Identifier getFabricId() {
-        return identifier;
+    public ResourceLocation getFabricId() {
+        return this.identifier;
     }
 
     @Override
-    public void reload(ResourceManager manager) {
-            properties = LightMappingProperties.loadPropertiesForIdentifier(manager, identifier);
+    public void onResourceManagerReload(ResourceManager resourceManager) {
+
+        properties = LightMappingProperties.loadPropertiesForIdentifier(resourceManager, this.identifier);
     }
 }

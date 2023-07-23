@@ -1,18 +1,20 @@
 package vanadium.properties;
 
 import com.google.gson.JsonParseException;
-import net.minecraft.block.MapColor;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.material.MapColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.intellij.lang.annotations.Identifier;
 import org.jetbrains.annotations.Nullable;
 import vanadium.Vanadium;
 import vanadium.enums.ColoredParticle;
@@ -20,7 +22,9 @@ import vanadium.enums.ColumnLayout;
 import vanadium.enums.Format;
 import vanadium.models.VanadiumColor;
 import vanadium.util.GsonUtils;
+import vanadium.util.MathUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -33,7 +37,6 @@ import static java.util.Map.entry;
 
 public class GlobalColorProperties {
     private static final Logger LOGGER = LogManager.getLogger(Vanadium.MODID);
-    private static final float saturationRatio = 1/255.0f;
 
     private static final Map<String, String> keyRemap = Map.ofEntries(
         entry("nether", "the_nether"),
@@ -58,10 +61,10 @@ public class GlobalColorProperties {
     public static GlobalColorProperties DEFAULT = new GlobalColorProperties(new Settings());
 
     private final Map<ColoredParticle, VanadiumColor> particle;
-    private final Map<Identifier, VanadiumColor> dimensionFog;
-    private final Map<Identifier, VanadiumColor> dimensionSky;
+    private final Map<ResourceLocation, VanadiumColor> dimensionFog;
+    private final Map<ResourceLocation, VanadiumColor> dimensionSky;
     private final int lilypad;
-    private final Map<StatusEffect, VanadiumColor> potions;
+    private final Map<Potions, VanadiumColor> potions;
     private final Map<DyeColor, VanadiumColor> sheep;
     private final Map<DyeColor, float[]> sheepRgb;
     private final Map<DyeColor, VanadiumColor> collar;
@@ -70,8 +73,8 @@ public class GlobalColorProperties {
     private final Map<DyeColor, float[]> bannerRgb;
     private final Map<MapColor, VanadiumColor> map;
     private final Map<EntityType<?>, int[]> spawnEgg;
-    private final Map<Formatting, TextColor> textColor;
-    private final TextColorSettings text;
+    private final Map<ChatFormatting, TextColor> textColor;
+    private final TextColor text;
 
     private final int xpOrbTime;
     private final Format defaultFormat;
@@ -82,7 +85,7 @@ public class GlobalColorProperties {
         this.dimensionFog = convertIdentifierMapping(settings.fog);
         this.dimensionSky = convertIdentifierMapping(settings.sky);
         this.lilypad = settings.lilypad != null ? settings.lilypad.rgb() : 0;
-        this.potions = convertMapping(settings.potion, Registries.STATUS_EFFECT);
+        this.potions = convertMapping(settings.potion, Player);
         this.sheep = settings.sheep;
         this.sheepRgb = toRgb(settings.sheep);
         this.collar = settings.collar;
@@ -98,7 +101,7 @@ public class GlobalColorProperties {
             for(Map.Entry<Integer, VanadiumColor> entry : text.code.entrySet()) {
                 int code = entry.getKey();
                 if(code < 16) {
-                    Formatting color = Formatting.byColorIndex(code);
+                    ChatFormatting color = ChatFormatting.getByCode(code);
                     textColor.put(color, TextColor.fromRgb(entry.getValue().rgb()));
                 }
             }
@@ -126,24 +129,26 @@ public class GlobalColorProperties {
         }
     }
 
-    public static GlobalColorProperties load(ResourceManager manager, Identifier id, boolean isFalling) {
-        try(InputStream inputStream = manager.getResourceOrThrow(id).getInputStream();
-        Reader reader = GsonUtils.getJsonReader(inputStream, id, k -> keyRemap.getOrDefault(k,k), k -> false)) {
+    public static GlobalColorProperties load(ResourceManager manager, ResourceLocation id, boolean isFalling) {
+        try(InputStream inputStream = manager.getResourceOrThrow(id).open();
+            Reader reader = GsonUtils.getJsonReader(inputStream, id, k -> keyRemap.getOrDefault(k,k), k -> false)) {
             return loadFromJson(reader, id);
-        } catch(IOException e) {
+        } catch (FileNotFoundException e) {
+            return isFalling? DEFAULT : null;
+        } catch (IOException e) {
             return isFalling? DEFAULT : null;
         }
     }
 
-    public int getParticle(ColoredParticle particleKey) {
+        public int getParticle(ColoredParticle particleKey) {
         return getColor(particleKey, particle);
     }
 
-    public int getDimensionFog(Identifier dimensionKey) {
+    public int getDimensionFog(ResourceLocation dimensionKey) {
         return getColor(dimensionKey, dimensionFog);
     }
 
-    public int getDimensionSky(Identifier dimensionKey) {
+    public int getDimensionSky(ResourceLocation dimensionKey) {
         return getColor(dimensionKey, dimensionSky);
     }
 
@@ -212,12 +217,12 @@ public class GlobalColorProperties {
         return color!= null? color.rgb() : 0;
     }
 
-    private Map<Identifier, VanadiumColor> convertIdentifierMapping(Map<String, VanadiumColor> map) {
-        Map<Identifier, VanadiumColor> result = new HashMap<>();
+    private Map<ResourceLocation, VanadiumColor> convertIdentifierMapping(Map<String, VanadiumColor> map) {
+        Map<ResourceLocation, VanadiumColor> result = new HashMap<>();
         map
                 .entrySet()
                 .forEach(entry -> {
-                    Identifier id = Identifier.tryParse(entry.getKey());
+                    ResourceLocation id = ResourceLocation.tryParse(entry.getKey());
                     if (id != null) {
                         result.put(id, entry.getValue());
                     }
@@ -230,7 +235,7 @@ public class GlobalColorProperties {
         initialColor
                 .entrySet()
                 .forEach(entry -> {
-                    T key = registry.get(Identifier.tryParse(entry.getKey()));
+                    T key = registry.get(ResourceLocation.tryParse(entry.getKey()));
                     if (key != null) {
                         result.put(key, entry.getValue());
                     }
@@ -246,9 +251,9 @@ public class GlobalColorProperties {
                    int entryRgb = entry.getValue()
                                        .rgb();
                    float[] rgb = new float[3];
-                   rgb[0] = ((entryRgb >> 16) & 0xff) * saturationRatio;
-                   rgb[1] = ((entryRgb >> 8) & 0xff) * saturationRatio;
-                   rgb[2] = (entryRgb & 0xff) * saturationRatio;
+                   rgb[0] = ((entryRgb >> 16) & 0xff) * MathUtils.INV_255;
+                   rgb[1] = ((entryRgb >> 8) & 0xff) * MathUtils.INV_255;
+                   rgb[2] = (entryRgb & 0xff) * MathUtils.INV_255;
                    result.put(entry.getKey(), rgb);
                  });
         return result;
@@ -256,20 +261,20 @@ public class GlobalColorProperties {
 
     private static <T> Map<EntityType<?>, int[]> collateSpawnEggColors(Settings settings) {
         Map<EntityType<?>, int[]> result = new HashMap<>();
-        Registry<EntityType<?>> registry = Registries.ENTITY_TYPE;
+        ResourceKey<Registry<EntityType<?>>> entityTypeResourceKey = Registries.ENTITY_TYPE;
 
         if(settings.egg != null) {
             LegacyEggColor legacy = settings.egg;
             legacy.shell
                     .entrySet()
                     .forEach(entry -> {
-                        EntityType<?> type = registry.get(Identifier.tryParse(entry.getKey()));
+                        EntityType<?> type = entityTypeResourceKey.cast(entry.getKey());
                         result.put(type, new int[]{entry.getValue().rgb(), 0});
                     });
             legacy.spots
                     .entrySet()
                     .forEach(entry -> {
-                        EntityType<?> type = registry.get(Identifier.tryParse(entry.getKey()));
+                        EntityType<?> type = entityTypeResourceKey.get(ResourceLocation.tryParse(entry.getKey()));
                         int[] colors = result.computeIfAbsent(type, t -> new int[2]);
                         colors[1] = entry.getValue()
                                          .rgb();
@@ -278,7 +283,7 @@ public class GlobalColorProperties {
 
         settings.spawnEgg.entrySet()
                 .forEach(entry -> {
-                     EntityType<?> type = registry.get(Identifier.tryParse(entry.getKey()));
+                     EntityType<?> type = entityTypeResourceKey.get(ResourceLocation.tryParse(entry.getKey()));
                      int[] colors = result.computeIfAbsent(type, t -> new int[2]);
                      VanadiumColor[] vanadiumColors = entry.getValue();
 
@@ -296,7 +301,7 @@ public class GlobalColorProperties {
         return color != null ? color.rgb() : 0;
     }
 
-    private static GlobalColorProperties loadFromJson(Reader rd, Identifier id) {
+    private static GlobalColorProperties loadFromJson(Reader rd, ResourceLocation id) {
         Settings settings;
         try {
             settings = GsonUtils.PROPERTY_GSON.fromJson(rd, Settings.class);
@@ -337,7 +342,7 @@ public class GlobalColorProperties {
         VanadiumColor xpbar;
         ButtonText button = new ButtonText();
         Map<DyeColor, VanadiumColor> sign = Collections.emptyMap();
-        Map<Formatting, VanadiumColor> format = Collections.emptyMap();
+        Map<ChatFormatting, VanadiumColor> format = Collections.emptyMap();
         Map<Integer, VanadiumColor> code = Collections.emptyMap();
 
         static class ButtonText {
