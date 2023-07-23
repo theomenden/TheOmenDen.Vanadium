@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-import vanadium.VanadiumBlendingClient;
+import vanadium.configuration.VanadiumBlendingConfiguration;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class SodiumGameOptionsPagesMixin {
                         .setName(Text.translatable("vanadium.BlendRadius"))
                                .setTooltip(Text.translatable("vanadium.BlendRadius.tooltip"))
                         .setControl(option -> new SliderControl(option, 0, 14, 1, ControlValueFormatter.biomeBlend()))
-                        .setBinding((options, value) -> VanadiumBlendingClient.getBlendingRadius(), options -> VanadiumBlendingClient.getBlendingRadius())
+                        .setBinding((options, value) -> VanadiumBlendingConfiguration.getBlendingRadius(), options -> VanadiumBlendingConfiguration.getBlendingRadius())
                         .setImpact(OptionImpact.LOW)
                         .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)
                         .build())

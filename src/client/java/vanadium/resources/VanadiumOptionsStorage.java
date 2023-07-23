@@ -1,7 +1,7 @@
 package vanadium.resources;
 
 import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
-import vanadium.VanadiumConfig;
+import vanadium.configuration.VanadiumConfig;
 
 public class VanadiumOptionsStorage implements OptionStorage<VanadiumConfig> {
     private final VanadiumConfig options = VanadiumConfig.INSTANCE;

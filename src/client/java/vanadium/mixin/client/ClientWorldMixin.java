@@ -1,7 +1,5 @@
 package vanadium.mixin.client;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import me.jellysquid.mods.sodium.client.world.biome.BlockColorCache;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -14,18 +12,14 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.ColorResolver;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.client.color.block.BlockColorProvider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import vanadium.VanadiumBlendingClient;
+import vanadium.configuration.VanadiumBlendingConfiguration;
 import vanadium.blending.BlendingChunk;
-import vanadium.blending.BlendingConfig;
 import vanadium.blending.ColorBlending;
 import vanadium.caching.BlendingCache;
 import vanadium.caching.ColorBlendingCache;
@@ -34,7 +28,6 @@ import vanadium.caching.LocalCache;
 import vanadium.enums.BiomeColorTypes;
 import vanadium.models.Coordinates;
 import vanadium.resolvers.VanadiumColorResolverCustomCompatibility;
-import vanadium.util.ColorCacheUtils;
 
 import java.util.function.Supplier;
 
@@ -65,7 +58,7 @@ public abstract class ClientWorldMixin extends World {
     public void onReloadColorCaches(CallbackInfo ci) {
         vanadium$blendedColorCache.invalidateAllChunks();
 
-        int blendingRadius = VanadiumBlendingClient.getBlendingRadius();
+        int blendingRadius = VanadiumBlendingConfiguration.getBlendingRadius();
         vanadium$chunkColorCache.invalidateAllCachesInRadius(blendingRadius);
     }
 

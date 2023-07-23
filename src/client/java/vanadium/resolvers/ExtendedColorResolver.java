@@ -1,31 +1,31 @@
 package vanadium.resolvers;
 
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.ColorResolver;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 import vanadium.colormapping.BiomeColorMap;
 import vanadium.models.Coordinates;
+import vanadium.models.NonBlockingThreadLocal;
 import vanadium.util.ColorMappingStorage;
 
 public class ExtendedColorResolver implements ColorResolver {
-    @Nullable private static DynamicRegistryManager registryManager;
+    @Nullable private static  DynamicRegistryManager registryManager;
     private final ThreadLocal<CoordinateY> yPosition;
     private final VanadiumResolver wrappedResolver;
 
     public <K> ExtendedColorResolver(ColorMappingStorage<K> storage, K key, VanadiumResolver fallbackResolver) {
-        this.yPosition = ThreadLocal.withInitial(CoordinateY::new);
+        this.yPosition = NonBlockingThreadLocal.withInitial(CoordinateY::new);
         this.wrappedResolver = createResolver(storage, key, fallbackResolver);
     }
 
     public ExtendedColorResolver(VanadiumResolver wrappedResolver) {
-        this.yPosition = ThreadLocal.withInitial(CoordinateY::new);
+        this.yPosition = NonBlockingThreadLocal.withInitial(CoordinateY::new);
         this.wrappedResolver = wrappedResolver;
     }
 
-    public int resolveExtendedColor(BlockRenderView world, BlockPos position) {
+    public int resolveExtendedColor( world, BlockPos position) {
         this.yPosition.get().y = position.getY();
         return world.getColor(position, this);
     }
@@ -46,7 +46,7 @@ public class ExtendedColorResolver implements ColorResolver {
     }
 
     private static <K> VanadiumResolver createResolver(ColorMappingStorage<K> storage, K key, VanadiumResolver fallbackResolver) {
-        var data = ThreadLocal.withInitial(StoredBiomeData::new);
+        var data = NonBlockingThreadLocal.withInitial(StoredBiomeData::new);
         return (manager, biome, coordinates) -> {
             var storedData = data.get();
             if(storedData.lastBiome != biome) {

@@ -12,6 +12,7 @@ import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.dimension.DimensionTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import vanadium.configuration.VanadiumConfig;
 import vanadium.resources.*;
 
 public class Vanadium implements ClientModInitializer {

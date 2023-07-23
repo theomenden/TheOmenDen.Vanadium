@@ -1,20 +1,15 @@
 package vanadium.blending;
 
-import com.ibm.icu.impl.Utility;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.ColorResolver;
-import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import vanadium.VanadiumBlendingClient;
-import vanadium.caching.BlendingCache;
+import vanadium.configuration.VanadiumBlendingConfiguration;
 import vanadium.caching.ColorBlendingCache;
 import vanadium.caching.ColorCache;
 import vanadium.caching.ColorSlice;
@@ -900,7 +895,7 @@ public final class ColorBlending {
             BlendingChunk blendChunk,
             Coordinates coordinates)
     {
-        final int blendRadius = VanadiumBlendingClient.getBlendingRadius();
+        final int blendRadius = VanadiumBlendingConfiguration.getBlendingRadius();
 
         if (blendRadius >  BlendingConfig.BIOME_MINIMUM_BLENDING_RADIUS &&
                 blendRadius <= BlendingConfig.BIOME_MAXIMUM_BLENDING_RADIUS)
