@@ -1,5 +1,6 @@
 package vanadium.models;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.intellij.lang.annotations.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -11,18 +12,17 @@ import vanadium.util.GsonUtils;
 import java.io.IOException;
 
 public class BiomeColorMappingResourceReloadListener implements SimpleSynchronousResourceReloadListener {
-    private final Identifier biomeColormapId;
-    private final Identifier optifineId;
+    private final ResourceLocation biomeColormapId;
+    private final ResourceLocation optifineId;
     private BiomeColorMap colorMapping;
-    private static final String OPTIFINE_PATH = "optifine/%s.properties";
 
-    public BiomeColorMappingResourceReloadListener(Identifier id) {
-        this.biomeColormapId = new Identifier(id.getNamespace(), id.getPath() + ".json");
-        this.optifineId = new Identifier("minecraft", "optifine/" + id.getPath() + ".properties");
+    public BiomeColorMappingResourceReloadListener(ResourceLocation id) {
+        this.biomeColormapId = new ResourceLocation(id.getNamespace(), id.getPath() + ".json");
+        this.optifineId = new ResourceLocation("minecraft", "optifine/" + id.getPath() + ".properties");
     }
 
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return biomeColormapId;
     }
 
@@ -34,12 +34,12 @@ public class BiomeColorMappingResourceReloadListener implements SimpleSynchronou
     }
 
     @Override
-    public void reload(ResourceManager manager){
+    public void onResourceManagerReload(ResourceManager resourceManager) {
         ColorMapNativePropertyImage pi;
         try {
-            pi = GsonUtils.loadColorMapping(manager, biomeColormapId, false);
+            pi = GsonUtils.loadColorMapping(resourceManager, biomeColormapId, false);
         } catch (InvalidColorMappingException e) {
-           pi = tryOptifineDirectory(manager);
+            pi = tryOptifineDirectory(resourceManager);
         }
 
         colorMapping = pi == null ? null : new BiomeColorMap(pi.colormapProperties(), pi.nativeImage());

@@ -2,7 +2,10 @@ package vanadium.fluids;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.Nullable;
@@ -16,13 +19,13 @@ public class VanadiumFluidRenderHandler implements FluidRenderHandler {
     }
 
     @Override
-    public Sprite[] getFluidSprites(@Nullable BlockRenderView view, @Nullable BlockPos pos, FluidState state) {
+    public TextureAtlasSprite[] getFluidSprites(@Nullable BlockAndTintGetter view, @Nullable BlockPos pos, FluidState state) {
         return this.delegate.getFluidSprites(view, pos, state);
     }
 
     @Override
-    public int getFluidColor(@Nullable BlockRenderView view, @Nullable BlockPos pos, FluidState state) {
-        var blockState = state.getBlockState();
+    public int getFluidColor(@Nullable BlockAndTintGetter view, @Nullable BlockPos pos, FluidState state) {
+        var blockState = state.createLegacyBlock();
         if(BiomeColorMappings.isCustomColored(blockState)) {
             return BiomeColorMappings.getBiomeColorMapping(blockState, view, pos);
         }
@@ -30,12 +33,12 @@ public class VanadiumFluidRenderHandler implements FluidRenderHandler {
     }
 
     @Override
-    public void renderFluid(BlockPos pos, BlockRenderView world, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
+    public void renderFluid(BlockPos pos, BlockAndTintGetter world, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
         this.delegate.renderFluid(pos, world, vertexConsumer, blockState, fluidState);
     }
 
     @Override
-    public void reloadTextures(SpriteAtlasTexture textureAtlas) {
+    public void reloadTextures(TextureAtlas textureAtlas) {
         delegate.reloadTextures(textureAtlas);
     }
 }

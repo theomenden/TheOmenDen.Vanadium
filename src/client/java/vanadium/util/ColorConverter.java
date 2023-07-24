@@ -1,6 +1,7 @@
 package vanadium.util;
 
 import org.apache.commons.lang3.Range;
+import org.joml.Vector3f;
 import vanadium.models.VanadiumColor;
 
 import java.util.stream.IntStream;
@@ -258,6 +259,14 @@ public final class ColorConverter {
 
     public static String getWhiteHex() {
         return WHITE_HEX;
+    }
+
+    public static Vector3f createColorVector(int rgb) {
+        float red = ((rgb >> 16) & 0xff) * INV_255;
+        float green = ((rgb >> 8) & 0xff) * INV_255;
+        float blue = (rgb & 0xff) * INV_255;
+
+        return new Vector3f(red, green,blue);
     }
 
     private static float hueToRgb(float p, float q, float t) {

@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 public class GsonUtils {
     public static final Gson PROPERTY_GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new StringIdentifiableTypeAdapterFactory())
-            .registerTypeAdapter(ResourceLocation.class, new ResourceLocationTypeAdapter())
+            .registerTypeAdapter(ResourceLocation.class, new IdentifierTypeAdapter())
             .registerTypeAdapter(ApplicableBlockStates.class, new ApplicableBlockStatesAdapter())
             .registerTypeAdapter(VanadiumColor.class, new VanadiumColorAdapter())
             .registerTypeAdapter(MapColor.class, new MaterialColorAdapter())
@@ -75,7 +75,7 @@ public class GsonUtils {
             return new ColorMapNativePropertyImage(properties, null);
         }
 
-        try(InputStream inputStream = resourceManager.getResourceOrThrow(properties.getSource()).getInputStream()) {
+        try(InputStream inputStream = resourceManager.getResourceOrThrow(properties.getSource()).open()) {
             NativeImage image = NativeImage.read(inputStream);
             if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
                 IntStream.range(0, image.getWidth())

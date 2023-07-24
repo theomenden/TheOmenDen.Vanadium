@@ -3,6 +3,7 @@ package vanadium.mixin.model;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.util.ModelIdentifier;
@@ -58,8 +59,8 @@ public abstract class ModelLoaderMixin {
             // note: we're calling a custom biome colors method. Re-evaluate if we combine custom biome colors
             // with provided biome colors.
             if(BiomeColorMappings.isCustomColored(blockState)) {
-                var colorProviders = ((BlockColorsAccessor) MinecraftClient
-                        .getInstance().getBlockColors()).getProviders();
+                var colorProviders = ((BlockColorsAccessor) Minecraft
+                        .getInstance().getBlockColors()).getBlockColors();
                 if(!colorProviders.containsKey(Registries.BLOCK.getRawId(blockState.getBlock()))) {
                     // tentatively set to true - further checking in JsonUnbakedModelMixin
                     ModelIdContext.isACustomeTintForCurrentModel = true;

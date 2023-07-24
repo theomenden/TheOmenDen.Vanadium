@@ -1,23 +1,31 @@
 package vanadium.resolvers;
 
-import net.minecraft.fluid.Fluid;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ByIdMap;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import org.intellij.lang.annotations.Identifier;
 import vanadium.Vanadium;
 import vanadium.mixin.block.BlockColorsAccessor;
-import vanadium.models.Coordinates;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+
+import javax.naming.spi.Resolver;
 
 public final class DefaultVanadiumResolverProviders {
 
     public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER = DefaultVanadiumResolverProviders::resolveByBlockState;
     public static final VanadiumResolverProvider<Block> BLOCK_PROVIDER = DefaultVanadiumResolverProviders::resolveByBlock;
-    public static final VanadiumResolverProvider<Identifier> SKY_PROVIDER = DefaultVanadiumResolverProviders::resolveBySky;
-    public static final VanadiumResolverProvider<Identifier> SKY_FOG_PROVIDER = DefaultVanadiumResolverProviders::resolveByFog;
+    public static final VanadiumResolverProvider<ResourceLocation> SKY_PROVIDER = DefaultVanadiumResolverProviders::resolveBySky;
+    public static final VanadiumResolverProvider<ResourceLocation> SKY_FOG_PROVIDER = DefaultVanadiumResolverProviders::resolveByFog;
     public static final VanadiumResolverProvider<Fluid> FLUID_FOG_PROVIDER = key -> (manager, biome, coordinates) -> -1;
 
     private DefaultVanadiumResolverProviders() {
@@ -26,13 +34,21 @@ public final class DefaultVanadiumResolverProviders {
 
     private static VanadiumResolver resolveByBlockState(BlockState key) {
         return (manager, biome, coordinates) -> {
-            var colorProvider = ((BlockColorsAccessor)MinecraftClient.getInstance()
-                    .getBlockColors())
-                    .getProviders()
-                    .get(Registries.BLOCK.getRawId(key.getBlock()));
+
+            var minecraftInstance = Minecraft.getInstance();
+
+            var block = manager.registry(BuiltInRegistries.BLOCK.key()).isPresent() ?
+                    manager.registry(BuiltInRegistries.BLOCK.key()).get().getId(key.getBlock());
+
+
+
+           var colorProvider = ((BlockColorsAccessor)minecraftInstance
+                   .getBlockColors())
+                   .getBlockColors()
+                   .byId(block);
 
             if(colorProvider != null) {
-                var world = MinecraftClient.getInstance().world;
+                var world = Minecraft.getInstance().level;
 
                 Vec3i pos = new Vec3i(coordinates.x(), coordinates.y(), coordinates.z());
                 return colorProvider.getColor(key,
@@ -44,10 +60,10 @@ public final class DefaultVanadiumResolverProviders {
         };
     }
     private static VanadiumResolver resolveByBlock(Block key) {
-        return resolveByBlockState(key.getDefaultState());
+        return resolveByBlockState(key.defaultBlockState());
     }
 
-    private static VanadiumResolver resolveBySky(Identifier key) {
+    private static VanadiumResolver resolveBySky(ResourceLocation key) {
         return (manager, biome, coordinates) -> {
            int color = 0;
 
@@ -65,7 +81,7 @@ public final class DefaultVanadiumResolverProviders {
         };
     }
 
-    private static VanadiumResolver resolveByFog(Identifier key) {
+    private static VanadiumResolver resolveByFog(ResourceLocation key) {
         return (manager, biome, coordinates) -> {
             int color = 0;
 

@@ -1,16 +1,19 @@
 {
-	"required": true,
-	"package": "vanadium.mixin.client",
-	"compatibilityLevel": "JAVA_17",
-	"client": [
-		"ClientWorldMixin",
-      "vanadium.mixin.sodium.BlockColorCacheMixin",
-      "vanadium.mixin.block.LeverMixin",
-      "vanadium.mixin.block.RedstoneWireMixin",
-		"vanadium.mixin.block.BlockColorsAccessor",
-		"BlockRenderCacheMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "vanadium.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "BlockRenderCacheMixin",
+    "ClientWorldMixin",
+    "vanadium.mixin.block.BlockColorsAccessor",
+    "vanadium.mixin.block.LeverMixin",
+    "vanadium.mixin.block.RedstoneWireMixin",
+    "vanadium.mixin.sodium.BlockColorCacheMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "BlockColorsAccessor"
+  ]
 }

@@ -1,5 +1,7 @@
 package vanadium.util;
 
+import org.joml.Vector3f;
+
 import java.util.random.RandomGenerator;
 
 public class MathUtils {

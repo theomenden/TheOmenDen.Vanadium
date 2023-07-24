@@ -105,7 +105,7 @@ public class GlobalColorProperties {
                     textColor.put(color, TextColor.fromRgb(entry.getValue().rgb()));
                 }
             }
-            for(Map.Entry<Formatting, VanadiumColor> entry : text.format.entrySet()) {
+            for(Map.Entry<ChatFormatting, VanadiumColor> entry : text.format.entrySet()) {
                 this.textColor.put(entry.getKey(), TextColor.fromRgb(entry.getValue().rgb()));
             }
             text.code = Collections.emptyMap();
@@ -156,7 +156,7 @@ public class GlobalColorProperties {
         return lilypad;
     }
 
-    public int getPotion(StatusEffect potionKey) {
+    public int getPotion(ResourceKey<Potions> potionKey) {
         return getColor(potionKey, potions);
     }
 

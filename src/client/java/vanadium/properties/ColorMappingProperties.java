@@ -188,7 +188,7 @@ public class ColorMappingProperties {
     }
 
     public static ColorMappingProperties loadProperties(ResourceManager manager, ResourceLocation identifier, boolean isCustom) {
-        try(InputStream stream = manager.getResourceOrThrow(identifier).getInputStream();
+        try(InputStream stream = manager.getResourceOrThrow(identifier).open();
             Reader reader = GsonUtils.getJsonReader(stream, identifier, k -> k, "blocks"::equals)) {
            return loadFromJson(reader, identifier, isCustom);
         } catch(IOException e) {
