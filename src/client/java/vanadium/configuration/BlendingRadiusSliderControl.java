@@ -4,9 +4,7 @@ import me.jellysquid.mods.sodium.client.gui.options.Option;
 import me.jellysquid.mods.sodium.client.gui.options.control.Control;
 import me.jellysquid.mods.sodium.client.gui.options.control.ControlElement;
 import me.jellysquid.mods.sodium.client.util.Dim2i;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.text.Text;
+import net.minecraft.client.renderer.Rect2i;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.Validate;
 

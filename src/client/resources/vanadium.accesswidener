@@ -10,3 +10,4 @@ accessible field net/minecraft/client/Options biomeBlendRadius Lnet/minecraft/cl
 mutable field net/minecraft/client/Options biomeBlendRadius Lnet/minecraft/client/OptionInstance;
 
 
+accessible field net/minecraft/world/level/biome/BiomeManager biomeZoomSeed J

@@ -1,6 +1,6 @@
 package vanadium.util;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import vanadium.Vanadium;
 
 public final class Localization {
@@ -9,7 +9,7 @@ public final class Localization {
         return domain + "." + Vanadium.MODID + path;
     }
 
-    public static Text createLocalizedText(String domain, String path, Object... args) {
-        return Text.translatable(createTranslationkey(domain, path), args);
+    public static TranslatableContents createLocalizedText(String domain, String path, Object... args) {
+        return new TranslatableContents(createTranslationkey(domain, path), "", args);
     }
 }

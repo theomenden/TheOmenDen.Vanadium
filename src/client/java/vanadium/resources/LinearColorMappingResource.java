@@ -1,7 +1,6 @@
 package vanadium.resources;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Identifier;
 
 import java.util.random.RandomGenerator;
 

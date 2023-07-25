@@ -107,7 +107,7 @@ public class BiomeColorMap implements VanadiumResolver {
             case GRID:
                 try{
                     ResourceLocation biomeRegistry = ResourceLocation.tryBuild(Biomes.PLAINS.registry().getNamespace(), Biomes.PLAINS.location().getPath());
-                int x = properties.getColumn(Biomes, biomeRegistry).Column();
+                int x = properties.getColumn(Biomes.PLAINS, biomeRegistry).Column();
                 int y = Range.between(0, imageColorMapping.getHeight() - 1).fit(63 - properties.getYOffset());
                 return imageColorMapping.getPixelRGBA(x, y);
             } catch(IllegalArgumentException e) {

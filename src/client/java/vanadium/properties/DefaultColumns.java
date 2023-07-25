@@ -1,10 +1,7 @@
 package vanadium.properties;
 
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -20,13 +17,15 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 public final class DefaultColumns {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final Map<ResourceLocation, ResourceLocation> dynamicColumns = new HashMap<>();
 
     private static final Map<ResourceLocation, ColumnBounds> currentColumns = createCurrentColumnBoundaries();
 
+    private static final Map<ResourceLocation, ColumnBounds> legacyColumns = createLegacyColumnBoundaries();
 
+    private static final Map<ResourceLocation, ColumnBounds> stableColumns = createStableColumnBoundaries();
     private static final int TOTAL_VANILLA_BIOMES = 63;
     private static final int TOTAL_LEGACY_BIOMES = 176;
 
@@ -41,24 +40,66 @@ public final class DefaultColumns {
             currentBoundaries = currentColumns.get(vanillaBiomeApproximation(biomeResourceLocation));
 
             if(currentBoundaries == null) {
-                var msg = "Custom biome has no approximate in vanilla: " + biomeResourceLocation.toString();
-                LOGGER.error(msg);
+                var msg = "Custom biomeSource has no approximate in vanilla: " + biomeResourceLocation.toString();
+                logger.error(msg);
                 throw new IllegalStateException(msg);
             }
         }
         return currentBoundaries;
     }
 
+    public static ColumnBounds getOptifineBoundaries(ResourceKey<Biome> biomeResourceKey, Registry<Biome> biomeRegistry) {
+        var currentBoundaries = currentColumns.get(biomeResourceKey.location());
+
+        if(currentBoundaries == null) {
+            var targetBiome = biomeRegistry.get(biomeResourceKey);
+            var rawId = biomeRegistry.getId(targetBiome);
+            return new ColumnBounds(rawId, 1);
+        }
+        return currentBoundaries;
+    }
+
+    public static ColumnBounds getLegacyBoundaries(ResourceKey<Biome> biomeKey, Registry<Biome> biomeRegistry, boolean isUsingOptifine) {
+        var bounds = legacyColumns.get(biomeKey.location());
+
+        if(bounds == null && isUsingOptifine) {
+                int rawID = biomeRegistry.getId(biomeRegistry.get(biomeKey));
+                return new ColumnBounds(rawID - TOTAL_VANILLA_BIOMES + TOTAL_LEGACY_BIOMES, 1);
+            }
+
+        bounds = legacyColumns.get(vanillaBiomeApproximation(biomeKey));
+        if(bounds == null) {
+            var msg = "The current biomeSource has no approximate vanilla biomeSource: " + biomeKey;
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        return bounds;
+    }
+
+    public static ColumnBounds getStableBoundaries(ResourceKey<Biome> biomeResourceKey) {
+        var bounds = stableColumns.get(biomeResourceKey.location());
+
+        if(bounds == null) {
+            bounds = stableColumns.get(vanillaBiomeApproximation(biomeResourceKey));
+
+            if(bounds == null) {
+                var msg = "Custom biomeSource has no vanilla approximate biomeSource: " + biomeResourceKey;
+                logger.error(msg);
+                throw new IllegalStateException(msg);
+            }
+        }
+        return bounds;
+    }
+
     private static ResourceLocation vanillaBiomeApproximation(ResourceKey<Biome> biomeResourceLocation) {
         ResourceLocation id;
-
         id = dynamicColumns.get(biomeResourceLocation.location());
 
         if(id != null) {
             return id;
         }
 
-        var msg = "No column boundaries exist for the dynamic biome: " + biomeResourceLocation.toString();
+        var msg = "No column boundaries exist for the dynamic biomeSource: " + biomeResourceLocation;
         throw new IllegalArgumentException(msg);
     }
 
@@ -78,7 +119,7 @@ public final class DefaultColumns {
             var vanillaBiome = biomeRegistry.get(entry.getKey());
 
             if(vanillaBiome == null) {
-                LOGGER.error("This vanilla biome is not registered somehow: {}", entry.getKey());
+                logger.error("This vanilla biomeSource is not registered somehow: {}", entry.getKey());
                 continue;
             }
 
@@ -97,9 +138,14 @@ public final class DefaultColumns {
     private static Map<ResourceLocation, ColumnBounds> createCurrentColumnBoundaries() {
         var map = new HashMap<ResourceLocation, ColumnBounds>();
 
-        RegistryAccess = RegistryAccess.Frozen.; BuiltInRegistries.REGISTRY.asHolderIdMap().forEach();
+        for(var biomeSource : BuiltInRegistries.BIOME_SOURCE) {
 
-        for(var biome : )
+            var resourceKey = BuiltInRegistries.BIOME_SOURCE.key();
+            var id = BuiltInRegistries.BIOME_SOURCE.getId(biomeSource);
+
+            map.put(resourceKey.registry(), new ColumnBounds(id, 1));
+        }
+        return map;
     }
 
     private static Map<ResourceLocation, ColumnBounds> createLegacyColumnBoundaries() {
@@ -143,8 +189,8 @@ public final class DefaultColumns {
                 entry(Biomes.DEEP_LUKEWARM_OCEAN.location(), new ColumnBounds(48, 1)),
                 entry(Biomes.DEEP_COLD_OCEAN.location(), new ColumnBounds(49, 1)),
                 entry(Biomes.DEEP_FROZEN_OCEAN.location(), new ColumnBounds(50, 1)),
-                // formerly "mutated" variants of biomes, normal biome ID + 128, except for
-                // the post-1.7 biome additions.
+                // formerly "mutated" variants of biomes, normal biomeSource ID + 128, except for
+                // the post-1.7 biomeSource additions.
                 entry(Biomes.THE_VOID.location(), new ColumnBounds(127, 1)),
                 entry(Biomes.SUNFLOWER_PLAINS.location(), new ColumnBounds(129, 1)),
                 entry(Biomes.WINDSWEPT_GRAVELLY_HILLS.location(), new ColumnBounds(131, 1)),

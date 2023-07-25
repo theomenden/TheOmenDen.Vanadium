@@ -1,10 +1,10 @@
 package vanadium.resolvers;
 
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.biome.Biome;
 import vanadium.models.Coordinates;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.world.biome.Biome;
 
 @FunctionalInterface
 public interface VanadiumRegistryResolver {
-    int getColorRegistryForDynamicPosition(DynamicRegistryManager dynamicRegistryManager, Biome biome, Coordinates coordinates);
+    int getColorRegistryForDynamicPosition(RegistryAccess.ImmutableRegistryAccess dynamicRegistryManager, Biome biome, Coordinates coordinates);
 }

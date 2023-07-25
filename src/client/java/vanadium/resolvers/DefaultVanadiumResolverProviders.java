@@ -1,24 +1,14 @@
 package vanadium.resolvers;
 
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ByIdMap;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import org.intellij.lang.annotations.Identifier;
 import vanadium.Vanadium;
-import vanadium.mixin.block.BlockColorsAccessor;
-
-import javax.naming.spi.Resolver;
 
 public final class DefaultVanadiumResolverProviders {
 
@@ -37,18 +27,12 @@ public final class DefaultVanadiumResolverProviders {
 
             var minecraftInstance = Minecraft.getInstance();
 
-            var block = manager.registry(BuiltInRegistries.BLOCK.key()).isPresent() ?
-                    manager.registry(BuiltInRegistries.BLOCK.key()).get().getId(key.getBlock());
+           var colorProvider =  ColorProviderRegistry.BLOCK.get(key.getBlock());
 
-
-
-           var colorProvider = ((BlockColorsAccessor)minecraftInstance
-                   .getBlockColors())
-                   .getBlockColors()
-                   .byId(block);
 
             if(colorProvider != null) {
-                var world = Minecraft.getInstance().level;
+                var world = minecraftInstance.level;
+
 
                 Vec3i pos = new Vec3i(coordinates.x(), coordinates.y(), coordinates.z());
                 return colorProvider.getColor(key,

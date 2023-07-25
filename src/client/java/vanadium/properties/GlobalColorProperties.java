@@ -74,7 +74,7 @@ public class GlobalColorProperties {
     private final Map<MapColor, VanadiumColor> map;
     private final Map<EntityType<?>, int[]> spawnEgg;
     private final Map<ChatFormatting, TextColor> textColor;
-    private final TextColor text;
+    private final TextColorSettings text;
 
     private final int xpOrbTime;
     private final Format defaultFormat;

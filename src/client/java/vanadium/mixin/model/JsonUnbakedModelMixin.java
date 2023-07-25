@@ -12,7 +12,7 @@ import vanadium.models.ModelIdContext;
 
 import java.util.List;
 
-@Mixin(JsonUnbakedModel.class)
+@Mixin(Json.class)
 public abstract class JsonUnbakedModelMixin {
     @Shadow public abstract List<ModelElement> getElements();
 

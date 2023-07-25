@@ -1,15 +1,18 @@
 package vanadium.mixin.block;
 
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,30 +21,29 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import vanadium.Vanadium;
 
 
-@Mixin(RedstoneWireBlock.class)
+@Mixin(RedStoneWireBlock.class)
 public abstract class RedstoneWireMixin extends Block {
+    @Shadow @Final public static IntegerProperty POWER;
+
     private RedstoneWireMixin() {
         super(null);
     }
 
-    @Inject(method= "getWireColor", at = @At("HEAD"), cancellable = true)
+    @Inject(method= "getColorForPower", at = @At("HEAD"), cancellable = true)
     private static void onWireColorChange(int power, CallbackInfoReturnable<Integer> cir){
        if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
            cir.setReturnValue(Vanadium.REDSTONE_COLORS.getColorAtIndex(power));
        }
     }
 
-    @Inject (
-            method= "randomDisplayTick",
-            at = @At (
-                    value = "FIELD",
-                    target="Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;",
-                    ordinal = 0
-            ),
-            locals = LocalCapture.CAPTURE_FAILHARD,
-            cancellable = true
-    )
-    private void onRandomDisplayTick(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci, int power) {
+    @Inject(method="animateTick",
+    at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/core/Direction$Plane;iterator()Ljava/util/Iterator;",
+            ordinal = 0),
+    locals = LocalCapture.CAPTURE_FAILHARD,
+    cancellable = true)
+    private void onRandomDisplayTick(BlockState state, Level world, BlockPos pos, RandomSource random, CallbackInfo ci, int power) {
         if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
             double x = pos.getX() + 0.5 + (random.nextFloat() - 0.5)*0.2;
             double y = ((float)pos.getY() + 0.0625f);
@@ -50,7 +52,7 @@ public abstract class RedstoneWireMixin extends Block {
             float r = ((color >> 16) & 0xff) / 255.0f;
             float g = ((color >> 8) & 0xff) / 255.0f;
             float b = (color & 0xff) / 255.0f;
-            world.addParticle(new DustParticleEffect(new Vector3f(r,g,b),1.0f), x,y,z, 0.0,0.0,0.0);
+            world.addParticle(new DustParticleOptions(new Vector3f(r,g,b),1.0f), x,y,z, 0.0,0.0,0.0);
             ci.cancel();
         }
     }
