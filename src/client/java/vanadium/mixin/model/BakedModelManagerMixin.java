@@ -3,6 +3,7 @@ package vanadium.mixin.model;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.RegistryAccess;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,7 +20,7 @@ public abstract class BakedModelManagerMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void reloadVanadiumCustomBiomeColors(RegistryAccess.ImmutableRegistryAccess manger, Profiler profiler, CallbackInfo ci) {
+    private void reloadVanadiumCustomBiomeColors(ReloadState state, Profiler profiler, CallbackInfo ci) {
         Vanadium.CUSTOM_BLOCK_COLORS.onResourceManagerReload(manager);
     }
 }
