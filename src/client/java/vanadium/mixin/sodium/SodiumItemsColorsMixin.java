@@ -1,10 +1,10 @@
 package vanadium.mixin.sodium;
 
 import me.jellysquid.mods.sodium.client.world.biome.ItemColorsExtended;
-import net.minecraft.client.color.item.ItemColorProvider;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.*;
 import vanadium.colormapping.BiomeColorMappings;
 
@@ -15,13 +15,13 @@ import vanadium.colormapping.BiomeColorMappings;
         remap = Interface.Remap.NONE)
 )
 public abstract class SodiumItemsColorsMixin implements ItemColorsExtended {
-@Unique private static final ItemColorProvider VANADIUM_PROVIDER = (stack, tintIndex) ->
-        BiomeColorMappings.getBiomeColorMapping(((BlockItem)stack.getItem()).getBlock().getDefaultState(), null, null);
+@Unique private static final ItemColor VANADIUM_PROVIDER = (stack, tintIndex) ->
+        BiomeColorMappings.getBiomeColorMapping(((BlockItem)stack.getItem()).getBlock().defaultBlockState(), null, null);
 
 @Intrinsic(displace = true)
-    public ItemColorProvider i$getColorProvider(ItemStack stack) {
+    public ItemColor i$getColorProvider(ItemStack stack) {
     if(stack.getItem() instanceof BlockItem blockItem
-        && BiomeColorMappings.isItemCustomColored(blockItem.getBlock().getDefaultState())) {
+        && BiomeColorMappings.isItemCustomColored(blockItem.getBlock().defaultBlockState())) {
         return VANADIUM_PROVIDER;
     }
     return this.getColorProvider(stack);

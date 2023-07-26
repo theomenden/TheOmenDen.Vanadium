@@ -2,6 +2,9 @@ package vanadium.properties;
 
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -116,7 +119,7 @@ public class ColorMappingProperties {
         return this.yOffset;
     }
 
-    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, Registry<Biome> biomeRegistry){
+    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, ResourceKey<Biome> biomeResourceKey){
         if(this.format != Format.GRID) {
             throw new IllegalStateException("Column layout is not set to GRID");
         }
@@ -135,11 +138,10 @@ public class ColorMappingProperties {
             throw new IllegalArgumentException("Biome " + biomeId + " not found in color mapping");
         }
 
-
         return switch(this.layout) {
             case DEFAULT -> DefaultColumns.getDefaultBoundaries(biomeKey);
-            case OPTIFINE -> DefaultColumns.getOptifineBoundaries(biomeKey, biomeRegistry);
-            case LEGACY -> DefaultColumns.getLegacyBoundaries(biomeKey, biomeRegistry, this.isUsingOptifine);
+            case OPTIFINE -> DefaultColumns.getOptifineBoundaries(biomeKey, biomeResourceKey);
+            case LEGACY -> DefaultColumns.getLegacyBoundaries(biomeKey, biomeResourceKey, this.isUsingOptifine);
             case STABLE -> DefaultColumns.getStableBoundaries(biomeKey);
         };
     }

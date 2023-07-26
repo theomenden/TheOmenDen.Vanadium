@@ -1,6 +1,8 @@
 package vanadium.models;
 
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
+import net.minecraft.client.renderer.texture.SpriteLoader;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -34,7 +36,7 @@ public class ColormapResourceReloadListener implements SimpleResourceReloadListe
     public CompletableFuture<int[]> load(ResourceManager manager, ProfilerFiller profiler, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return RawTextureDataLoader.loadRawTextureData(manager, mapResourceId);
+                return SpriteLoader.loadSprite(mapResourceId, manager.getResource(mapResourceId).get());
             } catch (IOException e) {
                 return tryLoadingFromOptifineDirectory(manager);
             }

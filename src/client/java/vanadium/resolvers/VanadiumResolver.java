@@ -5,5 +5,5 @@ import net.minecraft.world.level.biome.Biome;
 import vanadium.models.Coordinates;
 @FunctionalInterface
 public interface VanadiumResolver {
-    int getColorAtCoordinatesForBiomeByManager(RegistryAccess.ImmutableRegistryAccess manager, Biome biome, Coordinates coordinates);
+    int getColorAtCoordinatesForBiomeByManager(RegistryAccess manager, Biome biome, Coordinates coordinates);
 }

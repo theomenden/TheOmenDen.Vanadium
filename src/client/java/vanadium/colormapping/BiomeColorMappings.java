@@ -31,8 +31,8 @@ public final class BiomeColorMappings {
     private BiomeColorMappings() {
     }
 
-    public static VanadiumResolver getTotalSky(ResourceKey<DimensionType> dimensionId) {
-        return skyColorMappings.getVanadiumResolver(dimensionId.registry());
+    public static VanadiumResolver getTotalSky(ResourceLocation dimensionId) {
+        return skyColorMappings.getVanadiumResolver(dimensionId);
     }
 
     public static VanadiumResolver getTotalSkyFog(ResourceLocation dimensionId) {

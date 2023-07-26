@@ -33,7 +33,7 @@ public class SodiumGameOptionsPagesMixin {
                         .setName(Component.translatable("vanadium.biomeBlendRadius"))
                                .setTooltip(Component.translatable("vanadium.biomeBlendRadius.tooltip"))
                         .setControl(option -> new SliderControl(option, 0, 14, 1, ControlValueFormatter.biomeBlend()))
-                        .setBinding((options, value) -> VanadiumBlendingConfiguration.getBlendingRadius(), options -> VanadiumBlendingConfiguration.getBlendingRadius())
+                        .setBinding((options, value) -> VanadiumBlendingConfiguration.getBiomeBlendingRadius(), options -> VanadiumBlendingConfiguration.getBiomeBlendingRadius())
                         .setImpact(OptionImpact.LOW)
                         .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)
                         .build())

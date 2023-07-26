@@ -3,11 +3,15 @@ package vanadium.properties;
 import com.google.gson.JsonParseException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.alchemy.Potions;
@@ -28,9 +32,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.Map.entry;
@@ -64,7 +67,7 @@ public class GlobalColorProperties {
     private final Map<ResourceLocation, VanadiumColor> dimensionFog;
     private final Map<ResourceLocation, VanadiumColor> dimensionSky;
     private final int lilypad;
-    private final Map<Potions, VanadiumColor> potions;
+    private final Map<MobEffect, VanadiumColor> potions;
     private final Map<DyeColor, VanadiumColor> sheep;
     private final Map<DyeColor, float[]> sheepRgb;
     private final Map<DyeColor, VanadiumColor> collar;
@@ -85,7 +88,7 @@ public class GlobalColorProperties {
         this.dimensionFog = convertIdentifierMapping(settings.fog);
         this.dimensionSky = convertIdentifierMapping(settings.sky);
         this.lilypad = settings.lilypad != null ? settings.lilypad.rgb() : 0;
-        this.potions = convertMapping(settings.potion, Player);
+        this.potions = convertMapping(settings.potion, BuiltInRegistries.MOB_EFFECT);
         this.sheep = settings.sheep;
         this.sheepRgb = toRgb(settings.sheep);
         this.collar = settings.collar;
@@ -101,18 +104,19 @@ public class GlobalColorProperties {
             for(Map.Entry<Integer, VanadiumColor> entry : text.code.entrySet()) {
                 int code = entry.getKey();
                 if(code < 16) {
-                    ChatFormatting color = ChatFormatting.getByCode(code);
+                    ChatFormatting color = ChatFormatting.getById(code);
                     textColor.put(color, TextColor.fromRgb(entry.getValue().rgb()));
                 }
             }
-            for(Map.Entry<ChatFormatting, VanadiumColor> entry : text.format.entrySet()) {
-                this.textColor.put(entry.getKey(), TextColor.fromRgb(entry.getValue().rgb()));
-            }
+            text.format
+                    .entrySet()
+                    .forEach(entry -> this.textColor.put(entry.getKey(), TextColor.fromRgb(entry
+                            .getValue()
+                            .rgb())));
             text.code = Collections.emptyMap();
             text.format = Collections.emptyMap();
             this.text = text;
         } else {
-            // settings.text == null
             this.textColor = Collections.emptyMap();
             this.text = new TextColorSettings();
         }
@@ -156,8 +160,8 @@ public class GlobalColorProperties {
         return lilypad;
     }
 
-    public int getPotion(ResourceKey<Potions> potionKey) {
-        return getColor(potionKey, potions);
+    public int getPotion(MobEffect mobEffect) {
+        return getColor(mobEffect, potions);
     }
 
     public int getWool(DyeColor color) {
@@ -261,14 +265,15 @@ public class GlobalColorProperties {
 
     private static <T> Map<EntityType<?>, int[]> collateSpawnEggColors(Settings settings) {
         Map<EntityType<?>, int[]> result = new HashMap<>();
-        ResourceKey<Registry<EntityType<?>>> entityTypeResourceKey = Registries.ENTITY_TYPE;
 
+        var entityTypeRegistryAccessor = Registries.ENTITY_TYPE;
+        var entityTypeRegistry = new Registry<EntityType<?>>();
         if(settings.egg != null) {
             LegacyEggColor legacy = settings.egg;
             legacy.shell
                     .entrySet()
                     .forEach(entry -> {
-                        EntityType<?> type = entityTypeResourceKey.cast(entry.getKey());
+                        EntityType<?> type = ;
                         result.put(type, new int[]{entry.getValue().rgb(), 0});
                     });
             legacy.spots

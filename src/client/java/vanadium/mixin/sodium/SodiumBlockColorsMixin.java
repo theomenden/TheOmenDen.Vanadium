@@ -2,8 +2,8 @@ package vanadium.mixin.sodium;
 
 import me.jellysquid.mods.sodium.client.model.quad.blender.ColorSampler;
 import me.jellysquid.mods.sodium.client.world.biome.BlockColorsExtended;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.*;
 import vanadium.colormapping.BiomeColorMappings;
 

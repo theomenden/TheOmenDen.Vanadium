@@ -6,5 +6,5 @@ import vanadium.models.Coordinates;
 
 @FunctionalInterface
 public interface VanadiumRegistryResolver {
-    int getColorRegistryForDynamicPosition(RegistryAccess.ImmutableRegistryAccess dynamicRegistryManager, Biome biome, Coordinates coordinates);
+    int getColorRegistryForDynamicPosition(RegistryAccess dynamicRegistryManager, Biome biome, Coordinates coordinates);
 }

@@ -2,6 +2,7 @@ package vanadium;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -79,12 +80,12 @@ public class Vanadium implements ClientModInitializer {
                       .key();
     }
 
-    public static <T> T getRegistryValue(Registry<T> registry, RegistryAccess.RegistryEntry<T> entry) {
-        var optionalRegistryKey = entry.key();
-        if(optionalRegistryKey != null) {
-            return registry.get(optionalRegistryKey.registry());
+    public static <T> T getRegistryValue(Registry<T> registry, Holder<T> entry) {
+        var optionalRegistryKey = entry.unwrapKey();
+        if(optionalRegistryKey.isPresent()) {
+            return registry.get(optionalRegistryKey.get());
         }
-        return entry.value().get(optionalRegistryKey.registry());
+        return entry.value();
     }
 
     @Override

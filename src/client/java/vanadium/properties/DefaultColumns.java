@@ -2,6 +2,7 @@ package vanadium.properties;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -48,23 +49,24 @@ public final class DefaultColumns {
         return currentBoundaries;
     }
 
-    public static ColumnBounds getOptifineBoundaries(ResourceKey<Biome> biomeResourceKey, Registry<Biome> biomeRegistry) {
+    public static ColumnBounds getOptifineBoundaries(ResourceKey<Biome> biomeResourceKey, ResourceKey<Biome> biomeRegistryKey) {
         var currentBoundaries = currentColumns.get(biomeResourceKey.location());
 
         if(currentBoundaries == null) {
-            var targetBiome = biomeRegistry.get(biomeResourceKey);
-            var rawId = biomeRegistry.getId(targetBiome);
+            var targetBiome = BuiltInRegistries.BIOME_SOURCE.get(biomeRegistryKey.registry());
+            var rawId = BuiltInRegistries.BIOME_SOURCE.getId(targetBiome);
             return new ColumnBounds(rawId, 1);
         }
         return currentBoundaries;
     }
 
-    public static ColumnBounds getLegacyBoundaries(ResourceKey<Biome> biomeKey, Registry<Biome> biomeRegistry, boolean isUsingOptifine) {
+    public static ColumnBounds getLegacyBoundaries(ResourceKey<Biome> biomeKey, ResourceKey<Biome> biomeRegistryKey, boolean isUsingOptifine) {
         var bounds = legacyColumns.get(biomeKey.location());
 
         if(bounds == null && isUsingOptifine) {
-                int rawID = biomeRegistry.getId(biomeRegistry.get(biomeKey));
-                return new ColumnBounds(rawID - TOTAL_VANILLA_BIOMES + TOTAL_LEGACY_BIOMES, 1);
+            var targetBiome = BuiltInRegistries.BIOME_SOURCE.get(biomeRegistryKey.registry());
+            var rawId = BuiltInRegistries.BIOME_SOURCE.getId(targetBiome);
+                return new ColumnBounds(rawId - TOTAL_VANILLA_BIOMES + TOTAL_LEGACY_BIOMES, 1);
             }
 
         bounds = legacyColumns.get(vanillaBiomeApproximation(biomeKey));

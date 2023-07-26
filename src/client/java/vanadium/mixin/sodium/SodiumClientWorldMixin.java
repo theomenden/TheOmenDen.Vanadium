@@ -13,6 +13,6 @@ public abstract class SodiumClientWorldMixin extends Level implements BiomeSeedP
     }
 
     public long getBiomeSeed() {
-        return this.getBiomeManager().biomeZoomSeed;
+        return ((SodiumBiomeAccessMixin)this.getBiomeManager()).getBiomeZoomSeed();
     }
 }
