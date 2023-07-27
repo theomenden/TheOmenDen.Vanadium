@@ -1,6 +1,7 @@
 package vanadium.properties;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -32,6 +33,20 @@ public final class DefaultColumns {
 
     private DefaultColumns(){
 
+    }
+
+    public static void reloadDefaultColumnBoundaries(RegistryAccess manager) {
+        dynamicColumns.clear();
+        if(manager != null) {
+            var biomeRegistry = manager.registry(Registries.BIOME).get();
+
+            biomeRegistry
+                    .entrySet()
+                    .stream()
+                    .map(Map.Entry::getKey)
+                    .filter(key -> !currentColumns.containsKey(key.registry()))
+                    .forEach(key -> dynamicColumns.put(key.registry(), computeBiomeClosestToDefault(key, biomeRegistry)));
+        }
     }
 
     public static ColumnBounds getDefaultBoundaries(ResourceKey<Biome> biomeResourceLocation) {

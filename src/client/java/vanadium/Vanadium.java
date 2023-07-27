@@ -62,7 +62,7 @@ public class Vanadium implements ClientModInitializer {
         return dimensionId;
     }
 
-    public static ResourceLocation getBiomeId(RegistryAccess.ImmutableRegistryAccess manager, Biome biome) {
+    public static ResourceLocation getBiomeId(RegistryAccess manager, Biome biome) {
 
         ResourceKey biomeId = manager.registry(Registries.BIOME).get().key();
 

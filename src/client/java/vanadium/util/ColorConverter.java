@@ -66,6 +66,14 @@ public final class ColorConverter {
         return (byte)Math.round(color * 255.0f);
     }
 
+    public static int convertFloatArrayToIntColor(float[] values) {
+        int red = (int) (values[0] *255);
+        int green = (int) (values[1] *255);
+        int blue = (int) (values[2] *255);
+
+        return (red <<16) | (green <<8) | blue;
+    }
+
     public static float convertSRGBFloatToLinearAsFloat(float color) {
         float clamped = Range.between(0.0f, 1.0f).fit(color);
 

@@ -13,7 +13,7 @@ import vanadium.models.NonBlockingThreadLocal;
 import vanadium.util.ColorMappingStorage;
 
 public class ExtendedColorResolver implements ColorResolver {
-    @Nullable private static  RegistryAccess.ImmutableRegistryAccess registryManager;
+    @Nullable private static  RegistryAccess registryManager;
     private final ThreadLocal<CoordinateY> yPosition;
     private final VanadiumResolver wrappedResolver;
 
@@ -43,7 +43,7 @@ public class ExtendedColorResolver implements ColorResolver {
                 new Coordinates((int)x, this.yPosition.get().y, (int)z));
     }
 
-    public static void setRegistryManager(@Nullable RegistryAccess.ImmutableRegistryAccess manager) {
+    public static void setRegistryManager(@Nullable RegistryAccess manager) {
         registryManager = manager;
     }
 

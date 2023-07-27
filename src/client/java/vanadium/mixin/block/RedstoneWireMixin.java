@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import vanadium.Vanadium;
+import vanadium.util.MathUtils;
 
 
 @Mixin(RedStoneWireBlock.class)
@@ -49,9 +50,9 @@ public abstract class RedstoneWireMixin extends Block {
             double y = ((float)pos.getY() + 0.0625f);
             double z = pos.getZ() + 0.5 + (random.nextFloat() - 0.5)*0.2;
             int color = Vanadium.REDSTONE_COLORS.getColorAtIndex(power);
-            float r = ((color >> 16) & 0xff) / 255.0f;
-            float g = ((color >> 8) & 0xff) / 255.0f;
-            float b = (color & 0xff) / 255.0f;
+            float r = ((color >> 16) & 0xff) * MathUtils.INV_255;
+            float g = ((color >> 8) & 0xff) * MathUtils.INV_255;
+            float b = (color & 0xff) * MathUtils.INV_255;
             world.addParticle(new DustParticleOptions(new Vector3f(r,g,b),1.0f), x,y,z, 0.0,0.0,0.0);
             ci.cancel();
         }

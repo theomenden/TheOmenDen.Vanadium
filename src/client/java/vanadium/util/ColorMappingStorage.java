@@ -33,7 +33,7 @@ public final class ColorMappingStorage<K> {
     }
 
     @Nullable
-    public BiomeColorMap getBiomeColorMapping(RegistryAccess.ImmutableRegistryAccess registryManager, K key, Biome biome) {
+    public BiomeColorMap getBiomeColorMapping(RegistryAccess registryManager, K key, Biome biome) {
         BiomeColorMap resolvedMap = this.colorMappings.get(key, Vanadium.getBiomeId(registryManager, biome));
 
         if(resolvedMap == null) {
