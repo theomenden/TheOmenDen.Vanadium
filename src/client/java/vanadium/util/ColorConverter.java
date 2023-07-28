@@ -245,6 +245,13 @@ public final class ColorConverter {
         return Integer.parseInt(hex, 16);
     }
 
+    public static int hexToRgbU(String hex) {
+        if(hex.startsWith("#")) {
+            hex = hex.substring(1);
+        }
+        return Integer.parseUnsignedInt(hex, 16);
+    }
+
     public static int rgbToArgb(int rgb, int alpha) {
         return (alpha << 24) | (rgb & 0xFFFFFF);
     }

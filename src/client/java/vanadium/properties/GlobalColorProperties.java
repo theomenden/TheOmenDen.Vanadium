@@ -197,6 +197,10 @@ public class GlobalColorProperties {
         return colors != null? colors[index] : 0;
     }
 
+    public TextColor getText(ChatFormatting formatting) {
+        return textColor.get(formatting);
+    }
+
     public int getXpText() {
         return getColor(text.xpbar);
     }

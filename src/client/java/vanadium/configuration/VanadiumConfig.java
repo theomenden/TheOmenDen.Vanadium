@@ -32,6 +32,23 @@ public final class VanadiumConfig {
      relativeBlockLightIntensityExponent = -13.0;
     }
 
+    public boolean getShouldClearSky() {
+        return this.shouldClearSky;
+    }
+    public boolean getShouldClearVoid() {
+        return this.shouldClearVoid;
+    }
+    public boolean getShouldBlendSkyLight() {
+        return this.shouldBlendSkyLight;
+    }
+    public boolean getShouldFlickerBlockLight() {
+        return this.shouldFlickerBlockLight;
+    }
+
+    public double getDefaultLightIntensityExponent() {
+        return this.relativeBlockLightIntensityExponent;
+    }
+
     public static double getScaledBlockLightIntensity(double relativeBlockLightIntensityExponent) {
         return Math.log(2) * 0.25 * relativeBlockLightIntensityExponent;
     }
