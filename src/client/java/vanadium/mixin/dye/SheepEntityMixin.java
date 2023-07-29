@@ -6,19 +6,12 @@ import net.minecraft.world.item.DyeColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.Vanadium;
-import vanadium.util.ColorCacheUtils;
-import vanadium.util.ColorConverter;
-import vanadium.util.MathUtils;
-
-import java.util.Map;
 
 @Mixin(Sheep.class)
 
-public class SheepEntityMixin extends Animal {
+public abstract class SheepEntityMixin extends Animal {
     private SheepEntityMixin() {
         super(null, null);
     }

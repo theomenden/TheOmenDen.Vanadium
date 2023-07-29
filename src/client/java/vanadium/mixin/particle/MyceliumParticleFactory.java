@@ -21,11 +21,7 @@ public abstract class MyceliumParticleFactory {
             Particle particle = cir.getReturnValue();
             int color = Vanadium.MYCELIUM_PARTICLE_COLORS.getRandomColorFromMapping();
 
-            float rCol = ((color >> 16) & 0xff) * MathUtils.INV_255;
-            float gCol = ((color >> 8) & 0xff) * MathUtils.INV_255;
-            float bCol = (color  & 0xff) * MathUtils.INV_255;
-
-            particle.setColor(rCol, gCol, bCol);
+            FallingLavaParticleMixin.calculateShiftedColor(particle, color);
         }
     }
 }

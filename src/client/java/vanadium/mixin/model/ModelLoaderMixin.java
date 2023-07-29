@@ -2,17 +2,15 @@ package vanadium.mixin.model;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.argument.BlockStateArgumentType;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.util.Identifier;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.arguments.blocks.BlockStateArgument;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.level.block.state.BlockState;
+import org.intellij.lang.annotations.Identifier;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -26,7 +24,8 @@ import vanadium.models.ModelIdContext;
 @Mixin(ModelLoader.class)
 public abstract class ModelLoaderMixin {
     @Unique
-    private static final BlockStateArgumentType BLOCK_STATE_PARSER = BlockStateArgumentType.blockState(CommandRegistryAccess.of(DynamicRegistryManager.ImmutableImpl.EMPTY, FeatureSet.empty()));
+    private static final BlockStateArgument BLOCK_STATE_PARSER = BlockStateArgument.block(CommandBuildContext
+            .configurable(RegistryAccess.ImmutableRegistryAccess.EMPTY, FeatureFlagSet.of()));
 
     @Dynamic("Model baking lambda in upload()")
     @Inject(
@@ -36,7 +35,7 @@ public abstract class ModelLoaderMixin {
                     target = "Lnet/minecraft/client/render/model/ModelLoader;bake(Lnet/minecraft/util/Identifier;Lnet/minecraft/client/render/model/ModelBakeSettings;)Lnet/minecraft/client/render/model/BakedModel;"
             )
     )
-    private void setModelIdContext(Identifier id, CallbackInfo info) {
+    private void setModelIdContext(ResourceLocation id, CallbackInfo info) {
         ModelIdContext.isACustomeTintForCurrentModel = false;
         if(id instanceof ModelIdentifier modelId) {
             BlockState blockState;

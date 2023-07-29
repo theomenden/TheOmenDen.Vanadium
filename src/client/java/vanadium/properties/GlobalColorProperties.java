@@ -144,7 +144,7 @@ public class GlobalColorProperties {
         }
     }
 
-        public int getParticle(ColoredParticle particleKey) {
+    public int getParticle(ColoredParticle particleKey) {
         return getColor(particleKey, particle);
     }
 
@@ -200,6 +200,15 @@ public class GlobalColorProperties {
     public TextColor getText(ChatFormatting formatting) {
         return textColor.get(formatting);
     }
+
+    public int getHoveredButtonText() {
+        return getColor(text.button.hover);
+    }
+
+    public int getDisabledButtonText() {
+        return getColor(text.button.disabled);
+    }
+
 
     public int getXpText() {
         return getColor(text.xpbar);
