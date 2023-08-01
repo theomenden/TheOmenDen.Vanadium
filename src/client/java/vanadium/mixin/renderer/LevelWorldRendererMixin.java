@@ -9,18 +9,18 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import vanadium.Vanadium;
 
 @Mixin(LevelRenderer.class)
-public class WorldRendererMixin {
+public abstract class LevelWorldRendererMixin {
     @ModifyConstant(
-            method= "renderSky",
+            method = "renderSky",
             constant = @Constant(doubleValue = 0.0, ordinal = 0),
             slice = @Slice(
                     from = @At(
                             value = "INVOKE",
-                            target="Lnet/minecraft/client/multiplayer/ClientLevel$ClientLevelData;getHorizonHeight(Lnet/minecraft/world/level/LevelHeightAccessor;)D"
+                            target ="Lnet/minecraft/client/multiplayer/ClientLevel;getSkyColor(Lnet/minecraft/world/phys/Vec3;F)Lnet/minecraft/world/phys/Vec3;"
                     )
             )
     )
-    private double modifyVoidBackgroundCondition(double zero) {
+    private double modifyVoidBackgroundRenderingCondition(double zero) {
         if(Vanadium.getCurrentConfiguration().getShouldClearVoid()) {
             zero = Double.NEGATIVE_INFINITY;
         }

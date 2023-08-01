@@ -39,7 +39,7 @@ public final class BiomeColorMappings {
         return skyFogColorMappings.getVanadiumResolver(dimensionId);
     }
 
-    public static BiomeColorMap getFluidFog(RegistryAccess.ImmutableRegistryAccess manager, Fluid fluid, Biome biome) {
+    public static BiomeColorMap getFluidFog(RegistryAccess manager, Fluid fluid, Biome biome) {
         return colorMappingsByFluidFog.getBiomeColorMapping(manager, fluid, biome);
     }
 

@@ -276,40 +276,36 @@ public class GlobalColorProperties {
         return result;
     }
 
-    private static <T> Map<EntityType<?>, int[]> collateSpawnEggColors(Settings settings) {
+    private static Map<EntityType<?>, int[]> collateSpawnEggColors(Settings settings) {
         Map<EntityType<?>, int[]> result = new HashMap<>();
 
-        var entityTypeRegistryAccessor = Registries.ENTITY_TYPE;
-        var entityTypeRegistry = new Registry<EntityType<?>>();
+       var entityTypeRegistry =  BuiltInRegistries.ENTITY_TYPE;
+
         if(settings.egg != null) {
             LegacyEggColor legacy = settings.egg;
             legacy.shell
-                    .entrySet()
-                    .forEach(entry -> {
-                        EntityType<?> type = ;
-                        result.put(type, new int[]{entry.getValue().rgb(), 0});
+                    .forEach((key, value) -> {
+                        EntityType<?> type = entityTypeRegistry.get(ResourceLocation.tryParse(key));
+                        result.put(type, new int[]{value.rgb(), 0});
                     });
             legacy.spots
-                    .entrySet()
-                    .forEach(entry -> {
-                        EntityType<?> type = entityTypeResourceKey.get(ResourceLocation.tryParse(entry.getKey()));
+                    .forEach((key, value) -> {
+                        EntityType<?> type = entityTypeRegistry.get(ResourceLocation.tryParse(key));
                         int[] colors = result.computeIfAbsent(type, t -> new int[2]);
-                        colors[1] = entry.getValue()
-                                         .rgb();
+                        colors[1] = value
+                                .rgb();
                     });
         }
 
-        settings.spawnEgg.entrySet()
-                .forEach(entry -> {
-                     EntityType<?> type = entityTypeResourceKey.get(ResourceLocation.tryParse(entry.getKey()));
-                     int[] colors = result.computeIfAbsent(type, t -> new int[2]);
-                     VanadiumColor[] vanadiumColors = entry.getValue();
+        settings.spawnEgg.forEach((key, vanadiumColors) -> {
+            EntityType<?> type = entityTypeRegistry.get(ResourceLocation.tryParse(key));
+            int[] colors = result.computeIfAbsent(type, t -> new int[2]);
 
-                    IntStream
-                            .range(0, Math.min(2, vanadiumColors.length))
-                            .forEach(i -> colors[i] = vanadiumColors[i]
-                                    .rgb());
-                 });
+            IntStream
+                    .range(0, Math.min(2, vanadiumColors.length))
+                    .forEach(i -> colors[i] = vanadiumColors[i]
+                            .rgb());
+        });
 
         return result;
     }

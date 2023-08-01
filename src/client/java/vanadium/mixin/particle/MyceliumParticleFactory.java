@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.Vanadium;
 import vanadium.util.MathUtils;
 
-@Mixin(SuspendedTownParticle.Provider.class)
+@Mixin(SuspendedParticle.class)
 public abstract class MyceliumParticleFactory {
     @Inject(
             method = "createParticle(Lnet/minecraft/core/particles/SimpleParticleType;Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDD)Lnet/minecraft/client/particle/Particle;",
@@ -21,7 +21,15 @@ public abstract class MyceliumParticleFactory {
             Particle particle = cir.getReturnValue();
             int color = Vanadium.MYCELIUM_PARTICLE_COLORS.getRandomColorFromMapping();
 
-            FallingLavaParticleMixin.calculateShiftedColor(particle, color);
+            this.calculateShiftedColor(particle, color);
         }
+    }
+
+    private static void calculateShiftedColor(Particle particle, int color) {
+        float redValue = ((color >> 16) & 0xff) * MathUtils.INV_255;
+        float greenValue = ((color >> 8) & 0xff) * MathUtils.INV_255;
+        float blueValue = (color & 0xff) * MathUtils.INV_255;
+
+        particle.setColor(redValue, greenValue, blueValue);
     }
 }

@@ -4,6 +4,7 @@ import net.minecraft.client.gui.Gui;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import vanadium.Vanadium;
 
 @Mixin(Gui.class)
@@ -17,4 +18,5 @@ public class InGameHudMixin {
         int col = Vanadium.COLOR_PROPERTIES.getProperties().getXpText();
         return col != 0 ? col : original;
     }
+
 }
