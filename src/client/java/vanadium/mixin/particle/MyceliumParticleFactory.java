@@ -1,7 +1,6 @@
 package vanadium.mixin.particle;
 
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SuspendedParticle;
 import net.minecraft.client.particle.SuspendedTownParticle;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,10 +9,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.Vanadium;
 import vanadium.util.MathUtils;
 
-@Mixin(SuspendedParticle.class)
+@Mixin(SuspendedTownParticle.class)
 public abstract class MyceliumParticleFactory {
     @Inject(
-            method = "createParticle(Lnet/minecraft/core/particles/SimpleParticleType;Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDD)Lnet/minecraft/client/particle/Particle;",
+            method = "getRenderType",
             at = @At("RETURN")
     )
     private void onCreateParticle(CallbackInfoReturnable<Particle> cir) {

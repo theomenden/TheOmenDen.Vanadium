@@ -1,50 +1,45 @@
 package vanadium.mixin.model;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.arguments.blocks.BlockStateArgument;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.client.resources.model.AtlasSet;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.models.model.ModelTemplate;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.state.BlockState;
-import org.intellij.lang.annotations.Identifier;
-import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.colormapping.BiomeColorMappings;
 import vanadium.mixin.block.BlockColorsAccessor;
 import vanadium.models.ModelIdContext;
 
-@Mixin(ModelLoader.class)
-public abstract class ModelLoaderMixin {
-    @Unique
-    private static final BlockStateArgument BLOCK_STATE_PARSER = BlockStateArgument.block(CommandBuildContext
-            .configurable(RegistryAccess.ImmutableRegistryAccess.EMPTY, FeatureFlagSet.of()));
+import java.util.Map;
 
-    @Dynamic("Model baking lambda in upload()")
+@Mixin(ModelManager.class)
+public abstract class ModelManagerMixin {
+
     @Inject(
-            method = "method_4733",
+            method = "loadModels",
             at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/model/ModelLoader;bake(Lnet/minecraft/util/Identifier;Lnet/minecraft/client/render/model/ModelBakeSettings;)Lnet/minecraft/client/render/model/BakedModel;"
+                    value="INVOKE",
+                    target = "Lnet/minecraft/client/resources/model/ModelBakery;bakeModels(Ljava/util/function/BiFunction;)V"
             )
     )
-    private void setModelIdContext(ResourceLocation id, CallbackInfo info) {
+    private void setModelResourceContext(ProfilerFiller profilerFiller, Map<ResourceLocation, AtlasSet.StitchResult> atlasPreparations, ModelBakery modelBakery, CallbackInfoReturnable<ModelManager.ReloadState> cir) {
         ModelIdContext.isACustomeTintForCurrentModel = false;
-        if(id instanceof ModelIdentifier modelId) {
+        if(id instanceof ModelTemplate modelId) {
             BlockState blockState;
             if(modelId.getVariant().equals("inventory")) {
                 // we're using the block color providers for detecting non-custom item tinting for now
-                var blockId = new Identifier(modelId.getNamespace(), modelId.getPath());
-                blockState = Registries.BLOCK.get(blockId).getDefaultState();
+                var blockId = new ResourceLocation(modelId.getNamespace(), modelId.getPath());
+                blockState = BuiltInRegistries.BLOCK.get(blockId).getDefaultState();
             } else {
-                var blockStateDesc = modelId.getNamespace() + ":" + modelId.getPath() + "[" + modelId.getVariant() + "]";
+                var blockStateDesc = modelId.namespace() + ":" + modelId.getPath() + "[" + modelId.getVariant() + "]";
                 try {
                     blockState = BLOCK_STATE_PARSER.parse(new StringReader(blockStateDesc)).getBlockState();
                 } catch(CommandSyntaxException e) {
@@ -60,7 +55,7 @@ public abstract class ModelLoaderMixin {
             if(BiomeColorMappings.isCustomColored(blockState)) {
                 var colorProviders = ((BlockColorsAccessor) Minecraft
                         .getInstance().getBlockColors()).getBlockColors();
-                if(!colorProviders.containsKey(Registries.BLOCK.getRawId(blockState.getBlock()))) {
+                if(!colorProviders.containsKey(Registry.BLOCK.getRawId(blockState.getBlock()))) {
                     // tentatively set to true - further checking in JsonUnbakedModelMixin
                     ModelIdContext.isACustomeTintForCurrentModel = true;
                 }

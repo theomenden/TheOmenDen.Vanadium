@@ -15,13 +15,13 @@ public abstract class ClickableWidgetMixin extends AbstractWidget {
         super(x, y, width, height, message);
     }
 
-    @ModifyConstant(method = "renderButton", constant = @Constant(intValue = 16777215))
+    @ModifyConstant(method = "renderWidget", constant = @Constant(intValue = 16777215))
     private int proxyButtonHoverColor(int original) {
         int col = Vanadium.COLOR_PROPERTIES.getProperties().getHoveredButtonText();
         return col != 0 && this.isHovered() ? col : original;
     }
 
-    @ModifyConstant(method = "renderButton", constant = @Constant(intValue = 10526880))
+    @ModifyConstant(method = "renderWidget", constant = @Constant(intValue = 10526880))
     private int proxyButtonDisabledColor(int original) {
         int col = Vanadium.COLOR_PROPERTIES.getProperties().getDisabledButtonText();
         return col != 0 ? col : original;

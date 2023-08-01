@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.Vanadium;
 import vanadium.util.MathUtils;
 
@@ -18,25 +19,20 @@ public abstract class DrippingLavaParticleMixin extends TextureSheetParticle {
 
     @Unique private int age;
 
-    @Inject(
-            method = "<init>",
-            at=@At("RETURN")
-    )
-    private void onConstructor(CallbackInfo ci) {
-        age = 0;
+    @Inject(method = "createDripstoneLavaFallParticle",
+    at=@At("RETURN"))
+    private static void onCreateParticle(CallbackInfoReturnable<DripParticle.DripstoneFallAndLandParticle> ci) {
         if(Vanadium.LAVA_DROP_COLORS.hasCustomColorMapping()) {
             int color = Vanadium.LAVA_DROP_COLORS.getColorAtIndex(0);
 
-            calculateProvidedColor(color);
+            var particle = ci.getReturnValue();
+            float r = ((color >> 16) & 0xff) * MathUtils.INV_255;
+            float g = ((color >> 8) & 0xff) * MathUtils.INV_255;
+            float b = (color & 0xff) * MathUtils.INV_255;
+
+            particle.setColor(r, g, b);
+
         }
-    }
-
-    private void calculateProvidedColor(int color) {
-        float r = ((color >> 16) & 0xff) * MathUtils.INV_255;
-        float g = ((color >> 8) & 0xff) * MathUtils.INV_255;
-        float b = (color & 0xff) * MathUtils.INV_255;
-
-        this.setColor(r,g,b);
     }
 
     @Inject(
