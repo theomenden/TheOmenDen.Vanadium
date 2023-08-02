@@ -35,10 +35,10 @@ public class ColorMappingResource implements SimpleResourceReloadListener {
     @Override
     public CompletableFuture<Void> load(ResourceManager manager, ProfilerFiller profiler, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                SimpleTexture simpleTexture = new SimpleTexture(identifier);
-                simpleTexture.load(manager);
-            }
+
+                try (SimpleTexture simpleTexture = new SimpleTexture(identifier)) {
+                    simpleTexture.load(manager);
+                }
             catch(IOException e) {
                 logger.error("Failed to load color mapping from path, attempting Optifine directory", e);
                 attemptToLoadFromOptifineDirectory(manager);
@@ -57,9 +57,8 @@ public class ColorMappingResource implements SimpleResourceReloadListener {
     }
 
     private void attemptToLoadFromOptifineDirectory(ResourceManager manager) {
-        try {
-            SimpleTexture simpleTexture = new SimpleTexture(optifineIdentifier);
-            simpleTexture.load(manager);
+            try (SimpleTexture simpleTexture = new SimpleTexture(optifineIdentifier)) {
+                simpleTexture.load(manager);
         } catch (IOException e) {
             logger.error("Failed to load color mapping from Optifine directory", e);
         }

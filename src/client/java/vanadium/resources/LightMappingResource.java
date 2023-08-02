@@ -35,7 +35,7 @@ public class LightMappingResource implements SimpleResourceReloadListener<Map<Re
 
     private static Map<ResourceLocation, NativeImage> getLightMappings(ResourceManager manager, ResourceLocation directoryResourceLocation) {
         Map<ResourceLocation, Resource> filesToMap = manager.listResources(directoryResourceLocation.getPath(),s -> s.getPath().endsWith(".png")
-                                && s.equals(directoryResourceLocation.getNamespace()));
+                                && s.equals(directoryResourceLocation));
 
         Map<ResourceLocation, NativeImage> resolvedLightMappings = new HashMap<>(filesToMap.size());
 

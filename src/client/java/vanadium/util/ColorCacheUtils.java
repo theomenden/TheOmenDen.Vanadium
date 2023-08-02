@@ -1,6 +1,5 @@
 package vanadium.util;
 
-import vanadium.enums.BiomeColorTypes;
 import vanadium.models.Coordinates;
 
 public final class ColorCacheUtils {
@@ -20,7 +19,7 @@ public final class ColorCacheUtils {
         return ((long)(chunkX & PRESERVED_30_BITS)) |
                ((long)(chunkZ & PRESERVED_30_BITS) << 26) |
                ((long)(chunkY & 0x1F) << 52) |
-               ((long)(colorType << 57));
+                ((long) colorType << 57);
     }
 
     public static long getChunkKey(Coordinates coordinates, int colorType) {

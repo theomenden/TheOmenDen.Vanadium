@@ -4,14 +4,13 @@ import net.minecraft.client.gui.Gui;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import vanadium.Vanadium;
 
 @Mixin(Gui.class)
 public class InGameHudMixin {
 
     @ModifyConstant(
-            method = "Lnet/minecraft/client/gui/Gui;renderExperienceBar(Lnet/minecraft/client/gui/GuiGraphics;I)V",
+            method = "renderExperienceBar(Lnet/minecraft/client/gui/GuiGraphics;I)V",
             constant = @Constant(intValue = 8453920)
     )
     private int getXpTextColor(int original) {
