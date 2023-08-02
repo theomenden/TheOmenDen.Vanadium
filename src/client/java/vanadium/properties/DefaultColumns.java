@@ -166,7 +166,7 @@ public final class DefaultColumns {
     }
 
     private static Map<ResourceLocation, ColumnBounds> createLegacyColumnBoundaries() {
-        return Map.ofEntries(
+        return Map.<ResourceLocation, ColumnBounds>ofEntries(
                 entry(Biomes.OCEAN.location(), new ColumnBounds(0, 1)),
                 entry(Biomes.PLAINS.location(), new ColumnBounds(1, 1)),
                 entry(Biomes.DESERT.location(), new ColumnBounds(2, 1)),
@@ -248,7 +248,7 @@ public final class DefaultColumns {
     }
 
     private static Map<ResourceLocation, ColumnBounds> createStableColumnBoundaries() {
-        return Map.ofEntries(
+        return Map.<ResourceLocation, ColumnBounds>ofEntries(
                 entry(Biomes.THE_VOID.location(), new ColumnBounds(0, 1)),
                 entry(Biomes.PLAINS.location(), new ColumnBounds(1, 1)),
                 entry(Biomes.SUNFLOWER_PLAINS.location(), new ColumnBounds(2, 1)),

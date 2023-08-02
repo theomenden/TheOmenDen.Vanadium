@@ -19,14 +19,14 @@ public final class BiomeNameTracer {
     @Nullable
     public static ResourceLocation updateBiomeName(ResourceLocation biomeId, ResourceLocation context) {
       if(REMOVED_BIOMES.contains(biomeId)){
-          log.warn("Biome '{}' does not exist and should be removed", context, biomeId);
+          log.warn("Biome '{}' does not exist and should be removed: {}", context, biomeId);
           return null;
       }
 
         ResourceLocation renamed = RENAMED_BIOMES.get(biomeId);
 
       if(renamed != null){
-          log.warn("Biome '{}' has been renamed to '{}' and needs to be updated", context, biomeId, renamed);
+          log.warn("Biome '{}' has been renamed to '{}' and needs to be updated: {}", context, biomeId, renamed);
           return renamed;
       }
 
