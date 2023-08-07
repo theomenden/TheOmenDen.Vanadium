@@ -1,7 +1,7 @@
 package vanadium.util;
 
 import net.minecraft.network.chat.contents.TranslatableContents;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 public final class Localization {
     private Localization() {}

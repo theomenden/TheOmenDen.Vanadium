@@ -6,7 +6,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.DimensionTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CubicSampler;
@@ -26,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 import vanadium.blending.BlendingChunk;
 import vanadium.blending.ColorBlending;
 import vanadium.caching.BlendingCache;
@@ -41,7 +40,6 @@ import vanadium.models.NonBlockingThreadLocal;
 import vanadium.resolvers.ExtendedColorResolver;
 import vanadium.resolvers.VanadiumColorResolverCustomCompatibility;
 
-import java.awt.*;
 import java.util.function.Supplier;
 
 @Mixin(value = ClientLevel.class)

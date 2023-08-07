@@ -1,29 +1,27 @@
-package vanadium;
+package vanadium.entry;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.DimensionTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
-import net.minecraft.world.level.dimension.DimensionType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vanadium.configuration.VanadiumConfig;
 import vanadium.resources.*;
 
 public class Vanadium implements ClientModInitializer {
-    private static final Logger LOGGER = LogManager.getLogger(Vanadium.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Vanadium.class);
     public static final String MODID = "vanadium";
     public static final String COLORMATIC_ID = "colormatic";
     public static final ResourceLocation OVERWORLD_ID = BuiltinDimensionTypes.OVERWORLD.registry();
@@ -90,15 +88,9 @@ public class Vanadium implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        VanadiumConfig.deserializeConfigFromJsonAsync()
-                .thenAccept((deserializedConfig) -> {
-                    LOGGER.info("Vanadium configuration initialized...");
-                    config = deserializedConfig;
-                }).exceptionally(ex -> {
-                    LOGGER.error("Vanadium configuration failed to initialize, using default configuration:  {}...", ex.getMessage());
-                    config = VanadiumConfig.INSTANCE;
-                    return null;
-                }).join();
+        AutoConfig.register(VanadiumConfig.class, GsonConfigSerializer::new);
+        config = AutoConfig.getConfigHolder(VanadiumConfig.class).getConfig();
+        LOGGER.info("{} is colorizing your packs \uD83C\uDFA8 ", MODID.toUpperCase());
 
         ResourceManagerHelper client = ResourceManagerHelper.get(PackType.CLIENT_RESOURCES);
         client.registerReloadListener(WATER_COLORS);
@@ -116,8 +108,5 @@ public class Vanadium implements ClientModInitializer {
         client.registerReloadListener(EXPERIENCE_ORB_COLORS);
         client.registerReloadListener(LIGHTMAP_PROPERTIES);
         client.registerReloadListener(LIGHTMAPS);
-
-        LOGGER.info("Vanadium initialized!");
-
     }
 }

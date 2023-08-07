@@ -1,22 +1,24 @@
 package vanadium.mixin.model;
 
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.arguments.blocks.BlockStateArgument;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(BakedModel.class)
-public class ModelLoaderMixin {
-    private static final BlockStateArgument BLOCK_STATE_ARGUMENT = BlockStateArgument.block(
-           CommandBuildContext.configurable(RegistryAccess.EMPTY, FeatureFlagSet.of())
-    );
+@Mixin(BlockBehaviour.class)
+public abstract class ModelLoaderMixin {
 
-    @Dynamic("Lambda in upload")
-    @Inject(
-            method = ""
-    )
+    @Dynamic("Model baking Lambda in ")
+    @Inject(method = "",
+    at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/resources/model/ModelBakery;bakeModels(Ljava/util/function/BiFunction;)V"
+    ))
+    private void setModelResourceLocationContext(ResourceLocation resourceLocation, CallbackInfo ci) {
+
+    }
+
 }

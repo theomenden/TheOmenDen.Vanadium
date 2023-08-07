@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 @Mixin(AbstractButton.class)
 public abstract class ClickableWidgetMixin extends AbstractWidget {

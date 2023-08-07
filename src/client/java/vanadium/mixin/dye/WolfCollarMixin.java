@@ -8,7 +8,7 @@ import net.minecraft.world.item.DyeColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 @Mixin(WolfCollarLayer.class)
 public abstract class WolfCollarMixin extends RenderLayer<Wolf, WolfModel<Wolf>> {

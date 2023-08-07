@@ -5,7 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin {

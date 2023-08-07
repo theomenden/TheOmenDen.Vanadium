@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Gui;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 @Mixin(Gui.class)
 public class InGameHudMixin {

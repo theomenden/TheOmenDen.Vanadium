@@ -14,7 +14,7 @@ import vanadium.models.ModelIdContext;
 import java.util.List;
 
 @Mixin(BlockModel.class)
-public abstract class JsonModelMixin {
+public abstract class BlockModelMixin {
 
     @Shadow @Final private List<BlockElement> elements;
 
@@ -23,14 +23,14 @@ public abstract class JsonModelMixin {
             at = @At("HEAD")
     )
     private void setVanadiumCustomTint(CallbackInfoReturnable<BakedModel> cir) {
-        if (ModelIdContext.isACustomeTintForCurrentModel
+        if (ModelIdContext.isACustomTintForCurrentModel
                 && this.elements
                 .stream()
                 .flatMap(element -> element.faces
                         .values()
                         .stream())
                 .anyMatch(face -> face.tintIndex >= 0)) {
-            ModelIdContext.isACustomeTintForCurrentModel = false;
+            ModelIdContext.isACustomTintForCurrentModel = false;
         }
     }
 }

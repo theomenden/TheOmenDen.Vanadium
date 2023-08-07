@@ -1,10 +1,6 @@
 package vanadium.properties;
 
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -14,7 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 import vanadium.enums.ColumnLayout;
 import vanadium.enums.Format;
 import vanadium.models.GridEntry;

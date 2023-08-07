@@ -1,9 +1,5 @@
 {
-  "schemaVersion": 1,
-  "id": "vanadium",
-  "version": "${version}",
-  "name": "Vanadium",
-  "description": "A simple custom colors implementation with some level of naive caching.",
+  "accessWidener": "vanadium.accesswidener",
   "authors": [
     "The Omen Den",
     "Andrew Beers (Alu)"
@@ -13,12 +9,15 @@
     "sources": "https://github.com/theomenden/TheOmenDen.Vanadium",
     "issues": "https://github.com/theomenden/TheOmenDen.Vanadium/issues"
   },
-  "license":"MIT",
-  "icon": "assets/vanadiumElement.png",
-  "mixins": [
-    "vanadium.client.mixins.json"
-  ],
-  "accessWidener": "vanadium.accesswidener",
+  "custom": {
+    "modmenu": {
+      "links": {
+        "vanadium.discord": "https://discord.gg/GWshtCqEx4",
+        "vanadium.github": "https://github.com/theomenden/TheOmenDen.Vanadium"
+      },
+      "update_checker": true
+    }
+  },
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": "^1.20.1",
@@ -27,19 +26,22 @@
     "mod-menu": ">=7.0.1",
     "java": ">=17"
   },
-  "custom": {
-    "modmenu": {
-       "links": {
-         "vanadium.discord": "https://discord.gg/GWshtCqEx4" ,
-         "vanadium.github": "https://github.com/theomenden/TheOmenDen.Vanadium"
-       },
-      "parent": {
-        "id": "vanadium",
-        "name": "Vanadium",
-        "description": "A simple custom colors implementation with some level of naive caching.",
-        "icon": "assets/vanadiumElement.png"
-      },
-      "update_checker": true
-    }
-  }
+  "description": "A simple custom colors implementation with some level of naive caching.",
+  "entrypoints": {
+    "client": [
+      "vanadium.entry.Vanadium"
+    ],
+    "modmenu": [
+      "vanadium.entry.VanadiumModMenu"
+    ]
+  },
+  "icon": "assets/vanadiumElement.png",
+  "id": "vanadium",
+  "license": "MIT",
+  "mixins": [
+    "vanadium.client.mixins.json"
+  ],
+  "name": "Vanadium",
+  "schemaVersion": 1,
+  "version": "${version}"
 }

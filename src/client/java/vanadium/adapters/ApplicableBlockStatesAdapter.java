@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 import vanadium.properties.ApplicableBlockStates;
 
 import java.io.IOException;

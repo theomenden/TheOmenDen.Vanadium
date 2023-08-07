@@ -1,117 +1,43 @@
 package vanadium.configuration;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import net.fabricmc.loader.api.FabricLoader;
-import vanadium.Vanadium;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.Options;
+import net.minecraft.network.chat.Component;
+import vanadium.entry.Vanadium;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-public final class VanadiumConfig {
-    private transient File outputConfigFile;
-
+@Config(name= Vanadium.MODID)
+public class VanadiumConfig implements ConfigData {
     public static final VanadiumConfig INSTANCE = new VanadiumConfig();
 
-    private boolean shouldClearSky;
-    private boolean shouldClearVoid;
-    private boolean shouldBlendSkyLight;
-    private boolean shouldFlickerBlockLight;
-    private double relativeBlockLightIntensityExponent;
+    public boolean shouldClearSky;
+    public boolean shouldClearVoid;
+    public boolean shouldBlendSkyLight = true;
+    public boolean shouldFlickerBlockLight = true;
+    public double relativeBlockLightIntensityExponent = -13.0;
 
-    public VanadiumConfig() {
-     shouldClearSky = false;
-     shouldClearVoid = false;
-     shouldBlendSkyLight = true;
-     shouldFlickerBlockLight = true;
-     relativeBlockLightIntensityExponent = -13.0;
-    }
+    public int blendingRadius = 14;
 
-    public boolean getShouldClearSky() {
-        return this.shouldClearSky;
-    }
-    public boolean getShouldClearVoid() {
-        return this.shouldClearVoid;
-    }
-    public boolean getShouldBlendSkyLight() {
-        return this.shouldBlendSkyLight;
-    }
-    public boolean getShouldFlickerBlockLight() {
-        return this.shouldFlickerBlockLight;
-    }
+    public static OptionInstance<Integer> vanadiumBlendingRadius = new OptionInstance<>(
+            "options.biomeBlendRadius",
+            OptionInstance.noTooltip(),
+            (component, integer) -> {
+                int diameter = integer * 2 + 1;
+                return Options.genericValueLabel(component, Component.translatable("options.biomeBlendRadius." + diameter));
+            },
+            new OptionInstance.IntRange(0, 14),
+            14,
+            (integer) -> {
+                Minecraft.getInstance().levelRenderer.allChanged();
+            });
 
-    public double getDefaultLightIntensityExponent() {
-        return this.relativeBlockLightIntensityExponent;
+    public static int getBiomeBlendingRadius() {
+        return vanadiumBlendingRadius.get();
     }
 
     public static double getScaledBlockLightIntensity(double relativeBlockLightIntensityExponent) {
         return Math.log(2) * 0.25 * relativeBlockLightIntensityExponent;
-    }
-
-    public CompletableFuture<Void> serializeConfigToJsonAsync() {
-        return CompletableFuture.runAsync(() -> {
-            try(JsonWriter writer = new JsonWriter(new FileWriter(outputConfigFile))) {
-                writer.beginObject();
-                writer.name("shouldClearSky").value(shouldClearSky);
-                writer.name("shouldClearVoid").value(shouldClearVoid);
-                writer.name("shouldBlendSkyLight").value(shouldBlendSkyLight);
-                writer.name("shouldFlickerBlockLight").value(shouldFlickerBlockLight);
-                writer.name("relativeBlockLightIntensityExponent").value(relativeBlockLightIntensityExponent);
-                writer.endObject();
-            } catch (IOException e) {
-                throw new RuntimeException("Serialization failed: " + e.getMessage());
-            }
-        });
-    }
-
-    public static CompletableFuture<VanadiumConfig> deserializeConfigFromJsonAsync() {
-        File configFile = new File(FabricLoader
-                .getInstance().getConfigDir().toFile(), Vanadium.MODID + ".json");
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        return CompletableFuture.supplyAsync(() -> {
-            if(!configFile.exists()) {
-                VanadiumConfig defaultConfig = VanadiumConfig.INSTANCE;
-                defaultConfig.serializeConfigToJsonAsync().join();
-                return defaultConfig;
-            }
-
-            try(JsonReader reader = new JsonReader(new FileReader(configFile))) {
-                reader.beginObject();
-                VanadiumConfig config = new VanadiumConfig();
-                while (reader.hasNext()) {
-                    String key = reader.nextName();
-                    switch(key) {
-                        case "shouldClearSky":
-                            config.shouldClearSky = reader.nextBoolean();
-                            break;
-                        case "shouldClearVoid":
-                            config.shouldClearVoid = reader.nextBoolean();
-                            break;
-                        case "shouldBlendSkyLight":
-                            config.shouldBlendSkyLight = reader.nextBoolean();
-                            break;
-                        case "shouldFlickerBlockLight":
-                            config.shouldFlickerBlockLight = reader.nextBoolean();
-                            break;
-                        case "relativeBlockLightIntensityExponent":
-                            config.relativeBlockLightIntensityExponent = reader.nextDouble();
-                            break;
-                        default:
-                            reader.skipValue();
-                            break;
-                    }
-                }
-                reader.endObject();
-                return config;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        });
     }
 }

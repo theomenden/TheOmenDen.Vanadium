@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import vanadium.models.ModelIdContext;
 
 @Mixin(FaceBakery.class)
-public class QuadFactoryMixin {
+public class FaceBakeryMixin {
     @ModifyArg(
             method = "bakeQuad",
             at = @At(
@@ -16,6 +16,6 @@ public class QuadFactoryMixin {
             )
     )
     private int addTintToCustomColoredModel(int tintIndex) {
-        return ModelIdContext.isACustomeTintForCurrentModel ? 0 : tintIndex;
+        return ModelIdContext.isACustomTintForCurrentModel ? 0 : tintIndex;
     }
 }

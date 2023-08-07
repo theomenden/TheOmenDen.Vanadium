@@ -6,7 +6,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 import vanadium.colormapping.BiomeColorMap;
 import vanadium.resolvers.ExtendedColorResolver;
 import vanadium.resolvers.VanadiumResolver;

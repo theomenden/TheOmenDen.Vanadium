@@ -2,7 +2,7 @@ package vanadium.lightmapping;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 import java.util.HashMap;
 import java.util.Map;

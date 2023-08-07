@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;

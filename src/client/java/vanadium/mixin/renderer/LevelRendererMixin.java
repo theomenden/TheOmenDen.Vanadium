@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Slice;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {

@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 import vanadium.colormapping.BiomeColorMap;
 import vanadium.colormapping.BiomeColorMappings;
 import vanadium.exceptions.InvalidColorMappingException;

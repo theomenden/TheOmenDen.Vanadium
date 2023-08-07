@@ -3,11 +3,9 @@ package vanadium.particle;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import org.joml.Vector3f;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 import vanadium.util.ColorConverter;
 import vanadium.util.MathUtils;
-
-import java.awt.image.ColorConvertOp;
 
 public class CustomizedRedDustParticleEffect extends DustParticleOptions {
     public CustomizedRedDustParticleEffect(Vector3f color, float alpha) {

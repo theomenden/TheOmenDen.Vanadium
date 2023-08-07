@@ -3,18 +3,14 @@ package vanadium.colormapping;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.Biomes;
 import org.apache.commons.lang3.Range;
-import vanadium.Vanadium;
+import vanadium.entry.Vanadium;
 import vanadium.models.Coordinates;
 import vanadium.models.VanadiumColor;
 import vanadium.properties.ColorMappingProperties;
@@ -24,7 +20,6 @@ import vanadium.util.ColumnBounds;
 
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
-import java.util.stream.Collectors;
 
 public class BiomeColorMap implements VanadiumResolver {
     private final ColorMappingProperties properties;
