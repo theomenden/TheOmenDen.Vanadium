@@ -50,7 +50,7 @@ public abstract class LightMapTextureRendererMixin {
     @Inject(method="tick",
     at = @At("RETURN"))
     private void onFlickeringTick(CallbackInfo ci) {
-        if(Vanadium.getCurrentConfiguration().getShouldFlickerBlockLight()) {
+        if(Vanadium.getCurrentConfiguration().shouldFlickerBlockLight) {
             calculateTicksBetweenFlickerTargets();
         }
 
@@ -78,7 +78,7 @@ public abstract class LightMapTextureRendererMixin {
 
         relativeIntensityExponentialScale = ambience * VanadiumConfig.getScaledBlockLightIntensity(
           Vanadium.getCurrentConfiguration()
-                  .getDefaultLightIntensityExponent()
+                  .relativeBlockLightIntensityExponent
         ) * MathUtils.INV_16;
         
         if(world.getSkyFlashTime() > 0) {
@@ -178,7 +178,7 @@ public abstract class LightMapTextureRendererMixin {
             ordinal = 1
     )
     private float modifySkyAmbience(float value) {
-        if(!Vanadium.getCurrentConfiguration().getShouldBlendSkyLight()) {
+        if(!Vanadium.getCurrentConfiguration().shouldBlendSkyLight) {
             value = (int)(value * 16) * MathUtils.INV_16F;
         }
 

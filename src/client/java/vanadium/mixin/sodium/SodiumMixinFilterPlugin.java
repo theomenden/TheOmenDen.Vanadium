@@ -10,7 +10,8 @@ import java.util.Set;
 
 public class SodiumMixinFilterPlugin implements IMixinConfigPlugin {
     private final boolean shouldLoadMixins = FabricLoader
-            .getInstance().isModLoaded("sodium");
+            .getInstance()
+            .isModLoaded("sodium");
 
     @Override
     public void onLoad(String mixinPackage) {

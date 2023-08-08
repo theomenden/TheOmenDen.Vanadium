@@ -1,12 +1,11 @@
 package vanadium.mixin.sodium;
 
-import net.minecraft.world.level.biome.BiomeManager;
-import org.spongepowered.asm.mixin.Final;
+import me.jellysquid.mods.sodium.client.world.biome.BiomeSlice;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(BiomeManager.class)
+@Mixin(BiomeSlice.class)
 public interface SodiumBiomeAccessMixin {
 
-    @Accessor public long getBiomeZoomSeed();
+    @Accessor public long getBiomeSeed();
 }

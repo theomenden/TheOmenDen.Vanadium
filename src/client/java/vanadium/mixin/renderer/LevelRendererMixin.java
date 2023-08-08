@@ -21,7 +21,7 @@ public class LevelRendererMixin {
             )
     )
     private double modifyVoidBackgroundCondition(double zero) {
-        if(Vanadium.getCurrentConfiguration().getShouldClearVoid()) {
+        if(Vanadium.getCurrentConfiguration().shouldClearVoid) {
             zero = Double.NEGATIVE_INFINITY;
         }
         return zero;

@@ -1,78 +1,65 @@
 package vanadium.mixin.sodium;
 
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
-import me.jellysquid.mods.sodium.client.world.WorldSlice;
-import me.jellysquid.mods.sodium.client.world.biome.BlockColorCache;
-import net.minecraft.core.SectionPos;
-import net.minecraft.world.level.ChunkPos;
+import me.jellysquid.mods.sodium.client.world.biome.BiomeColorCache;
+import me.jellysquid.mods.sodium.client.world.biome.BiomeColorSource;
+import me.jellysquid.mods.sodium.client.world.biome.BiomeSlice;
+import me.jellysquid.mods.sodium.client.world.cloned.ChunkRenderContext;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.world.level.ColorResolver;
-import net.minecraft.world.level.biome.BiomeManager;
 import org.apache.commons.lang3.Range;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vanadium.util.ColorCacheUtils;
-import vanadium.util.SodiumColorBlendingUtils;
 
-@Mixin(value = BlockColorCache.class)
+@Mixin(BiomeColorCache.class)
 public class BlockColorCacheMixin {
-    @Unique
-    private int vanadium$baseX;
-    @Unique
-    private int vanadium$baseY;
-    @Unique
-    private int vanadium$baseZ;
-    @Unique
-    private Reference2ReferenceOpenHashMap<ColorResolver, int[]> vanadium$Colors;
+    @Shadow @Final private BiomeSlice biomeData;
+    @Shadow private int minX;
+    @Shadow private int minY;
+    @Shadow private int minZ;
+    @Unique private int vanadium$baseX;
+    @Unique private int vanadium$baseY;
+    @Unique private int vanadium$baseZ;
 
-    @Shadow
-    private WorldSlice slice;
+ @Unique private Reference2ReferenceOpenHashMap<ColorResolver, int[]> vanadium$colors;
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    public void constructorTail(WorldSlice slice, int radius, CallbackInfo ci) {
-        SectionPos pos = slice.getOrigin();
+ @Inject(method = "<init>", at=@At("TAIL"))
+ public void constructorTail(BiomeSlice biomeData, int blendRadius, CallbackInfo ci){
+     this.vanadium$colors = new Reference2ReferenceOpenHashMap<>();
+ }
 
-        this.vanadium$baseX = pos.getX();
-        this.vanadium$baseY = pos.getY();
-        this.vanadium$baseZ = pos.getZ();
+ @Inject(method = "update", at =  @At("TAIL"))
+ public void update(ChunkRenderContext context, CallbackInfo ci) {
+     vanadium$baseX = this.minX;
+     vanadium$baseY = this.minY;
+     vanadium$baseZ = this.minZ;
+ }
 
-        this.vanadium$Colors = new Reference2ReferenceOpenHashMap<>();
-    }
-
-    /**
-     * @author
-     * @reason
-     */
+ /**
+  * @author
+  * @reason
+  */
     @Overwrite(remap = false)
-    public int getColor(ColorResolver resolver, int x, int y, int z) {
-        int[] colors = this.vanadium$Colors.computeIfAbsent(resolver, k -> new int[4096]);
+    public int getColor(BiomeColorSource biomeColorSource, int posX, int posY, int posZ) {
 
-        int blockX = Range.between(0,15).fit(x - this.vanadium$baseX);
-        int blockY = Range.between(0,15).fit(x - this.vanadium$baseY);
-        int blockZ = Range.between(0,15).fit(x - this.vanadium$baseZ);
+        var resolver = BiomeColors.FOLIAGE_COLOR_RESOLVER.getColor();
 
-        int index = ColorCacheUtils.getArrayIndex(16, blockX, blockY, blockZ);
+     int[] colors = this.vanadium$colors.computeIfAbsent(resolver, k -> new int[4096]);
 
-        int color = colors[index];
+     int blockX = Range.between(0,15).fit(posX - this.vanadium$baseX);
+     int blockY = Range.between(0,15).fit(posX - this.vanadium$baseY);
+     int blockZ = Range.between(0,15).fit(posX - this.vanadium$baseZ);
 
-        if(color == 0) {
-            BiomeManager biomeManager = slice.getBiomeAccess();
+     int index = ColorCacheUtils.getArrayIndex(16, blockX, blockY, blockZ);
 
-            SodiumColorBlendingUtils.generateColors(
-                    biomeManager,
-                    resolver,
-                    x,
-                    y,
-                    z,
-                    colors);
+     int color = colors[index];
 
-            color = colors[index];
-        }
+     if(color == 0) {
 
-        return color;
-    }
+     }
+ }
+
 }

@@ -1,6 +1,6 @@
 package vanadium.mixin.sodium;
 
-import me.jellysquid.mods.sodium.client.world.biome.ItemColorsExtended;
+import me.jellysquid.mods.sodium.client.model.color.interop.ItemColorsExtended;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.world.item.BlockItem;
@@ -19,11 +19,11 @@ public abstract class SodiumItemsColorsMixin implements ItemColorsExtended {
         BiomeColorMappings.getBiomeColorMapping(((BlockItem)stack.getItem()).getBlock().defaultBlockState(), null, null);
 
 @Intrinsic(displace = true)
-    public ItemColor i$getColorProvider(ItemStack stack) {
+    public ItemColor i$sodium$getColorProvider(ItemStack stack) {
     if(stack.getItem() instanceof BlockItem blockItem
         && BiomeColorMappings.isItemCustomColored(blockItem.getBlock().defaultBlockState())) {
         return VANADIUM_PROVIDER;
     }
-    return this.getColorProvider(stack);
+    return this.sodium$getColorProvider(stack);
 }
 }

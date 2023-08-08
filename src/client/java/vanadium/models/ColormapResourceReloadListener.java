@@ -2,12 +2,10 @@ package vanadium.models;
 
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.client.renderer.texture.SpriteLoader;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.util.perf.Profiler;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -35,12 +33,11 @@ public class ColormapResourceReloadListener implements SimpleResourceReloadListe
     @Override
     public CompletableFuture<int[]> load(ResourceManager manager, ProfilerFiller profiler, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                return SpriteLoader.loadSprite(mapResourceId, manager.getResource(mapResourceId).get());
-            } catch (IOException e) {
-                return tryLoadingFromOptifineDirectory(manager);
-            }
-        }, executor);
+                var spriteContents =  SpriteLoader.loadSprite(mapResourceId, manager.getResource(mapResourceId).orElse(null));
+
+                return spriteContents.getUniqueFrames().toArray();
+        }, executor)
+         .exceptionally(e -> tryLoadingFromOptifineDirectory(manager));
     }
 
     @Override
@@ -52,7 +49,9 @@ public class ColormapResourceReloadListener implements SimpleResourceReloadListe
     @Nullable
     private int[] tryLoadingFromOptifineDirectory(ResourceManager manager) {
         try {
-            return RawTextureDataLoader.loadRawTextureData(manager, optifineId);
+            return SpriteLoader.loadSprite(optifineId, manager.getResourceOrThrow(optifineId))
+                    .getUniqueFrames()
+                               .toArray();
         } catch (IOException e) {
             return null;
         }

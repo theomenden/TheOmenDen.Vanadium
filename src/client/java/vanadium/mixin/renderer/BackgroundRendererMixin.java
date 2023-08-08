@@ -113,7 +113,7 @@ public abstract class BackgroundRendererMixin {
     private static int proxyCustomFogColor(Biome self, ClientLevel level, BiomeSourceAccess access,
                                            float angleDelta, int x, int y, int z) {
 
-        if(Vanadium.getCurrentConfiguration().getShouldClearSky()
+        if(Vanadium.getCurrentConfiguration().shouldClearSky
          && level.dimensionType().hasSkyLight()) {
             return self.getFogColor();
         }
@@ -146,7 +146,7 @@ public abstract class BackgroundRendererMixin {
     private static void setFogColorToSkyColor(Camera camera, float partialTicks, ClientLevel level, int i , float f, CallbackInfo ci) {
         if (!Vanadium
                 .getCurrentConfiguration()
-                .getShouldClearSky()
+                .shouldClearSky
                 || !level
                 .dimensionType()
                 .hasSkyLight()) {
@@ -168,7 +168,7 @@ public abstract class BackgroundRendererMixin {
             target = "Lnet/minecraft/client/player/LocalPlayer;getWaterVision()F")
     )
     private static void saveColorsToRestRainAndThunder(CallbackInfo ci) {
-        if(!Vanadium.getCurrentConfiguration().getShouldClearSky()) {
+        if(!Vanadium.getCurrentConfiguration().shouldClearSky) {
             return;
         }
 

@@ -30,10 +30,10 @@ public class SodiumGameOptionsPagesMixin {
     private static void quality(CallbackInfoReturnable<OptionPage> cir, List<OptionGroup> groups) {
         groups.add(OptionGroup.createBuilder()
                 .add(OptionImpl.createBuilder(int.class, vanillaOpts)
-                        .setName(Component.translatable("vanadium.biomeBlendRadius"))
-                               .setTooltip(Component.translatable("vanadium.biomeBlendRadius.tooltip"))
+                        .setName(Component.translatable("category.biomeBlendRadius"))
+                               .setTooltip(Component.translatable("text.autoconfig.options.vanadiumBlendingRadiusTooltip"))
                         .setControl(option -> new SliderControl(option, 0, 14, 1, ControlValueFormatter.biomeBlend()))
-                        .setBinding((options, value) -> VanadiumBlendingConfiguration.getBiomeBlendingRadius(), options -> VanadiumBlendingConfiguration.getBiomeBlendingRadius())
+                        .setBinding((options, value) -> VanadiumBlendingConfiguration.setBiomeBlendingRadius(value), options -> VanadiumBlendingConfiguration.getBiomeBlendingRadius())
                         .setImpact(OptionImpact.LOW)
                         .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)
                         .build())

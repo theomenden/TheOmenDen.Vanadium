@@ -42,7 +42,11 @@ public abstract class DrippingLavaParticleMixin extends TextureSheetParticle {
     private void onLifetimeAdjusted(CallbackInfo ci) {
         if(Vanadium.LAVA_DROP_COLORS.hasCustomColorMapping()) {
             int color = Vanadium.LAVA_DROP_COLORS.getColorAtIndex(++this.lifetime);
-            calculateProvidedColor(color);
+            float r = ((color >> 16) & 0xff) * MathUtils.INV_255;
+            float g = ((color >> 8) & 0xff) * MathUtils.INV_255;
+            float b = (color & 0xff) * MathUtils.INV_255;
+
+            this.setColor(r,g,b);
         }
     }
 }
