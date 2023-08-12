@@ -23,7 +23,6 @@ public static VanadiumConfig configuration;
     public static final Identifier OVERWORLD_ID = new Identifier("minecraft:overworld");
 
 
-
     public static Identifier getDimensionid(World world) {
         DimensionType type = world.getDimension();
 

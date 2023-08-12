@@ -3,6 +3,7 @@ package vanadium.customcolors.particle;
 
 import net.minecraft.particle.DustParticleEffect;
 import org.joml.Vector3f;
+import vanadium.VanadiumClient;
 
 public class CustomRedDustParticle extends DustParticleEffect {
     public CustomRedDustParticle(Vector3f color, float alpha) {
@@ -20,6 +21,6 @@ public class CustomRedDustParticle extends DustParticleEffect {
     }
 
     private int getFullPoweredColor() {
-        return Vanadium.REDSTONE_COLORS.getColorBounded(15);
+        return VanadiumClient.REDSTONE_COLORS.getColorBounded(15);
     }
 }
