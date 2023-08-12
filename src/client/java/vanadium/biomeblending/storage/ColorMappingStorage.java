@@ -1,4 +1,4 @@
-package vanadium.biomeblending.colormaps;
+package vanadium.biomeblending.storage;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;

@@ -14,6 +14,7 @@ public final class MathUtils {
     public static final double INV_2_4 = 1.0/2.4;
 
     public static final double INV_16 = 1.0/16.0D;
+    public static final int INV_16_INT = Math.floorDiv(1, 16);
 
     private MathUtils(){}
 
