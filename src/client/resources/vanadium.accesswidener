@@ -1,14 +1,1 @@
 accessWidener  v2  named
-
-accessible class net/minecraft/client/Options$FieldAccess
-
-accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
-accessible class net/minecraft/client/resources/model/ModelManager$ReloadState
-accessible class net/minecraft/client/particle/DripParticle$DripstoneFallAndLandParticle
-accessible field net/minecraft/world/level/biome/Biome climateSettings Lnet/minecraft/world/level/biome/Biome$ClimateSettings;
-
-accessible field net/minecraft/client/Options biomeBlendRadius Lnet/minecraft/client/OptionInstance;
-mutable field net/minecraft/client/Options biomeBlendRadius Lnet/minecraft/client/OptionInstance;
-
-
-accessible field net/minecraft/world/level/biome/BiomeManager biomeZoomSeed J
