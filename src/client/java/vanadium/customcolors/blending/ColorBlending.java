@@ -8,7 +8,7 @@ import vanadium.biomeblending.blending.BlendingBuffer;
 import vanadium.biomeblending.blending.BlendingChunk;
 import vanadium.biomeblending.blending.BlendingConfig;
 import vanadium.biomeblending.caching.ColorBlendingCache;
-import vanadium.models.Coordinates;
+import vanadium.models.records.Coordinates;
 import vanadium.models.NonBlockingThreadLocal;
 import vanadium.utils.MathUtils;
 

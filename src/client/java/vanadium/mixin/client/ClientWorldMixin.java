@@ -24,7 +24,7 @@ import vanadium.biomeblending.caching.BlendingCache;
 import vanadium.biomeblending.caching.ColorCache;
 import vanadium.biomeblending.caching.LocalCache;
 import vanadium.customcolors.VanadiumColorResolverCompatibility;
-import vanadium.models.BiomeColorTypes;
+import vanadium.models.records.BiomeColorTypes;
 import vanadium.models.NonBlockingThreadLocal;
 
 import java.util.function.Supplier;

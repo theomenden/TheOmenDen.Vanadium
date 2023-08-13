@@ -1,4 +1,10 @@
 package vanadium.models;
 
-public record YCoordinate(int Y) {
+import lombok.Getter;
+import lombok.Setter;
+
+public final class YCoordinate {
+    @Getter
+    @Setter
+    public int Y;
 }

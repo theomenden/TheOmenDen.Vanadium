@@ -1,4 +1,4 @@
-package vanadium.models;
+package vanadium.models.records;
 
 import org.apache.commons.lang3.Range;
 

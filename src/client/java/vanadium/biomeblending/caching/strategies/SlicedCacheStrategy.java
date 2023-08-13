@@ -4,7 +4,7 @@ import com.google.common.util.concurrent.Striped;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import vanadium.biomeblending.blending.BlendingConfig;
 import vanadium.biomeblending.caching.ColorBlendingCache;
-import vanadium.models.Coordinates;
+import vanadium.models.records.Coordinates;
 import vanadium.utils.MathUtils;
 
 import java.util.concurrent.locks.Lock;

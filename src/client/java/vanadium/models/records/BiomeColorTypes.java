@@ -1,4 +1,4 @@
-package vanadium.models;
+package vanadium.models.records;
 
 public record BiomeColorTypes(int grass, int water, int foliage) {
     public static final BiomeColorTypes INSTANCE = new BiomeColorTypes(0, 1, 2);

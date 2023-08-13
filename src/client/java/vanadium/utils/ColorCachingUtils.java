@@ -1,6 +1,6 @@
 package vanadium.utils;
 
-import vanadium.models.Coordinates;
+import vanadium.models.records.Coordinates;
 
 public class ColorCachingUtils {
     private static final int PRESERVED_30_BITS = 0x03FFFFFF;

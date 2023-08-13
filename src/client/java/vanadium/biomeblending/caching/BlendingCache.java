@@ -5,8 +5,8 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import vanadium.biomeblending.blending.BlendingChunk;
-import vanadium.models.BiomeColorTypes;
-import vanadium.models.Coordinates;
+import vanadium.models.records.BiomeColorTypes;
+import vanadium.models.records.Coordinates;
 
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;

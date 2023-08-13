@@ -3,9 +3,14 @@
   "package": "vanadium.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "client.ClientWorldMixin"
+    "client.ClientWorldMixin",
+    "coloring.BlockColorsAccessor",
+    "fabricapi.FluidRendererHandlerRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "compatibility.IdentifierMixin"
+  ]
 }

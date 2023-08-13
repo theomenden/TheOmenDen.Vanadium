@@ -5,7 +5,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import org.apache.commons.lang3.Range;
-import vanadium.models.ColumnBounds;
+import vanadium.models.records.ColumnBounds;
 import vanadium.utils.LoggerUtils;
 
 import java.util.HashMap;

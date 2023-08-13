@@ -1,6 +1,6 @@
 package vanadium.biomeblending.caching;
 
-import vanadium.models.Coordinates;
+import vanadium.models.records.Coordinates;
 
 public final class ColorBlendingCache {
     private static final int representationSize = 0x03FFFFFF;

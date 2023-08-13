@@ -1,7 +1,7 @@
 package vanadium.customcolors;
 
 import net.minecraft.world.biome.ColorResolver;
-import vanadium.models.BiomeColorTypes;
+import vanadium.models.records.BiomeColorTypes;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
