@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import vanadium.customcolors.particle.CustomRedDustParticle;
 
 @Mixin(LeverBlock.class)
-public class LeverBlockMixin extends Block {
+public abstract class LeverBlockMixin extends Block {
     private LeverBlockMixin(){super(null);}
 
     @Redirect(

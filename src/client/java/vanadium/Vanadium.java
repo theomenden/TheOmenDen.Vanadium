@@ -15,10 +15,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.dimension.DimensionType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import vanadium.customcolors.resources.*;
 
-public class VanadiumClient implements ClientModInitializer {
-public static VanadiumConfig configuration;
+public class Vanadium implements ClientModInitializer {
+    private static final Logger logger = LogManager.getLogger(Vanadium.class);
+    public static VanadiumConfig configuration;
     public static final String MODID = "vanadium";
     public static final String COLORMATIC_ID = "colormatic";
     public static final Identifier OVERWORLD_ID = new Identifier("minecraft:overworld");
@@ -78,6 +81,22 @@ public static VanadiumConfig configuration;
                 .getConfig();
 
         ResourceManagerHelper client = ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES);
+        client.registerReloadListener(WATER_COLORS);
+        client.registerReloadListener(UNDERWATER_COLORS);
+        client.registerReloadListener(UNDERLAVA_COLORS);
+        client.registerReloadListener(SKY_COLORS);
+        client.registerReloadListener(FOG_COLORS);
+        client.registerReloadListener(BIRCH_COLORS);
+        client.registerReloadListener(SPRUCE_COLORS);
+        client.registerReloadListener(REDSTONE_COLORS);
+        client.registerReloadListener(PUMPKIN_STEM_COLORS);
+        client.registerReloadListener(MELON_STEM_COLORS);
+        client.registerReloadListener(MYCELIUM_PARTICLE_COLORS);
+        client.registerReloadListener(LAVA_DROP_COLORS);
+        client.registerReloadListener(DURABILITY_COLORS);
+        client.registerReloadListener(EXPERIENCE_ORB_COLORS);
+        client.registerReloadListener(LIGHTMAP_PROPERTIES);
+        client.registerReloadListener(LIGHTMAPS);
 
     }
 }

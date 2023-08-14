@@ -13,7 +13,7 @@ import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 import vanadium.models.ApplicableBlockStates;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockStates> {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Set<String> MODIDS = Set.of(VanadiumClient.MODID, VanadiumClient.COLORMATIC_ID);
+    private static final Set<String> MODIDS = Set.of(Vanadium.MODID, Vanadium.COLORMATIC_ID);
 
     @Override
     public void write(JsonWriter jsonWriter, ApplicableBlockStates applicableBlockStates) throws IOException {

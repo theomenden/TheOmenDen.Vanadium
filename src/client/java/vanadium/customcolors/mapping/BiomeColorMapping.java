@@ -8,7 +8,7 @@ import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import org.apache.commons.lang3.Range;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 import vanadium.customcolors.ExtendedColorResolver;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.models.ColorMappingProperties;
@@ -50,7 +50,7 @@ public class BiomeColorMapping implements VanadiumResolver {
                 float rain = Range.between(0.0F, 1.0F).fit(biome.weather.downfall());
                 return getColorMap(temp, rain);
             case GRID:
-                ColumnBounds columnBounds = properties.getColumn(VanadiumClient.getBiomeRegistryKey(manager, biome), manager.get(RegistryKeys.BIOME));
+                ColumnBounds columnBounds = properties.getColumn(Vanadium.getBiomeRegistryKey(manager, biome), manager.get(RegistryKeys.BIOME));
                 @SuppressWarnings({"removal", "deprecation"})
                 double fraction = Biome.FOLIAGE_NOISE.sample(coordinates.x() * 0.0225, coordinates.z() * 0.0225, false);
                 fraction = (fraction + 1.0) * 0.5;

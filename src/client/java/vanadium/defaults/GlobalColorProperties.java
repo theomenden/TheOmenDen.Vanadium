@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 import vanadium.models.records.VanadiumColor;
 import vanadium.models.enums.ColoredParticle;
 import vanadium.models.enums.ColumnLayout;
@@ -34,7 +34,7 @@ import java.util.stream.IntStream;
 import static java.util.Map.entry;
 
 public class GlobalColorProperties {
-    private static final Logger LOGGER = LogManager.getLogger(VanadiumClient.MODID);
+    private static final Logger LOGGER = LogManager.getLogger(Vanadium.MODID);
 
     private static final Map<String, String> keyRemap = Map.ofEntries(
             entry("nether", "the_nether"),

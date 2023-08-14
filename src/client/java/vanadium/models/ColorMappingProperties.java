@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 import vanadium.defaults.DefaultColumns;
 import vanadium.models.enums.ColumnLayout;
 import vanadium.models.enums.Format;
@@ -195,12 +195,12 @@ public class ColorMappingProperties {
             settings = new Settings();
         }
         if (settings.format == null) {
-            settings.format = VanadiumClient.COLOR_PROPERTIES
+            settings.format = Vanadium.COLOR_PROPERTIES
                     .getProperties()
                     .getDefaultFormat();
         }
         if (settings.layout == null) {
-            settings.layout = VanadiumClient.COLOR_PROPERTIES
+            settings.layout = Vanadium.COLOR_PROPERTIES
                     .getProperties()
                     .getDefaultColumnLayout();
         }

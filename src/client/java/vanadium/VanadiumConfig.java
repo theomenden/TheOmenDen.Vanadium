@@ -4,7 +4,7 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
-@Config(name= VanadiumClient.MODID)
+@Config(name= Vanadium.MODID)
 public class VanadiumConfig implements ConfigData {
     public boolean shouldClearSky;
     public boolean shouldClearVoid;
@@ -14,4 +14,9 @@ public class VanadiumConfig implements ConfigData {
 
     @ConfigEntry.BoundedDiscrete(min=0, max = 14)
     public int blendingRadius = 14;
+
+    public static double calculateScale(double relativeBlockLightIntensity) {
+        final double LOG_2 = Math.log(2);
+        return LOG_2 * 0.25 * relativeBlockLightIntensity;
+    }
 }

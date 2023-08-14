@@ -5,13 +5,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
 import vanadium.biomeblending.storage.ColorMappingStorage;
 import vanadium.customcolors.interfaces.VanadiumResolver;
+import vanadium.defaults.DefaultVanadiumResolverProviders;
 import vanadium.models.ColorMappingProperties;
 
 import java.util.Collection;
@@ -48,18 +48,15 @@ public final class BiomeColorMappings {
 
         properties
                 .getApplicableSpecialIds()
-                .entrySet()
-                .forEach(entry -> {
-                    switch (entry
-                            .getKey()
+                .forEach((key, value) -> {
+                    switch (key
                             .toString()) {
                         case "vanadium:sky", "colormatic:sky" ->
-                                skyColorMappings.addColorMapping(biomeColorMap, entry.getValue(), biomes);
+                                skyColorMappings.addColorMapping(biomeColorMap, value, biomes);
                         case "vanadium:sky_fog", "colormatic:sky_fog" ->
-                                skyFogColorMappings.addColorMapping(biomeColorMap, entry.getValue(), biomes);
+                                skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
                         case "vanadium:fluid_fog", "colormatic:fluid_fog" -> {
-                            Collection<Fluid> fluids = entry
-                                    .getValue()
+                            Collection<Fluid> fluids = value
                                     .stream()
                                     .map(Registries.FLUID::get)
                                     .collect(Collectors.toList());

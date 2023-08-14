@@ -1,5 +1,7 @@
 package vanadium.biomeblending.blending;
 
+import vanadium.biomeblending.caching.ColorBlendingCache;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BlendingChunk {

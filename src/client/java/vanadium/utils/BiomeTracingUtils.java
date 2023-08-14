@@ -4,7 +4,7 @@ import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +12,7 @@ import java.util.Set;
 import static java.util.Map.entry;
 
 public final class BiomeTracingUtils {
-    private static final Logger log = LogManager.getLogger(VanadiumClient.MODID);
+    private static final Logger log = LogManager.getLogger(Vanadium.MODID);
     private static final Set<Identifier> REMOVED_BIOMES = createRemovedBiomeSet();
     private static final Map<Identifier, Identifier> RENAMED_BIOMES = createRenamedBiomeMap();
 

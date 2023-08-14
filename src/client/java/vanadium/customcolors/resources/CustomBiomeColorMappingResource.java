@@ -5,7 +5,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 import vanadium.customcolors.mapping.BiomeColorMapping;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 import vanadium.models.records.PropertyImage;
@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 public class CustomBiomeColorMappingResource implements SimpleSynchronousResourceReloadListener {
-    private static final Logger LOGGER = LogManager.getLogger(VanadiumClient.MODID);
+    private static final Logger LOGGER = LogManager.getLogger(Vanadium.MODID);
     private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[a-zAZ0-9_/.-]+");
 
     private final Identifier identifier;
@@ -25,8 +25,8 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
     private final Identifier otherOptifineIdentifier;
 
     public CustomBiomeColorMappingResource() {
-        this.identifier = new Identifier(VanadiumClient.MODID, "colormap/custom");
-        this.colormaticIdentifier = new Identifier(VanadiumClient.COLORMATIC_ID, "colormap/custom");
+        this.identifier = new Identifier(Vanadium.MODID, "colormap/custom");
+        this.colormaticIdentifier = new Identifier(Vanadium.COLORMATIC_ID, "colormap/custom");
         this.optifineIdentifier = new Identifier("minecraft", "optifine/colormap/custom");
         this.otherOptifineIdentifier = new Identifier("minecraft", "optifine/colormap/blocks");
     }

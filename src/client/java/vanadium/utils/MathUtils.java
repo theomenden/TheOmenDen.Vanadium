@@ -11,8 +11,8 @@ public final class MathUtils {
     public static final float INV_16F = 1.0f/16.0f;
     public static final float INV_12_92 = 1.0f/12.92f;
     public static final float INV_1_055 = 1.0f/1.055f;
+    public static final float INV_50F = 1.0f/50.0f;
     public static final double INV_2_4 = 1.0/2.4;
-
     public static final double INV_16 = 1.0/16.0D;
     public static final int INV_16_INT = Math.floorDiv(1, 16);
 

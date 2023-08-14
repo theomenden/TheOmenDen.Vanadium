@@ -7,7 +7,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.Nullable;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 import vanadium.customcolors.ExtendedColorResolver;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.customcolors.interfaces.VanadiumResolverProvider;
@@ -24,7 +24,7 @@ public class ColorMappingStorage<T> {
     private final Map<T, VanadiumResolver> defaultResolvers;
     private final VanadiumResolverProvider<T> defaultResolverProvider;
 
-    ColorMappingStorage(VanadiumResolverProvider<T> defaultResolverProvider) {
+    public ColorMappingStorage(VanadiumResolverProvider<T> defaultResolverProvider) {
         this.colorMappings = HashBasedTable.create();
         this.fallbackColorMappings = Maps.newHashMap();
         this.resolvers = Maps.newHashMap();
@@ -34,7 +34,7 @@ public class ColorMappingStorage<T> {
 
     @Nullable
     public BiomeColorMapping getColorMapping(DynamicRegistryManager manager, T key, Biome biome) {
-        var resultingMapping = this.colorMappings.get(key, VanadiumClient.getBiomeRegistryKey(manager, biome));
+        var resultingMapping = this.colorMappings.get(key, Vanadium.getBiomeRegistryKey(manager, biome));
 
         return resultingMapping == null
                 ? this.fallbackColorMappings.get(key)

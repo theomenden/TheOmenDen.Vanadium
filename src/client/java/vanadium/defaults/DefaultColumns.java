@@ -5,8 +5,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import org.apache.commons.lang3.Range;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import vanadium.models.records.ColumnBounds;
-import vanadium.utils.LoggerUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import static java.util.Map.entry;
 
 public final class DefaultColumns {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final Map<Identifier, Identifier> dynamicColumns = new HashMap<>();
 
     private static final Map<Identifier, ColumnBounds> currentColumns = createCurrentColumnBoundaries();
@@ -51,8 +53,8 @@ public final class DefaultColumns {
             currentBoundaries = currentColumns.get(vanillaBiomeApproximation(biomeResourceLocation));
 
             if(currentBoundaries == null) {
-                var msg = "Custom biomeSource has no approximate in vanilla: " + biomeResourceLocation.getValue();
-                LoggerUtils.getLoggerInstance().warning(msg);
+                var msg = "Custom biome has no approximate in vanilla: " + biomeResourceLocation.getValue();
+                LOGGER.warn(msg);
                 throw new IllegalStateException(msg);
             }
         }
@@ -82,7 +84,7 @@ public final class DefaultColumns {
 
        if(bounds == null) {
            var errorMessage = "Custom biome has no approximate to vanilla: " + biomeKey.getValue();
-           LoggerUtils.getLoggerInstance().severe(errorMessage);
+           LOGGER.error(errorMessage);
            throw  new IllegalStateException(errorMessage);
        }
 
@@ -96,8 +98,8 @@ public final class DefaultColumns {
             bounds = stableColumns.get(vanillaBiomeApproximation(biomeResourceKey));
 
             if(bounds == null) {
-                var msg = "Custom biomeSource has no vanilla approximate biomeSource: " + biomeResourceKey;
-                LoggerUtils.getLoggerInstance().severe(msg);
+                var msg = "Custom biomeSource has no vanilla approximate biome Source: " + biomeResourceKey;
+                LOGGER.error(msg);
                 throw new IllegalStateException(msg);
             }
         }
@@ -132,7 +134,7 @@ public final class DefaultColumns {
             var vanillaBiome = biomeRegistry.get(entry.getKey());
 
             if(vanillaBiome == null) {
-                LoggerUtils.getLoggerInstance().severe("This vanilla biomeSource is not registered somehow: " + entry.getKey());
+                LOGGER.error("This vanilla biome is not registered somehow: " + entry.getKey());
                 continue;
             }
 

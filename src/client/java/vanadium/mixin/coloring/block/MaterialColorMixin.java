@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import vanadium.VanadiumClient;
+import vanadium.Vanadium;
 
 @Mixin(MapColor.class)
 public abstract class MaterialColorMixin {
@@ -20,7 +20,7 @@ public abstract class MaterialColorMixin {
             cancellable = true
     )
     private void onRenderColor(MapColor.Brightness brightness, CallbackInfoReturnable<Integer> cir) {
-        int color = VanadiumClient.COLOR_PROPERTIES
+        int color = Vanadium.COLOR_PROPERTIES
                 .getProperties()
                 .getMap((MapColor) (Object) this);
 
