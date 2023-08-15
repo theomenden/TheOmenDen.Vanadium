@@ -1,0 +1,48 @@
+{
+  "accessWidener": "vanadium.accesswidener",
+  "authors": [
+    "The Omen Den",
+    "Andrew Beers (Alu)"
+  ],
+  "contact": {
+    "homepage": "https://github.com/theomenden/TheOmenDen.Vanadium",
+    "sources": "https://github.com/theomenden/TheOmenDen.Vanadium",
+    "issues": "https://github.com/theomenden/TheOmenDen.Vanadium/issues"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "vanadium.discord": "https://discord.gg/GWshtCqEx4",
+        "vanadium.github": "https://github.com/theomenden/TheOmenDen.Vanadium"
+      },
+      "update_checker": true
+    }
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "^1.20.1",
+    "fabric-api": "*",
+    "sodium": ">=0.5.0",
+    "modmenu": ">=7.2.1",
+    "java": ">=17"
+  },
+  "description": "A simple custom colors implementation with some level of naive caching.",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "vanadium.Vanadium"
+    ],
+    "modmenu": [
+      "vanadium.VanadiumModMenu"
+    ]
+  },
+  "icon": "assets/vanadiumElement.png",
+  "id": "vanadium",
+  "license": "MIT",
+  "mixins": [
+    "vanadium.mixins.json"
+  ],
+  "name": "Vanadium",
+  "schemaVersion": 1,
+  "version": "${version}"
+}
