@@ -2,7 +2,8 @@ package vanadium.customcolors.mapping;
 
 import lombok.Getter;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.registry.*;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
@@ -32,10 +33,11 @@ public class BiomeColorMapping implements VanadiumResolver {
         this.imageColorMapping = colorMapping;
 
         VanadiumColor colorAsHex = properties.getColor();
-        if(colorAsHex == null) {
+
+        if(colorAsHex != null) {
             defaultColor = colorAsHex.rgb();
         } else {
-            defaultColor = computeDefaultColor(properties);
+           defaultColor = computeDefaultColor(properties);
         }
 
         this.resolver = new ExtendedColorResolver(this);
@@ -43,28 +45,38 @@ public class BiomeColorMapping implements VanadiumResolver {
 
     @Override
     public int getColorAtCoordinatesForBiome(DynamicRegistryManager manager, Biome biome, Coordinates coordinates) {
-        switch(properties.getFormat()) {
-            case VANILLA:
+        switch (properties.getFormat()) {
+            case VANILLA -> {
                 float temp = biome.getTemperature();
-                temp = Range.between(0.0F, 1.0F).fit(temp);
-                float rain = Range.between(0.0F, 1.0F).fit(biome.weather.downfall());
+                temp = Range
+                        .between(0.0F, 1.0F)
+                        .fit(temp);
+                float rain = Range
+                        .between(0.0F, 1.0F)
+                        .fit(biome.weather.downfall());
                 return getColorMap(temp, rain);
-            case GRID:
+            }
+            case GRID -> {
                 ColumnBounds columnBounds = properties.getColumn(Vanadium.getBiomeRegistryKey(manager, biome), manager.get(RegistryKeys.BIOME));
                 @SuppressWarnings({"removal", "deprecation"})
                 double fraction = Biome.FOLIAGE_NOISE.sample(coordinates.x() * 0.0225, coordinates.z() * 0.0225, false);
                 fraction = (fraction + 1.0) * 0.5;
-                int x = columnBounds.Column() + (int)(fraction * columnBounds.Count());
+                int x = columnBounds.Column() + (int) (fraction * columnBounds.Count());
                 int y = coordinates.y() - properties.getYOffset();
                 int variance = properties.getYVariance();
                 RandomGenerator gridRandom = RandomGeneratorFactory
-                        .getDefault().create(coordinates.x() * 31L + coordinates.z());
+                        .getDefault()
+                        .create(coordinates.x() * 31L + coordinates.z());
                 y += gridRandom.nextInt(variance * 2 + 1) - variance;
                 x %= imageColorMapping.getWidth();
-                y = Range.between(0, imageColorMapping.getHeight() - 1).fit(y);
-                return imageColorMapping.getColor(x,y);
-            case FIXED:
+                y = Range
+                        .between(0, imageColorMapping.getHeight() - 1)
+                        .fit(y);
+                return imageColorMapping.getColor(x, y);
+            }
+            case FIXED -> {
                 return getDefaultColor();
+            }
         }
         throw new AssertionError();
     }

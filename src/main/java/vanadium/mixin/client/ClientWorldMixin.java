@@ -29,18 +29,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.Vanadium;
 import vanadium.biomeblending.blending.BlendingChunk;
 import vanadium.biomeblending.caching.BlendingCache;
-import vanadium.biomeblending.caching.ColorBlendingCache;
 import vanadium.biomeblending.caching.ColorCache;
 import vanadium.biomeblending.caching.LocalCache;
 import vanadium.customcolors.ExtendedColorResolver;
-import vanadium.customcolors.VanadiumColorResolverCompatibility;
 import vanadium.customcolors.blending.ColorBlending;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 import vanadium.models.NonBlockingThreadLocal;
 import vanadium.models.records.BiomeColorTypes;
 import vanadium.models.records.Coordinates;
+import vanadium.utils.ColorCachingUtils;
 
 import java.util.function.Supplier;
+
+import static vanadium.biomeblending.compatibility.CustomColorCompatibility.getColorType;
 
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin extends World {
@@ -65,34 +66,45 @@ public abstract class ClientWorldMixin extends World {
             at=@At(
                     value = "INVOKE",
             target = "Lnet/minecraft/client/world/BiomeColorCache;getBiomeColor(Lnet/minecraft/util/math/BlockPos;)I"
-    ))
+    ),
+    cancellable = true)
     private void calculateColorType(BlockPos pos, ColorResolver colorResolver, CallbackInfoReturnable<Integer> cir) {
-        if(this.colorCache.get(colorResolver) == null) {
-           this.colorCache.put(colorResolver, new BiomeColorCache(pos1 -> this.calculateColor(pos, colorResolver)));
-        }
+      final Coordinates blockPositionCoordinates = new Coordinates(pos.getX(), pos.getY(), pos.getZ());
+      final Coordinates chunkCoordinates = new Coordinates(blockPositionCoordinates.x() >> 4, blockPositionCoordinates.y() >> 4, blockPositionCoordinates.z() >> 4);
+      final Coordinates blockCoordinates = new Coordinates(blockPositionCoordinates.x() & 15, blockPositionCoordinates.y() & 15, blockPositionCoordinates.z() & 15);
 
-        final Coordinates positionedCoordinates = new Coordinates(pos.getX(), pos.getY(), pos.getZ());
-        final Coordinates chunkCoordinates = new Coordinates(positionedCoordinates.x() >> 4, positionedCoordinates.y() >> 4, positionedCoordinates.z() >> 4);
-        final Coordinates blockCoordinates = new Coordinates(positionedCoordinates.x() & 15, positionedCoordinates.y() & 15, positionedCoordinates.z() & 15);
-
-        LocalCache localCache = vanadiumBiomeBlending$threadLocalCache.get();
+      LocalCache localCache = vanadiumBiomeBlending$threadLocalCache.get();
 
         BlendingChunk chunk = null;
         int colorType;
 
-        if (localCache.latestColorResolver == colorResolver) {
+        if(localCache.latestColorResolver == colorResolver) {
             colorType = localCache.lastColorType;
-            long cachedChunkKey = ColorBlendingCache.getChunkCacheKey(chunkCoordinates, colorType);
+            long key = ColorCachingUtils.getChunkKey(chunkCoordinates, colorType);
 
-            if (localCache.lastBlendedChunk.key == cachedChunkKey) {
+            if(localCache.lastBlendedChunk.key == key){
                 chunk = localCache.lastBlendedChunk;
             }
         } else {
-            colorType = calculateColorType(colorResolver, localCache);
+            if(colorResolver == BiomeColors.GRASS_COLOR) {
+                colorType = BiomeColorTypes.INSTANCE.grass();
+            } else if (colorResolver == BiomeColors.WATER_COLOR) {
+                colorType = BiomeColorTypes.INSTANCE.water();
+            } else if (colorResolver == BiomeColors.FOLIAGE_COLOR) {
+                colorType = BiomeColorTypes.INSTANCE.foliage();
+            } else {
+                colorType = getColorType(colorResolver);
 
-            long cachedChunkKey = ColorBlendingCache.getChunkCacheKey(chunkCoordinates, colorType);
+                if(colorType >= localCache.blendedChunksCount) {
+                    localCache.reallocateBlendedChunkyArray(colorType);
+                }
+            }
+
+            long key = ColorCachingUtils.getChunkKey(chunkCoordinates, colorType);
+
             BlendingChunk cachedChunk = localCache.blendedChunks[colorType];
-            if (localCache.lastBlendedChunk.key == cachedChunkKey) {
+
+            if(cachedChunk.key == key) {
                 chunk = cachedChunk;
             }
         }
@@ -102,22 +114,19 @@ public abstract class ClientWorldMixin extends World {
             localCache.putChunkInBlendedCache(vanadium$blendingColorCache, chunk, colorType, colorResolver);
         }
 
-        int index = ColorBlendingCache.getArrayIndex(16, blockCoordinates);
+        int index = ColorCachingUtils.getArrayIndex(16, blockCoordinates);
         int color = chunk.data[index];
 
         if(color == 0) {
-            ColorBlending.generateColors(
-                    this,
+            ColorBlending.generateColors(this,
                     colorResolver,
                     colorType,
                     vanadium$chunkColorCache,
                     chunk,
-                    positionedCoordinates
-            );
+                    blockPositionCoordinates);
 
             color = chunk.data[index];
         }
-
         cir.setReturnValue(color);
     }
 
@@ -135,28 +144,6 @@ public abstract class ClientWorldMixin extends World {
         int chunkZ = chunkPos.z;
 
         vanadium$blendingColorCache.invalidateChunk(chunkX, chunkZ);
-    }
-
-    private static int calculateColorType(ColorResolver colorResolver, LocalCache localCache) {
-        if (colorResolver == BiomeColors.GRASS_COLOR) {
-            return BiomeColorTypes.INSTANCE.grass();
-        }
-
-        if (colorResolver == BiomeColors.WATER_COLOR) {
-            return BiomeColorTypes.INSTANCE.water();
-        }
-
-        if (colorResolver == BiomeColors.FOLIAGE_COLOR) {
-            return BiomeColorTypes.INSTANCE.foliage();
-        }
-
-        int resolvedColorType = VanadiumColorResolverCompatibility.getColorType(colorResolver);
-
-        if (resolvedColorType >= localCache.blendedChunksCount) {
-            localCache.reallocateBlendedChunkyArray(resolvedColorType);
-        }
-
-        return resolvedColorType;
     }
 
 @ModifyArg(

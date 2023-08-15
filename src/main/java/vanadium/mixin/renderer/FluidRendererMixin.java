@@ -7,15 +7,15 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 
 @Mixin(FluidRenderer.class)
 public abstract class FluidRendererMixin {
-    @ModifyVariable(
+    @ModifyConstant(
             method="render",
-    at = @At(value = "STORE")
+            constant = @Constant(intValue = 16777215)
     )
     private int calculateCustomColor(int original, BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
         int result = original;

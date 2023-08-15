@@ -12,10 +12,12 @@
   "custom": {
     "modmenu": {
       "links": {
-        "vanadium.discord": "https://discord.gg/GWshtCqEx4",
-        "vanadium.github": "https://github.com/theomenden/TheOmenDen.Vanadium"
+        "modmenu.discord": "https://discord.gg/GWshtCqEx4"
       },
       "update_checker": true
+    },
+    "sodium:options": {
+      "mixin.features.fast_biome_colors":false
     }
   },
   "depends": {
@@ -38,9 +40,11 @@
   },
   "icon": "assets/vanadiumElement.png",
   "id": "vanadium",
-  "license": "MIT",
+  "license": "LGPL-3",
   "mixins": [
-    "vanadium.mixins.json"
+    "vanadium.mixins.json",
+    "vanadium.sodium.mixins.json",
+    "vanadium.fabric.mixins.json"
   ],
   "name": "Vanadium",
   "schemaVersion": 1,

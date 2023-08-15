@@ -13,8 +13,7 @@ public final class VanadiumColorResolverCompatibility {
     public static int nextColorResolverId = BiomeColorTypes.INSTANCE.foliage() + 1;
 
     public static int nextColorResolverId() {
-        int result = nextColorResolverId++;
-        return result;
+        return nextColorResolverId++;
     }
 
     public static int addColorResolver(ColorResolver resolver) {

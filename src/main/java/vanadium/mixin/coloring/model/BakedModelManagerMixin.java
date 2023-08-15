@@ -18,13 +18,11 @@ public abstract class BakedModelManagerMixin {
 
     @Inject(
             method="reload",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/util/profiler/Profiler;startTick()V",
-                    shift = At.Shift.AFTER
-            )
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/util/profiler/Profiler;startTick()V",
+            shift = At.Shift.AFTER)
     )
-    private void reloadVanadiumCustomBiomeColors(ResourceReloader.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+    private static void reloadVanadiumCustomBiomeColors(ResourceReloader.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
         Vanadium.CUSTOM_BLOCK_COLORS.reload(manager);
     }
 }

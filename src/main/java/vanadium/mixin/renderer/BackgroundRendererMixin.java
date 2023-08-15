@@ -79,24 +79,31 @@ public abstract class BackgroundRendererMixin {
         int color = 0;
 
         if(BiomeColorMappings.isFluidFogCustomColored(fluid)) {
-            BiomeColorMapping colorMapping = BiomeColorMappings
-                    .getFluidFog(world.getRegistryManager(), fluid, biome);
+            BiomeColorMapping colorMapping = BiomeColorMappings.getFluidFog(world.getRegistryManager(), fluid, biome);
 
-            if(colorMapping != null) {
-                BlockPos pos = camera.getBlockPos();
+            if(colorMapping != null){
+                BlockPos position = camera.getBlockPos();
+                var cameraCoordinates = new Coordinates(position.getX(), position.getY(), position.getZ());
+                color = colorMapping.getColorAtCoordinatesForBiome(world.getRegistryManager(), biome, cameraCoordinates);
+            }
+        }
+
+        if(color == 0) {
+            if(colorMappingResource.hasCustomColorMapping()) {
+                BlockPos  pos = camera.getBlockPos();
+                var cameraCoordinates = new Coordinates(pos.getX(), pos.getY(), pos.getZ());
                 color = colorMappingResource
                         .getColorMapping()
-                        .getColorAtCoordinatesForBiome(world.getRegistryManager()
-                        ,biome,
-                                new Coordinates(pos.getX(), pos.getY(), pos.getZ()));
+                        .getColorAtCoordinatesForBiome(world.getRegistryManager(), biome, cameraCoordinates);
             } else {
-                color = biome.getWaterFogColor();
-
                 if(submersionType == CameraSubmersionType.LAVA) {
                     color = 0x991900;
+                } else {
+                    color = biome.getWaterFogColor();
                 }
             }
         }
+
         return color;
     }
 

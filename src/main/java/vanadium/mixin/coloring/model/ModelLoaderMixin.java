@@ -2,7 +2,6 @@ package vanadium.mixin.coloring.model;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.ModelLoader;
@@ -11,45 +10,37 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.BlockStateArgumentType;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.state.StateManager;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.util.Identifier;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vanadium.customcolors.decorators.ModelIdContext;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 import vanadium.mixin.coloring.BlockColorsAccessor;
-
-import java.util.function.Predicate;
 
 
 @Mixin(ModelLoader.class)
 public abstract class ModelLoaderMixin {
 
-    @Shadow @Final private static String BUILTIN;
-
-    @Shadow
-    private static Predicate<BlockState> stateKeyToPredicate(StateManager<Block, BlockState> stateFactory, String key) {
-        return null;
-    }
-
     @Unique
     private static final BlockStateArgumentType BLOCK_STATE_PARSER = BlockStateArgumentType.blockState(
-            CommandRegistryAccess.of(DynamicRegistryManager.EMPTY, FeatureSet.empty()));
+            CommandRegistryAccess.of(
+                    DynamicRegistryManager.of(Registries.REGISTRIES).toImmutable(),
+                    FeatureFlags.DEFAULT_ENABLED_FEATURES
+            )
+    );
 
     @Inject(
-            method = "method_4736",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;get(Lnet/minecraft/util/Identifier;)Ljava/lang/Object;")
+            method = "loadModel",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/model/ModelLoader;putModel(Lnet/minecraft/util/Identifier;Lnet/minecraft/client/render/model/UnbakedModel;)V")
     )
-    private static void onModelLoad(Identifier identifier, CallbackInfoReturnable<StateManager> cir) {
+    private void onModelLoad(Identifier id, CallbackInfo ci) {
         ModelIdContext.shouldTintCurrentModel = false;
 
-        if(identifier instanceof ModelIdentifier modelId){
+        if(id instanceof ModelIdentifier modelId){
             BlockState blockState;
             if(modelId.getVariant().equals("inventory")) {
                 var blockId = Identifier.of(modelId.getNamespace(), modelId.getPath());

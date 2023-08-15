@@ -6,20 +6,27 @@
     "biome.BiomeColorsMixin",
     "client.ClientWorldMixin",
     "coloring.BlockColorsAccessor",
+    "coloring.block.LeverBlockMixin",
     "coloring.dye.BannerBlockEntityRendererMixin",
+    "coloring.dye.DyeColorMixin",
+    "coloring.dye.SheepEntityMixin",
     "coloring.dye.WolfCollarFeatureRendererMixin",
     "coloring.item.ItemColorsMixin",
     "coloring.model.BakedQuadFactoryMixin",
     "coloring.model.JsonUnbakedModelMixin",
     "coloring.model.ModelLoaderMixin",
     "coloring.particle.DrippingLavaParticleMixin",
+    "coloring.particle.DustParticleEffectMixin",
     "coloring.particle.FallingLavaParticleFactoryMixin",
     "coloring.particle.LandingLavaParticleFactoryMixin",
     "coloring.particle.MyceliumParticleFactoryMixin",
     "coloring.particle.PortalParticleMixin",
     "coloring.particle.WaterSplashParticleMixin",
+    "coloring.potions.PotionUtilMixin",
+    "coloring.potions.StatusEffectMixin",
+    "coloring.text.ChatFormatMixin",
+    "compatibility.IdentifierMixin",
     "compatibility.TextureManagerMixin",
-    "fabricapi.FluidRendererHandlerRegistryMixin",
     "renderer.BackgroundRendererMixin",
     "renderer.FluidRendererMixin",
     "renderer.WorldRendererMixin"
@@ -28,15 +35,6 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "coloring.block.LeverBlockMixin",
-    "coloring.dye.DyeColorMixin",
-    "coloring.dye.SheepEntityMixin",
-    "coloring.particle.DustParticleEffectMixin",
-    "coloring.potions.PotionUtilMixin",
-    "coloring.potions.StatusEffectMixin",
-    "coloring.text.ChatFormatMixin",
-    "compatibility.IdentifierMixin",
-    "sodium.SodiumBiomeColorCacheMixin",
-    "sodium.SodiumGameOptionsMixin"
+
   ]
 }

@@ -34,6 +34,5 @@ public record LightMappingProperties() {
     }
 
     private static class LightmapSettings {
-
     }
 }

@@ -34,7 +34,7 @@ public class ColorMappingStorage<T> {
 
     @Nullable
     public BiomeColorMapping getColorMapping(DynamicRegistryManager manager, T key, Biome biome) {
-        var resultingMapping = this.colorMappings.get(key, Vanadium.getBiomeRegistryKey(manager, biome));
+        var resultingMapping = this.colorMappings.get(key, Vanadium.getBiomeIdentifier(manager, biome));
 
         return resultingMapping == null
                 ? this.fallbackColorMappings.get(key)

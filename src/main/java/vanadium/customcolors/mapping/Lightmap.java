@@ -1,6 +1,7 @@
 package vanadium.customcolors.mapping;
 
 import net.minecraft.client.texture.NativeImage;
+import vanadium.Vanadium;
 
 public class Lightmap {
     private final NativeImage lightmap;
@@ -20,6 +21,26 @@ public class Lightmap {
         return getPixelAtPositionWithGivenLightLevel(positionX, lightLevel + 16, nightVision);
     }
 
+    public int getSkyLighting(int level, float ambience, float nightVision) {
+        if(ambience < 0) {
+            int posX = lightmap.getWidth() - 1;
+            return getPixelAtPositionWithGivenLightLevel(posX, level, nightVision);
+        }
+
+        float scaledAmbience = ambience * (lightmap.getWidth() - 2);
+        float scaledAmbienceModulated = scaledAmbience % 1.0f;
+
+        int posX = (int)scaledAmbience;
+        int light = getPixelAtPositionWithGivenLightLevel(posX, level, nightVision);
+        boolean shouldBlendSkyLighting = Vanadium.configuration.shouldBlendSkyLight;
+
+        if(shouldBlendSkyLighting
+        && posX < lightmap.getWidth() - 2) {
+            int rightLighting = getPixelAtPositionWithGivenLightLevel(posX + 1, level, nightVision);
+            light = mergeColorsBasedOnNightVisionFactors(rightLighting, light, scaledAmbienceModulated);
+        }
+        return light;
+    }
 
     private int getPixelAtPositionWithGivenLightLevel(int x, int y, float nightVision) {
         if(nightVision <=0.0f) {

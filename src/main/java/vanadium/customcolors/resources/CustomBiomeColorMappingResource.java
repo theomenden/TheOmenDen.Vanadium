@@ -8,8 +8,8 @@ import org.apache.logging.log4j.Logger;
 import vanadium.Vanadium;
 import vanadium.customcolors.mapping.BiomeColorMapping;
 import vanadium.customcolors.mapping.BiomeColorMappings;
-import vanadium.models.records.PropertyImage;
 import vanadium.models.exceptions.InvalidColorMappingException;
+import vanadium.models.records.PropertyImage;
 import vanadium.utils.GsonUtils;
 
 import java.util.Collection;
@@ -36,41 +36,6 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
         return identifier;
     }
 
-
-    private static void addColorMappings(ResourceManager manager, Identifier directory, boolean isInJson) {
-        String extension = isInJson? ".json" : ".properties";
-        Collection<Identifier> files = manager.findResources(directory.getPath(),
-                                                            id -> id.getNamespace().equals(directory.getNamespace())
-                                                                    && (id.getPath().endsWith(extension) || id.getPath().endsWith(".png")))
-                                              .keySet()
-                                              .stream()
-                                              .map(id -> {
-                                                        String path = id.getPath();
-                                                        if(path.endsWith(".png")) {
-                                                            String standardizedPath = path.substring(0, path.length() - 4) + extension;
-                                                            return new Identifier(id.getNamespace(), standardizedPath);
-                                                        }
-                                                        return id;
-                                                    })
-                                              .distinct()
-                                              .toList();
-
-        files.forEach(file -> {
-            if (!IDENTIFIER_PATTERN
-                    .matcher(file.getPath())
-                    .matches()) {
-                LOGGER.warn("Invalid identifier in custom biome color mappings file: " + file);
-            }
-            try {
-                PropertyImage propertyImage = GsonUtils.loadColorMapping(manager, file, true);
-                BiomeColorMapping colorMapping = new BiomeColorMapping(propertyImage.properties(), propertyImage.nativeImage());
-                BiomeColorMappings.addBiomeColorMapping(colorMapping);
-            } catch (InvalidColorMappingException e) {
-                LOGGER.error("Unable to parse Colormapping {}:{} ", file, e.getMessage());
-            }
-        });
-    }
-
     @Override
     public void reload(ResourceManager resourceManager) {
         BiomeColorMappings.resetColorMappings();
@@ -79,4 +44,39 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
         addColorMappings(resourceManager, colormaticIdentifier, true);
         addColorMappings(resourceManager, identifier, true);
     }
+
+    private static void addColorMappings(ResourceManager manager, Identifier directory, boolean isInJson) {
+        String extension = isInJson? ".json" : ".properties";
+        Collection<Identifier> files = manager.findResources(directory.getPath(),
+                                                      id -> id.getNamespace().equals(directory.getNamespace())
+                                                              && (id.getPath().endsWith(extension) || id.getPath().endsWith(".png")))
+                                              .keySet()
+                                              .stream()
+                                              .map(id -> {
+                                                  String path = id.getPath();
+                                                  if(path.endsWith(".png")) {
+                                                      String standardizedPath = path.substring(0, path.length() - 4) + extension;
+                                                      return new Identifier(id.getNamespace(), standardizedPath);
+                                                  }
+                                                  return id;
+                                              })
+                                              .distinct()
+                                              .toList();
+
+        files.forEach(id -> {
+            if (!IDENTIFIER_PATTERN
+                    .matcher(id.getPath())
+                    .matches()) {
+                LOGGER.error("Colormapping definition file '{}' does not name a valid resource location. Please have the resource pack author fix this.", id);
+            }
+            try {
+                PropertyImage pi = GsonUtils.loadColorMapping(manager, id, true);
+                BiomeColorMapping colorMapping = new BiomeColorMapping(pi.properties(), pi.nativeImage());
+                BiomeColorMappings.addBiomeColorMapping(colorMapping);
+            } catch (InvalidColorMappingException e) {
+                LOGGER.error("Error parsing {}: {}", id, e.getMessage());
+            }
+        });
+    }
+
 }

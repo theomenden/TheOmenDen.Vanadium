@@ -62,7 +62,19 @@ public class Vanadium implements ClientModInitializer {
     }
 
     public static RegistryKey<Biome> getBiomeRegistryKey(DynamicRegistryManager manager, Biome biome) {
-        return manager.get(RegistryKeys.BIOME).getKey(biome).orElse(BiomeKeys.PLAINS);
+        return manager.get(RegistryKeys.BIOME)
+                      .getKey(biome)
+                      .orElse(BiomeKeys.PLAINS);
+    }
+
+    public static Identifier getBiomeIdentifier(DynamicRegistryManager manager, Biome biome) {
+        var id = manager.get(RegistryKeys.BIOME)
+                .getId(biome);
+
+        if(id == null) {
+            id = BiomeKeys.PLAINS.getValue();
+        }
+        return id;
     }
 
     public static <T> T getRegistryValue(Registry<T> registry, RegistryEntry<T> entry) {

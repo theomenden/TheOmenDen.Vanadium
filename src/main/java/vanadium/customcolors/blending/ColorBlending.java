@@ -248,12 +248,7 @@ public class ColorBlending {
                         colorSlice.data[sliceIndex] = cachedColor;
                     }
 
-                    float[] calculatedOkLabs = ColorConverter.convertSrgbToOkLabAsFloatArray(cachedColor);
-
-                    System.arraycopy(calculatedOkLabs, 0, blendBuffer.color, 0, calculatedOkLabs.length);
-
-
-                    blendBuffer.color[blendIndexY] = calculatedOkLabs[0];
+                    ColorConverter.convertSRGBToOkLabsInPlace(cachedColor, blendBuffer.color, blendIndex);
 
                     blendBuffer.colorBitsExclusive &= cachedColor;
                     blendBuffer.colorBitsInclusive |= cachedColor;

@@ -10,26 +10,33 @@ import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.world.biome.ColorResolver;
 import org.apache.commons.lang3.Range;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.models.records.Coordinates;
 import vanadium.utils.ColorCachingUtils;
 
 @Mixin(BiomeColorCache.class)
 public abstract class SodiumBiomeColorCacheMixin {
-   @Unique
+    @Shadow private int minX;
+    @Shadow private int minY;
+    @Shadow private int minZ;
+    @Unique
    private Coordinates vanadium$blendingMinimums;
 
    @Unique
-   private Reference2ReferenceMap<ColorResolver, int[]> vanadium$blendingColors;
+   private Reference2ReferenceMap<ColorResolver, int[]> vanadium$blendingColors = new Reference2ReferenceOpenHashMap<>();
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    public void onConstructorTail(BiomeSlice slice, int radius, CallbackInfo ci){
-        this.vanadium$blendingColors = new Reference2ReferenceOpenHashMap<>();
-    }
+   @Inject(
+           method = "<init>",
+           at = @At("TAIL")
+   )
+   public void onConstructorTail(BiomeSlice slice, int blendingRadius, CallbackInfo ci) {
+       vanadium$blendingColors = new Reference2ReferenceOpenHashMap<>();
+   }
 
     @Inject(method = "update(Lme/jellysquid/mods/sodium/client/world/cloned/ChunkRenderContext;)V", at=@At("TAIL"), remap = false)
     private void onUpdateHead(ChunkRenderContext context, CallbackInfo ci) {
@@ -38,12 +45,16 @@ public abstract class SodiumBiomeColorCacheMixin {
     }
 
 
-    @Inject(method = "getColor(Lme/jellysquid/mods/sodium/client/world/biome/BiomeColorSource;III)I",
-            at = @At("HEAD"),
-            cancellable = true,
-            remap = false
-    )
-    public void onGetColor(BiomeColorSource biomeColorSource, int posX, int posY, int posZ, CallbackInfoReturnable<Integer> cir) {
+    /**
+     * @author
+     * @reason
+     */
+    @Overwrite(remap = false)
+    public int getColor(BiomeColorSource biomeColorSource, int posX, int posY, int posZ) {
+
+       if(this.vanadium$blendingMinimums == null) {
+           this.vanadium$blendingMinimums = new Coordinates(this.minX, this.minY, this.minZ);
+       }
 
         var resolver = getResolver(biomeColorSource);
 
@@ -54,9 +65,7 @@ public abstract class SodiumBiomeColorCacheMixin {
 
         int index = ColorCachingUtils.getArrayIndex(16, blockX, blockY, blockZ);
 
-        int color = colors[index];
-
-        cir.setReturnValue(color);
+        return colors[index];
     }
 
     @Unique

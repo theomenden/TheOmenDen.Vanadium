@@ -14,7 +14,8 @@ public abstract class BakedQuadFactoryMixin {
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/render/model/BakedQuad;<init>([IILnet/minecraft/util/math/Direction;Lnet/minecraft/client/texture/Sprite;Z)V"
-            )
+            ),
+            index = 1
     )
     private int addTintToCustomColoredModel(int tintIndex) {
         return ModelIdContext.shouldTintCurrentModel

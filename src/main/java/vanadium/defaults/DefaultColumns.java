@@ -14,8 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.util.Map.entry;
-
 public final class DefaultColumns {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Map<Identifier, Identifier> dynamicColumns = new HashMap<>();
@@ -29,7 +27,7 @@ public final class DefaultColumns {
     private static final int TOTAL_LEGACY_BIOMES = 176;
 
     private DefaultColumns(){
-
+        LOGGER.info("There are {} vanilla biomes", TOTAL_VANILLA_BIOMES);
     }
 
     public static void reloadDefaultColumnBoundaries(DynamicRegistryManager manager) {

@@ -15,7 +15,7 @@ import java.util.List;
 public class GridEntryAdapter extends TypeAdapter<GridEntry> {
     private final IdentifierAdapter identifierAdapter = new IdentifierAdapter();
     @Override
-    public void write(JsonWriter jsonWriter, GridEntry gridEntry) throws IOException {
+    public void write(JsonWriter jsonWriter, GridEntry gridEntry) {
         throw new UnsupportedOperationException("Writing not supported at this time");
     }
 
@@ -27,8 +27,8 @@ public class GridEntryAdapter extends TypeAdapter<GridEntry> {
                 throw new JsonSyntaxException("Null value not allowed");
             }
             case STRING -> {
-                Identifier biomeIdentifier = this.identifierAdapter.read(jsonReader);
-                GridEntry gridEntry= new GridEntry();
+                var biomeIdentifier = this.identifierAdapter.read(jsonReader);
+                var gridEntry= new GridEntry();
                 gridEntry.biomes = ImmutableList.of(biomeIdentifier);
                 return gridEntry;
             }
@@ -43,18 +43,10 @@ public class GridEntryAdapter extends TypeAdapter<GridEntry> {
         in.beginObject();
         while (in.hasNext()) {
             switch (in.nextName()) {
-                case "biomes" -> {
-                    gridEntry.biomes = readBiomes(in);
-                }
-                case "column" -> {
-                    gridEntry.column = in.nextInt();
-                }
-                case "width" -> {
-                    gridEntry.width = in.nextInt();
-                }
-                default -> {
-                    in.skipValue();
-                }
+                case "biomes" -> gridEntry.biomes = readBiomes(in);
+                case "column" -> gridEntry.column = in.nextInt();
+                case "width" -> gridEntry.width = in.nextInt();
+                default -> in.skipValue();
             }
         }
         in.endObject();

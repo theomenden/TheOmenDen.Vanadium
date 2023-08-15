@@ -8,7 +8,9 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import vanadium.adapters.*;
-import vanadium.models.*;
+import vanadium.models.ApplicableBlockStates;
+import vanadium.models.ColorMappingProperties;
+import vanadium.models.GridEntry;
 import vanadium.models.enums.Format;
 import vanadium.models.exceptions.InvalidColorMappingException;
 import vanadium.models.records.PropertyImage;
@@ -16,15 +18,12 @@ import vanadium.models.records.VanadiumColor;
 
 import java.io.*;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public final class GsonUtils {
     public static final Gson PROPERTY_GSON = new GsonBuilder()
@@ -102,28 +101,50 @@ public final class GsonUtils {
     }
 
     private static String toJsonString(Properties properties, Function<String, String> keyMappingFunction, Predicate<String> arrayValue) {
-        Map<String, Object> propertyMap = properties.stringPropertyNames().stream()
-                                                    .collect(Collectors.toMap(
-                                                            property -> property,
-                                                            property -> {
-                                                                String[] keys = property.split("\\.");
-                                                                String nestedKey = keyMappingFunction.apply(keys[keys.length -1]);
-                                                                String propertyValue = properties.getProperty(property);
-                                                                Object value = arrayValue.test(nestedKey)
-                                                                        ? propertyValue.split("\\s+")
-                                                                        : propertyValue;
-                                                                return Map.of(nestedKey, value);
-                                                            },
-                                                            (value1, value2) -> {
-                                                                if (value1 instanceof Object[] && value2 instanceof Object[]) {
-                                                                    return Stream
-                                                                            .concat(Arrays.stream((Object[]) value1), Arrays.stream((Object[]) value2))
-                                                                            .toArray();
-                                                                } else {
-                                                                    return new Object[]{value1, value2};
-                                                                }
-                                                            },
-                                                            LinkedHashMap::new ));
+       Map<String, Object> propertyMap = new HashMap<>();
+
+       properties.stringPropertyNames()
+               .forEach(property -> {
+                   String[] keys = property.split("\\:");
+
+                   Map<String, Object> nestedProperties = propertyMap;
+
+                   int i;
+                   for (i = 0; i < keys.length - 1; i++) {
+                       String key = keyMappingFunction.apply(keys[i]);
+                       nestedProperties = (Map<String, Object>) nestedProperties.computeIfAbsent(key, k -> new HashMap<>());
+                   }
+
+                   String key = keyMappingFunction.apply(keys[i]);
+                   String propertyValue = properties.getProperty(property);
+                   Object value = arrayValue.test(key) ? propertyValue.split("\\s+") : propertyValue;
+                   nestedProperties.merge(key, value, GsonUtils::mergeCompoundKeys);
+               });
+
+       /*
+       for (String property: properties.stringPropertyNames()) {
+           String[] keys = property.split("\\:");
+           Map<String, Object> nestedProperties = propertyMap;
+           int i;
+           for(i = 0; i < keys.length -1; i++) {
+               String key = keyMappingFunction.apply(keys[i]);
+               Object temp = nestedProperties.computeIfAbsent(key, k -> new HashMap<>());
+
+               if(temp instanceof Map<?,?> nestedMap) {
+                   temp = nestedMap;
+                   continue;
+               }
+               Map<String, Object> newNestedMap = new HashMap<>();
+               newNestedMap.put("", temp);
+               nestedProperties.put(key, newNestedMap);
+               nestedProperties = newNestedMap;
+           }
+           String key = keyMappingFunction.apply(keys[i]);
+           String propertyValue = properties.getProperty(property);
+           Object value = arrayValue.test(key) ? propertyValue.split("\\s+") : propertyValue;
+           nestedProperties.merge(key, value, GsonUtils::mergeCompoundKeys);
+       }
+        */
 
         return PROPERTY_GSON.toJson(propertyMap);
     }

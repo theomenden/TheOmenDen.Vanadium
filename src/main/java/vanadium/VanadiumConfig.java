@@ -4,15 +4,29 @@ package vanadium;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.Tooltip;
 
-@Config(name= vanadium.Vanadium.MODID)
+@Config(name= Vanadium.MODID)
 public class VanadiumConfig implements ConfigData {
-    public boolean shouldClearSky;
-    public boolean shouldClearVoid;
-    public boolean shouldBlendSkyLighting;
-    public boolean shouldFlickerBlockLight;
+
+    @ConfigEntry.Category("customColors")
+    @Tooltip()
+    public boolean shouldClearSky = false;
+    @ConfigEntry.Category("customColors")
+    @Tooltip()
+    public boolean shouldClearVoid = false;
+    @ConfigEntry.Category("customColors")
+    @Tooltip()
+    public boolean shouldBlendSkyLight = true;
+    @ConfigEntry.Category("customColors")
+    @Tooltip()
+    public boolean shouldFlickerBlockLight = true;
+    @ConfigEntry.Category("customColors")
+    @Tooltip()
     public double relativeBlockLightIntensity = -13.0;
 
+    @ConfigEntry.Category("biomeBlendRadius")
+    @Tooltip()
     @ConfigEntry.BoundedDiscrete(min=0, max = 14)
     public int blendingRadius = 14;
 

@@ -16,10 +16,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import vanadium.Vanadium;
-import vanadium.models.records.VanadiumColor;
 import vanadium.models.enums.ColoredParticle;
 import vanadium.models.enums.ColumnLayout;
 import vanadium.models.enums.Format;
+import vanadium.models.records.VanadiumColor;
 import vanadium.utils.GsonUtils;
 import vanadium.utils.MathUtils;
 
@@ -30,8 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
-
-import static java.util.Map.entry;
 
 public class GlobalColorProperties {
     private static final Logger LOGGER = LogManager.getLogger(Vanadium.MODID);
@@ -119,8 +117,6 @@ public class GlobalColorProperties {
         }
         this.defaultFormat = settings.palette.format;
         this.defaultLayout = settings.palette.layout;
-        // water potions' color does not correspond to a status effect
-        // so we use `null` for the key
         VanadiumColor  water = settings.potion.get("water");
         if(water == null) {
             water = settings.potion.get("minecraft:water");
@@ -237,11 +233,10 @@ public class GlobalColorProperties {
     private static <T> Map<T, VanadiumColor> convertMapping(Map<String, VanadiumColor> initialColor, Registry<T> registry) {
         Map<T, VanadiumColor> result = new HashMap<>();
         initialColor
-                .entrySet()
-                .forEach(entry -> {
-                    T key = registry.get(Identifier.tryParse(entry.getKey()));
+                .forEach((key1, value) -> {
+                    T key = registry.get(Identifier.tryParse(key1));
                     if (key != null) {
-                        result.put(key, entry.getValue());
+                        result.put(key, value);
                     }
                 });
         return result;
@@ -250,15 +245,14 @@ public class GlobalColorProperties {
     private static <T> Map<T, float[]> toRgb(Map<T, VanadiumColor> map) {
         Map<T, float[]> result = new HashMap<>();
         map
-                .entrySet()
-                .forEach(entry -> {
-                    int entryRgb = entry.getValue()
-                                        .rgb();
+                .forEach((key, value) -> {
+                    int entryRgb = value
+                            .rgb();
                     float[] rgb = new float[3];
                     rgb[0] = ((entryRgb >> 16) & 0xff) * MathUtils.INV_255;
                     rgb[1] = ((entryRgb >> 8) & 0xff) * MathUtils.INV_255;
                     rgb[2] = (entryRgb & 0xff) * MathUtils.INV_255;
-                    result.put(entry.getKey(), rgb);
+                    result.put(key, rgb);
                 });
         return result;
     }

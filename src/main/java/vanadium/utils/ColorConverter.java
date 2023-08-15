@@ -6,8 +6,6 @@ import vanadium.models.records.VanadiumColor;
 
 import java.util.stream.IntStream;
 
-import static vanadium.utils.MathUtils.*;
-
 public final class ColorConverter {
     private static final int WHITE_RGB = 0xFFFFFF;
     private static final int WHITE_ARGB = 0xFFFFFFFF;
@@ -97,6 +95,28 @@ public final class ColorConverter {
         return sRGBLut[0xFF & color];
     }
 
+    public static void convertSRGBToOkLabsInPlace(int color, float[] destination, int index){
+        float r = pivotRgbToLinear(((color >> 16) & 0xFF) * MathUtils.INV_255);
+        float g = pivotRgbToLinear(((color >> 8) & 0xFF) * MathUtils.INV_255);
+        float b = pivotRgbToLinear((color & 0xFF) * MathUtils.INV_255);
+
+        // Convert to linear sRGB
+        float l = (0.4122214708f * r) + (0.5363325363f * g) + (0.0514459929f * b);
+        float m = (0.2119034982f * r) + (0.6806995451f * g) + (0.1073969566f * b);
+        float s = (0.0883024619f * r) + (0.2817188376f * g) + (0.6299787005f * b);
+
+        // Nonlinear compression
+        l = pivotLinearToRgb(l);
+        m = pivotLinearToRgb(m);
+        s = pivotLinearToRgb(s);
+
+        destination[0] = ((0.2104542553f * l) + (0.793617785f * m)) - (0.0040720468f * s);
+        destination[1] = ((1.9779984951f * l) - (2.428592205f * m)) + (0.4505937099f * s);
+        destination[2] = ((0.0259040371f * l) + (0.7827717662f * m)) - (0.808675766f * s);
+
+
+    }
+
     public static float[] convertSrgbToOkLabAsFloatArray(int srgb) {
         float r = pivotRgbToLinear(((srgb >> 16) & 0xFF) * MathUtils.INV_255);
         float g = pivotRgbToLinear(((srgb >> 8) & 0xFF) * MathUtils.INV_255);
@@ -164,6 +184,31 @@ public final class ColorConverter {
         int colorAsIntWithFullAlpha = rgbToArgb(color.rgb(), 1);
 
         return colorAsIntWithFullAlpha;
+    }
+
+    public static void convertOKLabsTosRGBAInPlace(float L, float a, float b, int[] destination, int index)
+    {
+        float l_ = L + 0.3963377774f * a + 0.2158037573f * b;
+        float m_ = L - 0.1055613458f * a - 0.0638541728f * b;
+        float s_ = L - 0.0894841775f * a - 1.2914855480f * b;
+
+        float l = (float)Math.pow(l_, 3);
+        float m = (float)Math.pow(m_, 3);
+        float s = (float)Math.pow(s_, 3);
+
+        float rResult =  4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s;
+        float gResult = -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s;
+        float bResult = -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s;
+
+        int rByte = linearFloatTosRGBAsByte(rResult);
+        int gByte = linearFloatTosRGBAsByte(gResult);
+        int bByte = linearFloatTosRGBAsByte(bResult);
+
+        VanadiumColor color = new VanadiumColor(rByte, gByte, bByte);
+
+        int colorAsIntWithFullAlpha = rgbToArgb(color.rgb(), 1);
+
+        destination[index] = colorAsIntWithFullAlpha;
     }
 
     public static byte linearFloatTosRGBAsByte(float value) {
