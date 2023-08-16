@@ -12,6 +12,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vanadium.customcolors.decorators.ModelIdContext;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 import vanadium.mixin.coloring.BlockColorsAccessor;
+
+import java.util.function.BiFunction;
 
 
 @Mixin(ModelLoader.class)
@@ -33,37 +36,43 @@ public abstract class ModelLoaderMixin {
             )
     );
 
+    @Dynamic("Lambda in bake")
     @Inject(
-            method = "loadModel",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/model/ModelLoader;putModel(Lnet/minecraft/util/Identifier;Lnet/minecraft/client/render/model/UnbakedModel;)V")
+            method = "method_45877",
+            at= @At(value ="INVOKE", ordinal = 0, shift = At.Shift.AFTER)
     )
-    private void onModelLoad(Identifier id, CallbackInfo ci) {
+    private void setModelIdContext(BiFunction biFunction, Identifier id, CallbackInfo ci) {
+        boolean finished = false;
         ModelIdContext.shouldTintCurrentModel = false;
-
-        if(id instanceof ModelIdentifier modelId){
-            BlockState blockState;
-            if(modelId.getVariant().equals("inventory")) {
-                var blockId = Identifier.of(modelId.getNamespace(), modelId.getPath());
-                blockState = Registries.BLOCK.get(blockId).getDefaultState();
+        if (id instanceof ModelIdentifier modelId) {
+            BlockState blockState = null;
+            if (modelId
+                    .getVariant()
+                    .equals("inventory")) {
+                var blockId = new Identifier(modelId.getNamespace(), modelId.getPath());
+                blockState = Registries.BLOCK
+                        .get(blockId)
+                        .getDefaultState();
             } else {
-                var blockStateDescriptor = modelId.getNamespace() + ":" + modelId.getPath() + "[" + modelId.getVariant() + "]";
-
+                var blockStateDesc = modelId.getNamespace() + ":" + modelId.getPath() + "[" + modelId.getVariant() + "]";
                 try {
-                    blockState = BLOCK_STATE_PARSER.parse(new StringReader(blockStateDescriptor)).getBlockState();
-                } catch(CommandSyntaxException e) {
-                    return;
+                    blockState = BLOCK_STATE_PARSER
+                            .parse(new StringReader(blockStateDesc))
+                            .getBlockState();
+                } catch (CommandSyntaxException e) {
+                    finished = true;
                 }
             }
-
-            if(BiomeColorMappings.isCustomColored(blockState)) {
-                var colorProviders = ((BlockColorsAccessor) MinecraftClient.getInstance().getBlockColors()).getProviders();
-
-                if(!colorProviders.containsKey(Registries.BLOCK.getRawId(blockState.getBlock()))) {
-                    ModelIdContext.shouldTintCurrentModel = true;
+            if (!finished) {
+                if (BiomeColorMappings.isCustomColored(blockState)) {
+                    var colorProviders = ((BlockColorsAccessor) MinecraftClient
+                            .getInstance()
+                            .getBlockColors()).getProviders();
+                    if (!colorProviders.containsKey(Registries.BLOCK.getRawId(blockState.getBlock()))) {
+                        ModelIdContext.shouldTintCurrentModel = true;
+                    }
                 }
             }
         }
-
     }
-
 }

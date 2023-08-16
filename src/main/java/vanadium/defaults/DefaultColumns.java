@@ -1,5 +1,6 @@
 package vanadium.defaults;
 
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.registry.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
@@ -10,9 +11,8 @@ import org.apache.logging.log4j.Logger;
 import vanadium.models.records.ColumnBounds;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public final class DefaultColumns {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -23,14 +23,13 @@ public final class DefaultColumns {
     private static final Map<Identifier, ColumnBounds> legacyColumns = createLegacyColumnBoundaries();
 
     private static final Map<Identifier, ColumnBounds> stableColumns = createStableColumnBoundaries();
-    private static final int TOTAL_VANILLA_BIOMES = new DynamicRegistryManager.ImmutableImpl(Registries.REGISTRIES.stream().toList()).get(RegistryKeys.BIOME).size();
+    private static final int TOTAL_VANILLA_BIOMES = 63;
     private static final int TOTAL_LEGACY_BIOMES = 176;
 
     private DefaultColumns(){}
 
     public static void reloadDefaultColumnBoundaries(DynamicRegistryManager manager) {
         dynamicColumns.clear();
-        LOGGER.info("There are {} vanilla biomes", TOTAL_VANILLA_BIOMES);
         if(manager != null) {
             var biomeRegistry = manager.get(RegistryKeys.BIOME);
 
@@ -148,14 +147,21 @@ public final class DefaultColumns {
     }
 
     private static Map<Identifier, ColumnBounds> createCurrentColumnBoundaries() {
+        var map = new HashMap<Identifier, ColumnBounds>();
 
-        var biomeRegistry = new DynamicRegistryManager.ImmutableImpl(Registries.REGISTRIES.stream().toList())
-                .get(RegistryKeys.BIOME);
+        SimpleRegistry<Biome> simpleBiomeRegistry = new SimpleRegistry<>(RegistryKeys.BIOME, Lifecycle.stable());
 
-        return biomeRegistry
+        Iterator<Biome> it = simpleBiomeRegistry
                 .stream()
-                .map(biome -> Map.entry(Objects.requireNonNull(biomeRegistry.getId(biome)), new ColumnBounds(biomeRegistry.getRawId(biome), 1)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .iterator();
+        while (it.hasNext()) {
+    var biome = it.next();
+    var id = simpleBiomeRegistry.getId(biome);
+    var rawId = simpleBiomeRegistry.getRawId(biome);
+
+    map.put(id, new ColumnBounds(rawId,1));
+}
+        return map;
 
     }
 
@@ -311,4 +317,5 @@ public final class DefaultColumns {
                 Map.entry(BiomeKeys.CHERRY_GROVE.getValue(), new ColumnBounds(63, 1))
         );
     }
+
 }

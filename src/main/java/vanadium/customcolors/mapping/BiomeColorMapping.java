@@ -1,9 +1,9 @@
 package vanadium.customcolors.mapping;
 
+import com.mojang.serialization.Lifecycle;
 import lombok.Getter;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
@@ -105,20 +105,34 @@ public class BiomeColorMapping implements VanadiumResolver {
     }
 
     private int computeDefaultColor(ColorMappingProperties properties) {
-        switch(properties.getFormat()) {
-            case VANILLA: return this.imageColorMapping.getColor(128,128);
-            case GRID:
-                try{
-                    //wasn't sure if this was the right way to do this, so we're gambling ;)
-                    var registry = DynamicRegistryManager.EMPTY.get(RegistryKeys.BIOME);
-                    int x = properties.getColumn(BiomeKeys.PLAINS, registry).Column();
-                    int y = Range.between(0, imageColorMapping.getHeight() - 1).fit(63 - properties.getYOffset());
+        switch (properties.getFormat()) {
+            case VANILLA -> {
+                return this.imageColorMapping.getColor(128, 128);
+            }
+            case GRID -> {
+                try {
+                    var biomeRegistry = new SimpleRegistry<>(
+                            RegistryKeys.BIOME,
+                            Lifecycle.stable()
+                    )
+                            .freeze();
+
+                    int x = properties
+                            .getColumn(BiomeKeys.PLAINS,
+                                    biomeRegistry)
+                            .Column();
+                    int y = Range
+                            .between(0, imageColorMapping.getHeight() - 1)
+                            .fit(63 - properties.getYOffset());
+
                     return imageColorMapping.getColor(x, y);
-                } catch(IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                     return 0xffffffff;
                 }
-            case FIXED:
+            }
+            case FIXED -> {
                 return 0xffffffff;
+            }
         }
         throw new AssertionError("Unknown color mapping format: " + properties.getFormat());
     }

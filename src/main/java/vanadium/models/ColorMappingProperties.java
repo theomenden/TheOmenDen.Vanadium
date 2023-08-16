@@ -107,7 +107,7 @@ public class ColorMappingProperties {
                     ColumnBounds cb = columnsByBiome.get(id);
 
                     if(cb == null) {
-                        throw new IllegalStateException(id.toString());
+                        throw new IllegalArgumentException(id.toString());
                     }
                     return cb;
                 } else {

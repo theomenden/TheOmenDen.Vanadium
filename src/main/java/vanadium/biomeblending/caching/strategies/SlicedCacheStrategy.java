@@ -1,37 +1,33 @@
 package vanadium.biomeblending.caching.strategies;
 
-import com.google.common.util.concurrent.Striped;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import vanadium.biomeblending.blending.BlendingConfig;
 import vanadium.biomeblending.caching.ColorBlendingCache;
 import vanadium.models.records.Coordinates;
-import vanadium.utils.MathUtils;
 
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.StampedLock;
 import java.util.stream.IntStream;
 
 public abstract class SlicedCacheStrategy<T extends BaseSlice> {
-    public final static int AVAILABLE_BUCKETS = 16;
+    public final static int AVAILABLE_BUCKETS = 8;
     public final Long2ObjectLinkedOpenHashMap<T>[] hashMapStorageContainer;
-    public final Lock[] locks;
+    public final StampedLock[] locks;
 
     public final int totalSlices;
     public int sliceSize;
     public SlicedCacheStrategy(int count) {
         this.totalSlices = count;
-        int countPerBucket = count * MathUtils.INV_16_INT;
+        int countPerBucket = count / AVAILABLE_BUCKETS;
         hashMapStorageContainer = new Long2ObjectLinkedOpenHashMap[AVAILABLE_BUCKETS];
 
         IntStream
                 .range(0, AVAILABLE_BUCKETS)
                 .forEach(i -> hashMapStorageContainer[i] = new Long2ObjectLinkedOpenHashMap<>(countPerBucket));
 
-        locks = new Lock[AVAILABLE_BUCKETS];
-        var stripedLocks = Striped.lock(AVAILABLE_BUCKETS);
-
+        locks = new StampedLock[AVAILABLE_BUCKETS];
         IntStream
                 .range(0, AVAILABLE_BUCKETS)
-                .forEach(i -> locks[i] = stripedLocks.get(i));
+                .forEach(i -> locks[i] = new StampedLock());
     }
 
     public abstract T createSlice(int sliceSize, int salt);
@@ -39,30 +35,23 @@ public abstract class SlicedCacheStrategy<T extends BaseSlice> {
     public final void redistributeSlices(int sliceSize) {
         this.sliceSize = sliceSize;
 
-        int countPerBucket = this.totalSlices * MathUtils.INV_16_INT;
+        int countPerBucket = this.totalSlices / AVAILABLE_BUCKETS;
 
-        for(int i = 0; i < AVAILABLE_BUCKETS; ++i) {
-            Lock stripedLock = locks[i];
-
-            if(stripedLock.tryLock()) {
-                try {
+        IntStream
+                .range(0, AVAILABLE_BUCKETS)
+                .forEach(i -> {
+                    StampedLock stampedLock = locks[i];
                     Long2ObjectLinkedOpenHashMap<T> hash = hashMapStorageContainer[i];
-
+                    long stamp = stampedLock.writeLock();
                     hash.clear();
-
-                    for(int index = 0; index < countPerBucket; ++index) {
-                        T slice = createSlice(sliceSize, index);
-
-                        hash.put(slice.getCacheKey(), slice);
-                    }
-                } finally {
-                    stripedLock.unlock();
-                }
-                continue;
-            }
-
-            throw new RuntimeException("Could not acquire lock for bucket " + i);
-        }
+                    IntStream
+                            .range(0, countPerBucket)
+                            .forEach(index -> {
+                                T slice = createSlice(sliceSize, index);
+                                hash.put(slice.getCacheKey(), slice);
+                            });
+                    stampedLock.unlockWrite(stamp);
+                });
     }
 
     public final void invalidateAllCachesInRadius(int blendedRadius){
@@ -75,7 +64,7 @@ public abstract class SlicedCacheStrategy<T extends BaseSlice> {
         slice.releaseReference();
     }
 
-    public final T getOrInitSliceByCoordinates(int slizeSize, int x, int y, int z, int colorType, boolean shouldTryLocking)
+    public final T getOrInitSliceByCoordinates(int sliceSize, int x, int y, int z, int colorType, boolean shouldTryLocking)
     {
         Coordinates sliceCoordinates = new Coordinates(x, y, z);
 
@@ -86,38 +75,52 @@ public abstract class SlicedCacheStrategy<T extends BaseSlice> {
 
         int bucketIndex = getBucketIndex(sliceCoordinates);
 
-        Lock stripedLock = locks[bucketIndex];
+        StampedLock stampedLock = locks[bucketIndex];
         Long2ObjectLinkedOpenHashMap<T> hash = hashMapStorageContainer[bucketIndex];
 
         T slice = null;
 
-        if (shouldTryLocking && stripedLock.tryLock()) {
-            try {
-                slice = hash.getAndMoveToFirst(key);
-                if (slice == null || slice.getSize() != sliceSize) {
-                    slice = createSlice(sliceSize,0);
-                    hash.putAndMoveToFirst(key, slice);
-                } else {
-                    slice.acquireReference();
-                    hash.remove(key);
-                    hash.putAndMoveToFirst(key, slice);
-                }
+        long stamp;
 
+        if(shouldTryLocking) {
+            stamp = stampedLock.tryWriteLock();
+        } else {
+            stamp = stampedLock.writeLock();
+        }
+
+        if(stamp != 0) {
+            slice = hash.getAndMoveToFirst(key);
+
+            if (slice == null) {
+                while (true) {
+                    slice = hash.removeLast();
+
+                    if (slice.getReferenceCount() == 0) {
+                        break;
+                    } else {
+                        hash.putAndMoveToFirst(slice.getCacheKey(), slice);
+                    }
+                }
                 slice.setCacheKey(key);
                 slice.invalidateCacheData();
-            } finally {
-                stripedLock.unlock();
+
+                hash.putAndMoveToFirst(slice.getCacheKey(), slice);
+
             }
+
+            if (slice.getSize() == sliceSize) {
+                slice.acquireReference();
+            } else {
+                slice = createSlice(sliceSize, 0);
+            }
+
+            stampedLock.unlockWrite(stamp);
         }
         return slice;
     }
 
     private int getBucketIndex(Coordinates coordinates) {
         return (coordinates.x() ^ coordinates.y() ^ coordinates.z()) & (AVAILABLE_BUCKETS - 1);
-    }
-
-    private int getStripe(long key) {
-        return (int) (key % locks.length);
     }
 
 }

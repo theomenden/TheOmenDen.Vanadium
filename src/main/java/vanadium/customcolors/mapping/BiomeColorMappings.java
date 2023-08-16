@@ -41,20 +41,18 @@ public final class BiomeColorMappings {
     }
 
     public static void addBiomeColorMapping(BiomeColorMapping biomeColorMap) {
-        ColorMappingProperties properties = biomeColorMap.getProperties();
-        Set<Identifier> biomes = properties.getApplicableBiomes();
-        colorMappingsByState.addColorMapping(biomeColorMap, properties.getApplicableBlockStates(), biomes);
-        colorMappingsByBlock.addColorMapping(biomeColorMap, properties.getApplicableBlocks(), biomes);
-
-        properties
+        ColorMappingProperties props = biomeColorMap.getProperties();
+        Set<Identifier> biomes = props.getApplicableBiomes();
+        colorMappingsByState.addColorMapping(biomeColorMap, props.getApplicableBlockStates(), biomes);
+        colorMappingsByBlock.addColorMapping(biomeColorMap, props.getApplicableBlocks(), biomes);
+        props
                 .getApplicableSpecialIds()
                 .forEach((key, value) -> {
-                    switch (key.toString()) {
-                        case "vanadium:sky", "colormatic:sky" ->
-                                skyColorMappings.addColorMapping(biomeColorMap, value, biomes);
-                        case "vanadium:sky_fog", "colormatic:sky_fog" ->
-                                skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
-                        case "vanadium:fluid_fog", "colormatic:fluid_fog" -> {
+                    switch (key
+                            .toString()) {
+                        case "colormatic:sky" -> skyColorMappings.addColorMapping(biomeColorMap, value, biomes);
+                        case "colormatic:sky_fog" -> skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
+                        case "colormatic:fluid_fog" -> {
                             Collection<Fluid> fluids = value
                                     .stream()
                                     .map(Registries.FLUID::get)
@@ -90,24 +88,23 @@ public final class BiomeColorMappings {
     public static int getBiomeColorMapping(BlockState state, BlockRenderView world, BlockPos pos) {
         if(world != null && pos != null) {
             var resolver = colorMappingsByState.getExtendedResolver(state);
-
+            if(resolver == null) {
+                resolver = colorMappingsByBlock.getExtendedResolver(state.getBlock());
+            }
             if(resolver == null) {
                 throw new IllegalArgumentException(String.valueOf(state));
             }
-
             return resolver.resolveExtendedColor(world, pos);
+        } else {
+            BiomeColorMapping colormap = colorMappingsByState.getFallbackColorMapping(state);
+            if(colormap == null) {
+                colormap = colorMappingsByBlock.getFallbackColorMapping(state.getBlock());
+            }
+            if(colormap != null) {
+                return colormap.getDefaultColor();
+            } else {
+                return 0xffffff;
+            }
         }
-
-        BiomeColorMapping biomeColorMap = colorMappingsByState.getFallbackColorMapping(state);
-
-        if(biomeColorMap == null) {
-            biomeColorMap = colorMappingsByBlock.getFallbackColorMapping(state.getBlock());
-        }
-
-        if(biomeColorMap != null) {
-            return biomeColorMap.getDefaultColor();
-        }
-
-        return 0xffffff;
     }
 }

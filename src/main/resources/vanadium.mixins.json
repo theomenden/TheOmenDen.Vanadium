@@ -5,6 +5,8 @@
   "client": [
     "biome.BiomeColorsMixin",
     "client.ClientWorldMixin",
+    "client.InGameHudMixin",
+    "client.MinecraftClientMixin",
     "coloring.BlockColorsAccessor",
     "coloring.block.LeverBlockMixin",
     "coloring.dye.BannerBlockEntityRendererMixin",
@@ -12,6 +14,7 @@
     "coloring.dye.SheepEntityMixin",
     "coloring.dye.WolfCollarFeatureRendererMixin",
     "coloring.item.ItemColorsMixin",
+    "coloring.model.BakedModelManagerMixin",
     "coloring.model.BakedQuadFactoryMixin",
     "coloring.model.JsonUnbakedModelMixin",
     "coloring.model.ModelLoaderMixin",

@@ -19,6 +19,7 @@ import vanadium.biomeblending.caching.ColorCache;
 import vanadium.biomeblending.caching.strategies.ColorSlice;
 import vanadium.models.NonBlockingThreadLocal;
 import vanadium.models.records.Coordinates;
+import vanadium.utils.ColorCachingUtils;
 import vanadium.utils.ColorConverter;
 import vanadium.utils.LCGUtils;
 import vanadium.utils.MathUtils;
@@ -190,6 +191,7 @@ public class ColorBlending {
         final int sliceMinY = getSliceMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY);
         final int sliceMinZ = getSliceMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ);
 
+
         final int sliceMaxX = getSliceMax(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDX);
         final int sliceMaxY = getSliceMax(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY);
         final int sliceMaxZ = getSliceMax(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ);
@@ -212,8 +214,8 @@ public class ColorBlending {
             worldMinZ += (1 << (blockSizeLog2 - 1));
         }
 
-        int sliceIndexZ = ColorBlendingCache.getArrayIndex(sliceSize, sliceMinX, sliceMinY, sliceMinZ);
-        int blendIndexZ = 3 * ColorBlendingCache.getArrayIndex(blendSize, blendMinX, blendMinY, blendMinZ);
+        int sliceIndexZ = ColorCachingUtils.getArrayIndex(sliceSize, sliceMinX, sliceMinY, sliceMinZ);
+        int blendIndexZ = 3 * ColorCachingUtils.getArrayIndex(blendSize, blendMinX, blendMinY, blendMinZ);
 
         for (int z = 0;
              z < dimZ;
@@ -261,8 +263,8 @@ public class ColorBlending {
                 blendIndexY += 3 * blendSize;
             }
 
-            sliceIndexZ += sliceSize * sliceSize;
-            blendIndexZ += 3 * blendSize * blendSize;
+            sliceIndexZ += (int)Math.pow(sliceSize, 2);
+            blendIndexZ += 3 * (int)(Math.pow(blendSize, 2));
         }
     }
 
@@ -453,13 +455,13 @@ public class ColorBlending {
         for (int z = 0;
              z < srcSize;
              ++z) {
-            int newIndexX = 0;
+            int newXIndex = 0;
 
             for (int newX = 0;
                  newX < srcSize;
                  ++newX) {
-                int newSrcIndexY = newIndexX + newBufferIndexZ;
-                int newDstIndexY = newIndexX;
+                int newSourceIndexForY = newXIndex + newBufferIndexZ;
+                int newDestinationIndexForY = newXIndex;
 
                 float sumR = 0;
                 float sumG = 0;
@@ -468,20 +470,20 @@ public class ColorBlending {
                 for (int newY = 0;
                      newY < fullFilterDim;
                      ++newY) {
-                    sumR += buffer.color[newSrcIndexY];
-                    sumG += buffer.color[newSrcIndexY + 1];
-                    sumB += buffer.color[newSrcIndexY + 2];
+                    sumR += buffer.color[newSourceIndexForY];
+                    sumG += buffer.color[newSourceIndexForY + 1];
+                    sumB += buffer.color[newSourceIndexForY + 2];
 
-                    newSrcIndexY += 3 * blendBufferDim;
+                    newSourceIndexForY += 3 * blendBufferDim;
                 }
 
-                newSrcIndexY = newIndexX + newBufferIndexZ;
+                newSourceIndexForY = newXIndex + newBufferIndexZ;
 
                 int lowerOffset = 0;
                 int upperOffset = 3 * fullFilterDim * blendBufferDim;
 
-                int lowerIndex = newSrcIndexY + lowerOffset;
-                int upperIndex = newSrcIndexY + upperOffset;
+                int lowerIndex = newSourceIndexForY + lowerOffset;
+                int upperIndex = newSourceIndexForY + upperOffset;
 
                 for (int newY = 0;
                      newY < scaledDstSize;
@@ -501,22 +503,22 @@ public class ColorBlending {
                         sumG += upperG;
                         sumB += upperB;
 
-                        buffer.blend[newDstIndexY] = sumR;
-                        buffer.blend[newDstIndexY + 1] = sumG;
-                        buffer.blend[newDstIndexY + 2] = sumB;
+                        buffer.blend[newDestinationIndexForY] = sumR;
+                        buffer.blend[newDestinationIndexForY + 1] = sumG;
+                        buffer.blend[newDestinationIndexForY + 2] = sumB;
 
                         sumR -= lowerR;
                         sumG -= lowerG;
                         sumB -= lowerB;
 
-                        newDstIndexY += 3 * blendBufferDim;
+                        newDestinationIndexForY += 3 * blendBufferDim;
                     }
 
                     lowerIndex += 3 * blendBufferDim;
                     upperIndex += 3 * blendBufferDim;
                 }
 
-                newIndexX += 3;
+                newXIndex += 3;
             }
 
             if (z < fullFilterDim) {
@@ -701,7 +703,7 @@ public class ColorBlending {
                     resultOffsetX += 16;
                 }
 
-                newResultIndexZ += blockSize * 16 * 16;
+                newResultIndexZ += blockSize *  256;
             }
 
             newBufferIndexZ += 3 * blendBufferDim * blendBufferDim;
@@ -733,7 +735,7 @@ public class ColorBlending {
                 indexY += 16;
             }
 
-            indexZ += 16 * 16;
+            indexZ += 256;
         }
     }
 
@@ -758,7 +760,7 @@ public class ColorBlending {
         final int inChunkY = MathUtils.getLowerBits(baseY, 4);
         final int inChunkZ = MathUtils.getLowerBits(baseZ, 4);
 
-        int baseIndex = ColorBlendingCache.getArrayIndex(16, inChunkX, inChunkY, inChunkZ);
+        int baseIndex = ColorCachingUtils.getArrayIndex(16, inChunkX, inChunkY, inChunkZ);
 
         fillBlendChunkRegionWithColor(
                 blendChunk,
@@ -793,7 +795,7 @@ public class ColorBlending {
         final int inChunkY = MathUtils.getLowerBits(baseY, 4);
         final int inChunkZ = MathUtils.getLowerBits(baseZ, 4);
 
-        int baseIndex = ColorBlendingCache.getArrayIndex(16, inChunkX, inChunkY, inChunkZ);
+        int baseIndex = ColorCachingUtils.getArrayIndex(16, inChunkX, inChunkY, inChunkZ);
 
         if (neighborsAreLoaded) {
             int indexZ = baseIndex;

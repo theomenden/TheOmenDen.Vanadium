@@ -87,7 +87,7 @@ public abstract class BlockColorsMixin {
     }
 
     @Inject(
-            method = "getColor",
+            method = "getColor(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;I)I",
             at = @At("HEAD"),
             cancellable = true
     )

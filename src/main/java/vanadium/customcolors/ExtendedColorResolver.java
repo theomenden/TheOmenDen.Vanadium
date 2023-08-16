@@ -14,7 +14,7 @@ import vanadium.models.records.Coordinates;
 import vanadium.models.NonBlockingThreadLocal;
 import vanadium.models.YCoordinate;
 
-public class ExtendedColorResolver implements ColorResolver {
+public final class ExtendedColorResolver implements ColorResolver {
     @Nullable private static DynamicRegistryManager registryManager;
     private final ThreadLocal<YCoordinate> positionY;
     @Getter
