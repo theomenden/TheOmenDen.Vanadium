@@ -26,12 +26,11 @@ public final class DefaultColumns {
     private static final int TOTAL_VANILLA_BIOMES = new DynamicRegistryManager.ImmutableImpl(Registries.REGISTRIES.stream().toList()).get(RegistryKeys.BIOME).size();
     private static final int TOTAL_LEGACY_BIOMES = 176;
 
-    private DefaultColumns(){
-        LOGGER.info("There are {} vanilla biomes", TOTAL_VANILLA_BIOMES);
-    }
+    private DefaultColumns(){}
 
     public static void reloadDefaultColumnBoundaries(DynamicRegistryManager manager) {
         dynamicColumns.clear();
+        LOGGER.info("There are {} vanilla biomes", TOTAL_VANILLA_BIOMES);
         if(manager != null) {
             var biomeRegistry = manager.get(RegistryKeys.BIOME);
 

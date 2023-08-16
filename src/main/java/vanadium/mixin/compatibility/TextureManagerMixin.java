@@ -18,8 +18,9 @@ import java.util.concurrent.Executor;
 @Mixin(TextureManager.class)
 public abstract class TextureManagerMixin {
 
-    @Inject(method = "reload", at = @At("HEAD"))
-    private void onReloading(ResourceReloader.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-        Vanadium.COLOR_PROPERTIES.reload(manager);
+    @Dynamic("Post reload lambda method")
+    @Inject(method = "method_18167", at = @At("HEAD"))
+    public void reloadVanadiumColorProperties(ResourceManager resourceManager, Executor executor, CompletableFuture completableFuture, Void v, CallbackInfo ci) {
+        Vanadium.COLOR_PROPERTIES.reload(resourceManager);
     }
 }

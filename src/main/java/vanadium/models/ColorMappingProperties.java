@@ -100,33 +100,30 @@ public class ColorMappingProperties {
     }
 
     public ColumnBounds getColumn(RegistryKey<Biome> biomeKey, Registry<Biome> biomeRegistry) {
+        if(format == Format.GRID) {
+            if(biomeKey != null) {
+                Identifier id = biomeKey.getValue();
+                if(columnsByBiome != null) {
+                    ColumnBounds cb = columnsByBiome.get(id);
 
-        if (format != Format.GRID) {
+                    if(cb == null) {
+                        throw new IllegalStateException(id.toString());
+                    }
+                    return cb;
+                } else {
+                    return switch(layout) {
+                        case DEFAULT ->  DefaultColumns.getDefaultBoundaries(biomeKey);
+                        case OPTIFINE -> DefaultColumns.getOptifineBoundaries(biomeKey, biomeRegistry);
+                        case LEGACY -> DefaultColumns.getLegacyBoundaries(biomeKey, biomeRegistry, this.isUsingOptfine);
+                        case STABLE -> DefaultColumns.getStableBoundaries(biomeKey);
+                    };
+                }
+            } else{
+                return DEFAULT_BOUNDS;
+            }
+        } else {
             throw new IllegalStateException(format.toString());
         }
-
-        if (biomeKey == null) {
-            return DEFAULT_BOUNDS;
-        }
-
-        Identifier id = biomeKey.getValue();
-
-        if (columnsByBiome != null) {
-            ColumnBounds cb = columnsByBiome.get(id);
-
-            if (cb != null) {
-                return cb;
-            }
-
-            throw new IllegalArgumentException(id.toString());
-        }
-
-        return switch (layout) {
-            case DEFAULT -> DefaultColumns.getDefaultBoundaries(biomeKey);
-            case OPTIFINE -> DefaultColumns.getOptifineBoundaries(biomeKey, biomeRegistry);
-            case LEGACY -> DefaultColumns.getLegacyBoundaries(biomeKey, biomeRegistry, this.isUsingOptfine);
-            case STABLE -> DefaultColumns.getStableBoundaries(biomeKey);
-        };
     }
 
     public Set<Identifier> getApplicableBiomes() {
@@ -173,10 +170,10 @@ public class ColorMappingProperties {
     public static ColorMappingProperties load(ResourceManager manager, Identifier id, boolean custom) {
         try (InputStream in = manager
                 .getResourceOrThrow(id)
-                .getInputStream()) {
-            try (Reader r = GsonUtils.getJsonReader(in, id, k -> k, "blocks"::equals)) {
-                return loadFromJson(r, id, custom);
-            }
+                .getInputStream();
+             Reader r = GsonUtils
+                     .getJsonReader(in, id, k -> k, "blocks"::equals)) {
+            return loadFromJson(r, id, custom);
         } catch (IOException e) {
             return loadFromJson(new StringReader("{}"), id, custom);
         }

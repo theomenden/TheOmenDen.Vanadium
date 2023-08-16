@@ -7,6 +7,7 @@ import me.jellysquid.mods.sodium.client.model.color.interop.BlockColorsExtended;
 import net.minecraft.block.Block;
 import net.minecraft.client.color.block.BlockColorProvider;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.collection.IdList;
 import org.spongepowered.asm.mixin.*;
@@ -28,7 +29,6 @@ import java.util.Set;
 )
 public abstract class SodiumBlockColorsMixin implements BlockColorsExtended {
 
-
     @Shadow public abstract Set<Property<?>> getProperties(Block block);
 
     @Shadow @Final private IdList<BlockColorProvider> providers;
@@ -40,8 +40,7 @@ public abstract class SodiumBlockColorsMixin implements BlockColorsExtended {
     private final Reference2ReferenceMap<Block, BlockColorProvider> blocksToColor = new Reference2ReferenceOpenHashMap<>();
     @Inject(
             method = "registerColorProvider",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At("HEAD")
     )
     private void onPreRegisterColorProvider(BlockColorProvider provider, Block[] blocks, CallbackInfo ci) {
         Arrays
@@ -49,11 +48,10 @@ public abstract class SodiumBlockColorsMixin implements BlockColorsExtended {
                 .forEach(block -> {
                     if (BiomeColorMappings.isCustomColored(block.getDefaultState())) {
                         this.blocksToColor.put(block, VANADIUM_PROVIDER);
-                        return;
+                    } else {
+                        this.blocksToColor.put(block, provider);
                     }
-                    this.blocksToColor.put(block, provider);
                 });
-    ci.cancel();
     }
 
     @Intrinsic(displace = true)

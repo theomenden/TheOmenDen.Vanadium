@@ -46,20 +46,15 @@ public final class DefaultVanadiumResolverProviders {
         return (manager, biome, coordinates) -> {
             int color;
 
-            if (!Vanadium.SKY_COLORS.hasCustomColorMapping()
-                    || !key.equals(Vanadium.OVERWORLD_ID)) {
-                color = Vanadium.COLOR_PROPERTIES
-                        .getProperties()
-                        .getDimensionSky(key);
-
-                if (color != 0) {
-                    return color;
-                }
-                color = biome.getSkyColor();
+            if(Vanadium.SKY_COLORS.hasCustomColorMapping()
+            && key.equals(Vanadium.OVERWORLD_ID)) {
+                color = Vanadium.SKY_COLORS.getColorMapping().getColorAtCoordinatesForBiome(manager, biome, coordinates);
             } else {
-                color = Vanadium.SKY_COLORS
-                        .getColorMapping()
-                        .getColorAtCoordinatesForBiome(manager, biome, coordinates);
+                color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionSky(key);
+
+                if(color == 0) {
+                    color = biome.getSkyColor();
+                }
             }
             return color;
         };

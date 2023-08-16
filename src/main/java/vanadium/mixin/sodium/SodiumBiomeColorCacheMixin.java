@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import vanadium.customcolors.VanadiumColorResolverCompatibility;
+import vanadium.customcolors.interfaces.VanadiumResolver;
+import vanadium.customcolors.interfaces.VanadiumResolverProvider;
 import vanadium.models.records.Coordinates;
 import vanadium.utils.ColorCachingUtils;
 
@@ -55,7 +58,6 @@ public abstract class SodiumBiomeColorCacheMixin {
        if(this.vanadium$blendingMinimums == null) {
            this.vanadium$blendingMinimums = new Coordinates(this.minX, this.minY, this.minZ);
        }
-
         var resolver = getResolver(biomeColorSource);
 
         int[] colors = this.vanadium$blendingColors.computeIfAbsent(resolver, k -> new int[4096]);

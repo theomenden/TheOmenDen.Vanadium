@@ -91,7 +91,6 @@ public abstract class BlockColorsMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-
     private void onColorMultiplier(BlockState state, BlockRenderView world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
         if(world != null
         && pos != null

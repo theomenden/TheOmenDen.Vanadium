@@ -7,23 +7,18 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 
 @Mixin(FluidRenderer.class)
 public abstract class FluidRendererMixin {
-    @ModifyConstant(
-            method="render",
-            constant = @Constant(intValue = 16777215)
-    )
-    private int calculateCustomColor(int original, BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
-        int result = original;
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/color/world/BiomeColors;getWaterColor(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;)I", ordinal = 0))
+    private void calculateCustomColor(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, CallbackInfo ci ) {
         var canonicalBlockState = fluidState.getBlockState();
-
-        if (BiomeColorMappings.isCustomColored(canonicalBlockState)) {
-            result = BiomeColorMappings.getBiomeColorMapping(canonicalBlockState, world, pos);
+        if(BiomeColorMappings.isCustomColored(canonicalBlockState)) {
+            BiomeColorMappings.getBiomeColorMapping(canonicalBlockState,world,pos);
         }
-        return result;
     }
 }

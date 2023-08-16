@@ -50,7 +50,6 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
                 resultingNamespaceLoad = attemptToLoadFromColormaticNamespace(manager);
 
                 if(resultingNamespaceLoad == null) {
-                    logger.error("Failed to load color mapping from path, attempting Optifine directory", e);
                  resultingNamespaceLoad =  attemptToLoadFromOptifineDirectory(manager);
                 }
             }

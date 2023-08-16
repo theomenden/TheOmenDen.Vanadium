@@ -203,6 +203,7 @@ public abstract class BackgroundRendererMixin {
         return scale;
     }
 
+    @Unique
     private static boolean isSubmersedColor(CameraSubmersionType submersionType) {
         return submersionType == CameraSubmersionType.LAVA
                 && (

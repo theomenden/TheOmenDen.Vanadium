@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.ColorResolver;
 import net.minecraft.world.biome.source.BiomeCoords;
 import net.minecraft.world.dimension.DimensionType;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -138,11 +139,16 @@ public abstract class ClientWorldMixin extends World {
         vanadium$chunkColorCache.invalidateAllCachesInRadius(blendingRadius);
     }
 
+    @Inject(method="reloadColor", at = @At("RETURN"))
+    private void reloadVanadiumColor(CallbackInfo ci){
+        this.colorCache.entrySet()
+                       .removeIf(entry -> entry.getKey() instanceof ExtendedColorResolver);
+    }
+
     @Inject(method="resetChunkColor", at = @At("HEAD"))
     public void onResetChunkColor(ChunkPos chunkPos, CallbackInfo ci) {
         int chunkX = chunkPos.x;
         int chunkZ = chunkPos.z;
-
         vanadium$blendingColorCache.invalidateChunk(chunkX, chunkZ);
     }
 
@@ -172,11 +178,4 @@ public abstract class ClientWorldMixin extends World {
             this.colorCache.put(resolver, new BiomeColorCache(pos1 -> this.calculateColor(pos1, resolver)));
         }
     }
-
-    @Inject(method="reloadColor", at = @At("RETURN"))
-    private void reloadVanadiumColor(CallbackInfo ci){
-        this.colorCache.entrySet()
-                .removeIf(entry -> entry.getKey() instanceof ExtendedColorResolver);
-    }
-
 }

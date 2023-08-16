@@ -49,8 +49,7 @@ public final class BiomeColorMappings {
         properties
                 .getApplicableSpecialIds()
                 .forEach((key, value) -> {
-                    switch (key
-                            .toString()) {
+                    switch (key.toString()) {
                         case "vanadium:sky", "colormatic:sky" ->
                                 skyColorMappings.addColorMapping(biomeColorMap, value, biomes);
                         case "vanadium:sky_fog", "colormatic:sky_fog" ->

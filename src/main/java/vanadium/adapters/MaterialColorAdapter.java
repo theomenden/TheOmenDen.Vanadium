@@ -8,12 +8,14 @@ import com.google.gson.stream.JsonWriter;
 import net.minecraft.block.MapColor;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Map.entry;
 
 public class MaterialColorAdapter extends TypeAdapter<MapColor> {
-    private static final Map<String, MapColor> MATERIAL_COLORS = Map.<String, MapColor>ofEntries(
+    private static final Map<String, MapColor> MATERIAL_COLORS = new HashMap<>(
+    Map.<String, MapColor>ofEntries(
             Map.entry("air", MapColor.CLEAR),
             Map.entry("grass", MapColor.PALE_GREEN),
             Map.entry("sand", MapColor.PALE_YELLOW),
@@ -68,7 +70,7 @@ public class MaterialColorAdapter extends TypeAdapter<MapColor> {
             Map.entry("green_terracotta", MapColor.TERRACOTTA_GREEN),
             Map.entry("red_terracotta", MapColor.TERRACOTTA_RED),
             Map.entry("black_terracotta", MapColor.TERRACOTTA_BLACK)
-    );
+    ));
 
     @Override
     public void write(JsonWriter jsonWriter, MapColor mapColor) throws IOException {

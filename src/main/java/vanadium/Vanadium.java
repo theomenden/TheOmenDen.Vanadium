@@ -4,10 +4,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -25,7 +22,7 @@ public class Vanadium implements ClientModInitializer {
     public static VanadiumConfig configuration;
     public static final String MODID = "vanadium";
     public static final String COLORMATIC_ID = "colormatic";
-    public static final Identifier OVERWORLD_ID = DimensionTypes.OVERWORLD_ID;
+    public static final Identifier OVERWORLD_ID = Identifier.of("minecraft", "overworld");
 
     public static final BiomeColorMappingResource WATER_COLORS = new BiomeColorMappingResource(new Identifier(MODID, "colormap/water"));
     public static final BiomeColorMappingResource UNDERWATER_COLORS = new BiomeColorMappingResource(new Identifier(MODID, "colormap/underwater"));
@@ -111,6 +108,5 @@ public class Vanadium implements ClientModInitializer {
         client.registerReloadListener(EXPERIENCE_ORB_COLORS);
         client.registerReloadListener(LIGHTMAP_PROPERTIES);
         client.registerReloadListener(LIGHTMAPS);
-
     }
 }

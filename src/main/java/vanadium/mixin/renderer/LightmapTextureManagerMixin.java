@@ -163,7 +163,7 @@ public abstract class LightmapTextureManagerMixin {
 
     @Inject(
             method = "update",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getSkyBrightness(F)F")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getSkyBrightness(F)F", ordinal = 0)
     )
     private void modifySkyAmbience(float delta, CallbackInfo ci) {
         if(Vanadium.configuration.shouldBlendSkyLight) {

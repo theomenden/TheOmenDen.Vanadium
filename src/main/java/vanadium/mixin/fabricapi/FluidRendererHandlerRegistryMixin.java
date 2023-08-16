@@ -9,7 +9,7 @@ import vanadium.customcolors.decorators.VanadiumFluidRenderHandler;
 
 @Mixin(value = FluidRenderHandlerRegistryImpl.class, remap = false)
 public abstract class FluidRendererHandlerRegistryMixin {
-    @ModifyVariable(method = "register", at = @At(value = "HEAD"), ordinal = 0)
+    @ModifyVariable(method = "register", at = @At(value = "HEAD"), ordinal = 0, argsOnly = true)
     private FluidRenderHandler wrapVanadiumFluidRenderHandler(FluidRenderHandler delegate) {
         return new VanadiumFluidRenderHandler(delegate);
     }

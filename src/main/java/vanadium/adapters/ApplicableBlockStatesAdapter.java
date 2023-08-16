@@ -26,7 +26,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
     private static final Set<String> MODIDS = Set.of(Vanadium.MODID, Vanadium.COLORMATIC_ID);
 
     @Override
-    public void write(JsonWriter jsonWriter, ApplicableBlockStates applicableBlockStates) throws IOException {
+    public void write(JsonWriter jsonWriter, ApplicableBlockStates applicableBlockStates) {
         throw new UnsupportedOperationException("writing is not supported");
     }
 
@@ -45,19 +45,21 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
         String[] parts = blockDescription.split(":");
         int beginningIndex;
         try {
-            if (parts.length <= 1 || parts[1].indexOf('=') >= 0) {
-                block = Registries.BLOCK.get(new Identifier(parts[0]));
-                beginningIndex = 1;
-            } else {
-                Identifier identifier = Identifier.of(parts[0], parts[1]);
+            if(parts.length > 1
+            && parts[1].indexOf('=') < 0) {
+                Identifier id = new Identifier(parts[0], parts[1]);
 
-                if(MODIDS.contains(parts[0])) {
-                    initializeSpecialBlockStates(applicableBlockStates, identifier, parts);
+                if(parts[0].equals(Vanadium.MODID)
+                || parts[0].equals(Vanadium.COLORMATIC_ID)) {
+                    initializeSpecialBlockStates(applicableBlockStates, id, parts);
                     return applicableBlockStates;
                 } else {
-                    block = Registries.BLOCK.get(identifier);
+                    block = Registries.BLOCK.get(id);
                 }
                 beginningIndex = 2;
+            } else {
+                block = Registries.BLOCK.get(new Identifier(parts[0]));
+                beginningIndex = 1;
             }
         } catch (Exception e) {
             throw new JsonSyntaxException("Invalid block identifier: " + blockDescription, e);

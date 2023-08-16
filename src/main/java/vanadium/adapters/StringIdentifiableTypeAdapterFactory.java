@@ -24,7 +24,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
             if (Arrays
                     .stream(implemented)
                     .anyMatch(iface -> iface == StringIdentifiable.class)) {
-                return (TypeAdapter<T>) new StringIdentifiableTypeAdapter<>(cls);
+                return (TypeAdapter<T>)new StringIdentifiableTypeAdapter<>(cls);
             }
         }
         return null;
@@ -33,6 +33,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
     private static class StringIdentifiableTypeAdapter<T extends Enum<T> & StringIdentifiable> extends TypeAdapter<T> {
         private final T[] values;
 
+        @SuppressWarnings({"ConstantConditions", "unchecked"})
         public StringIdentifiableTypeAdapter(Class<?> cls) {
             this.values = (T[])cls.getEnumConstants();
         }
@@ -53,12 +54,11 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
                 throw new JsonSyntaxException(new NullPointerException("Required value, cannot be null"));
             }
             String name = jsonReader.nextString();
-            for(T value : values) {
-                if(value.asString().equals(name)) {
-                    return value;
-                }
-            }
-            throw new JsonSyntaxException(new IllegalArgumentException("Unknown value: " + name));
+
+            return Arrays.stream(values)
+                    .filter(t -> t.asString().equals(name))
+                    .findFirst()
+                    .orElseThrow();
         }
     }
 }

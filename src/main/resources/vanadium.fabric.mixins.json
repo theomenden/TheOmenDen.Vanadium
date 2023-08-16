@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "vanadium.mixin.fabricapi.FabricApiFilterPluginMixin",
   "client": [
-    "FluidRendererHandlerRegistryMixin",
+    "FluidRendererHandlerRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
