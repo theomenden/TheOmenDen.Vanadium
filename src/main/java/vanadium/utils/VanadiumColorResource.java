@@ -12,8 +12,7 @@ public class VanadiumColorResource {
 
     public static VanadiumColor resolveColorFromHex(String hex) {
         int hexRgb = ColorConverter.hexToRgb(hex);
-        int fullAlphaRgb = ColorConverter.rgbToArgb(hexRgb, 1);
-        return new VanadiumColor(fullAlphaRgb);
+        return new VanadiumColor(hexRgb);
     }
 
     public static VanadiumColor resolveColorFromHex(String hex, int alpha) {

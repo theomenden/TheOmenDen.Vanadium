@@ -20,8 +20,8 @@ import vanadium.models.enums.ColoredParticle;
 import vanadium.models.enums.ColumnLayout;
 import vanadium.models.enums.Format;
 import vanadium.models.records.VanadiumColor;
+import vanadium.utils.ColorConverter;
 import vanadium.utils.GsonUtils;
-import vanadium.utils.MathUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,6 +71,7 @@ public class GlobalColorProperties {
     private final Map<EntityType<?>, int[]> spawnEgg;
     private final Map<Formatting, TextColor> textColor;
     private final TextColorSettings text;
+
 
     @Getter
     private final int xpOrbTime;
@@ -214,17 +215,16 @@ public class GlobalColorProperties {
     }
 
     private int getColor(VanadiumColor color) {
-        return color!= null? color.rgb() : 0;
+        return color != null ? color.rgb() : 0;
     }
 
     private Map<Identifier, VanadiumColor> convertIdentifierMapping(Map<String, VanadiumColor> map) {
         Map<Identifier, VanadiumColor> result = new HashMap<>();
         map
-                .entrySet()
-                .forEach(entry -> {
-                    Identifier id = Identifier.tryParse(entry.getKey());
+                .forEach((key, value) -> {
+                    Identifier id = Identifier.tryParse(key);
                     if (id != null) {
-                        result.put(id, entry.getValue());
+                        result.put(id, value);
                     }
                 });
         return result;
@@ -246,12 +246,7 @@ public class GlobalColorProperties {
         Map<T, float[]> result = new HashMap<>();
         map
                 .forEach((key, value) -> {
-                    int entryRgb = value
-                            .rgb();
-                    float[] rgb = new float[3];
-                    rgb[0] = ((entryRgb >> 16) & 0xff) * MathUtils.INV_255;
-                    rgb[1] = ((entryRgb >> 8) & 0xff) * MathUtils.INV_255;
-                    rgb[2] = (entryRgb & 0xff) * MathUtils.INV_255;
+                    float[] rgb = ColorConverter.createColorFloatArray(value.rgb());
                     result.put(key, rgb);
                 });
         return result;

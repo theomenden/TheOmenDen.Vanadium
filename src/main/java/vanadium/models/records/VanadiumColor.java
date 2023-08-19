@@ -4,10 +4,6 @@ import org.apache.commons.lang3.Range;
 
 public record VanadiumColor(int rgb) {
 
-    public VanadiumColor {
-        rgb |= 0xff000000;
-    }
-
     public VanadiumColor(int r, int g, int b) {
         this(r << 16 | g << 8 | b);
     }

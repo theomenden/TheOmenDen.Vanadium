@@ -149,9 +149,9 @@ public abstract class BackgroundRendererMixin {
         && world.getDimension().hasSkyLight()) {
             Vec3d color = world.getSkyColor(camera.getPos(), partialTicks);
 
-            BackgroundRendererMixin.red = (float)color.x;
-            BackgroundRendererMixin.green = (float)color.y;
-            BackgroundRendererMixin.blue = (float)color.z;
+            red = (float)color.x;
+            green = (float)color.y;
+            blue = (float)color.z;
         }
     }
 
@@ -185,9 +185,9 @@ public abstract class BackgroundRendererMixin {
     )
     private static void resetWeatheringColors(CallbackInfo ci) {
         if(Vanadium.configuration.shouldClearSky) {
-            BackgroundRendererMixin.red = redStore;
-            BackgroundRendererMixin.green = greenStore;
-            BackgroundRendererMixin.blue = blueStore;
+            red = redStore;
+            green = greenStore;
+            blue = blueStore;
         }
     }
 

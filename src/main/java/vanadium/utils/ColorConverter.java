@@ -181,9 +181,7 @@ public final class ColorConverter {
 
         VanadiumColor color = new VanadiumColor(rByte, gByte, bByte);
 
-        int colorAsIntWithFullAlpha = rgbToArgb(color.rgb(), 1);
-
-        return colorAsIntWithFullAlpha;
+        return rgbToArgb(color.rgb(), 1);
     }
 
     public static void convertOKLabsTosRGBAInPlace(float L, float a, float b, int[] destination, int index)
@@ -328,6 +326,14 @@ public final class ColorConverter {
         float blue = (rgb & 0xff) * MathUtils.INV_255;
 
         return new Vector3f(red, green,blue);
+    }
+
+    public static float[] createColorFloatArray(int srgb) {
+        return new float[] {
+        (srgb >> 16 & 0xff) * MathUtils.INV_255,
+        (srgb >> 8 & 0xff) * MathUtils.INV_255,
+        (srgb & 0xff) * MathUtils.INV_255
+        };
     }
 
     private static float hueToRgb(float p, float q, float t) {

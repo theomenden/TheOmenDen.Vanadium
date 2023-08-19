@@ -773,40 +773,41 @@ public class ColorBlending {
             World world,
             ColorResolver colorResolver,
             BlendingChunk blendChunk,
-            int requestX,
-            int requestY,
-            int requestZ) {
+            Coordinates requestCoordinates) {
         BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
         final int sliceSizeLog2 = BlendingConfig.getSliceSizeLog2(0);
         final int sliceSize = BlendingConfig.getSliceSize(0);
+        final  Coordinates sliceCoordinates = new Coordinates(
+                resolveScaledResults(sliceSizeLog2, requestCoordinates.x()),
+                resolveScaledResults(sliceSizeLog2, requestCoordinates.y()),
+                resolveScaledResults(sliceSizeLog2, requestCoordinates.z())
+        );
 
-        final int sliceX = resolveScaledResults(sliceSizeLog2, requestX);
-        final int sliceY = resolveScaledResults(sliceSizeLog2, requestY);
-        final int sliceZ = resolveScaledResults(sliceSizeLog2, requestZ);
+        boolean neighborsAreLoaded = neighborChunksAreLoaded(world, sliceSizeLog2, sliceCoordinates.x(), sliceCoordinates.z());
 
-        boolean neighborsAreLoaded = neighborChunksAreLoaded(world, sliceSizeLog2, sliceX, sliceZ);
+        Coordinates baseCoordinates = new Coordinates(
+                sliceCoordinates.x() << sliceSizeLog2,
+                sliceCoordinates.y() << sliceSizeLog2,
+                sliceCoordinates.z() << sliceSizeLog2);
+        Coordinates inChunkCoordinates = new Coordinates(
+                MathUtils.getLowerBits(baseCoordinates.x(), 4),
+                MathUtils.getLowerBits(baseCoordinates.y(), 4),
+                MathUtils.getLowerBits(baseCoordinates.z(), 4));
 
-        int baseX = sliceX << sliceSizeLog2;
-        int baseY = sliceY << sliceSizeLog2;
-        int baseZ = sliceZ << sliceSizeLog2;
 
-        final int inChunkX = MathUtils.getLowerBits(baseX, 4);
-        final int inChunkY = MathUtils.getLowerBits(baseY, 4);
-        final int inChunkZ = MathUtils.getLowerBits(baseZ, 4);
-
-        int baseIndex = ColorCachingUtils.getArrayIndex(16, inChunkX, inChunkY, inChunkZ);
+        int baseIndex = ColorCachingUtils.getArrayIndex(16, inChunkCoordinates);
 
         if (neighborsAreLoaded) {
             int indexZ = baseIndex;
 
             int indexY = indexZ;
-            int worldZ = baseZ;
+            int worldZ = baseCoordinates.z();
             for (int z = 0; z < sliceSize; ++z) {
                 for (int y = 0; y < sliceSize; ++y) {
                     int indexX = indexY;
-                    int worldY = baseY + y;
-                    int worldX = baseX;
+                    int worldY = baseCoordinates.y() + y;
+                    int worldX = baseCoordinates.x();
                     for (int x = 0; x < sliceSize; ++x) {
                         blockPos.set(worldX, worldY, worldZ);
                         int color = getColorAtPosition(world, blockPos, worldX, worldZ, colorResolver);
@@ -820,13 +821,14 @@ public class ColorBlending {
                 worldZ += 1;
             }
         } else {
-            int centerX = (sliceX << sliceSizeLog2) + (1 << (sliceSizeLog2 - 1));
-            int centerY = (sliceY << sliceSizeLog2) + (1 << (sliceSizeLog2 - 1));
-            int centerZ = (sliceZ << sliceSizeLog2) + (1 << (sliceSizeLog2 - 1));
+            Coordinates centerCoordinates = new Coordinates(
+                    (sliceCoordinates.x() << sliceSizeLog2) + (1 << (sliceSizeLog2 - 1)),
+                    (sliceCoordinates.y() << sliceSizeLog2) + (1 << (sliceSizeLog2 - 1)),
+                    (sliceCoordinates.z() << sliceSizeLog2) + (1 << (sliceSizeLog2 - 1))
+            );
+            blockPos.set(centerCoordinates.x(), centerCoordinates.y(), centerCoordinates.z());
 
-            blockPos.set(centerX, centerY, centerZ);
-
-            int color = getColorAtPosition(world, blockPos, centerX, centerZ, colorResolver);
+            int color = getColorAtPosition(world, blockPos, centerCoordinates.x(), centerCoordinates.z(), colorResolver);
 
             fillBlendChunkRegionWithColor(blendChunk, color, baseIndex, sliceSize);
         }
@@ -871,9 +873,7 @@ public class ColorBlending {
                     world,
                     colorResolver,
                     blendChunk,
-                    coordinates.x(),
-                    coordinates.y(),
-                    coordinates.z());
+                    coordinates);
         }
     }
 }

@@ -3,6 +3,7 @@ package vanadium.customcolors.mapping;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public final class BiomeColorMappings {
     private static final ColorMappingStorage<Block> colorMappingsByBlock = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.BLOCK_PROVIDER);
     private static final ColorMappingStorage<BlockState> colorMappingsByState = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.BLOCK_STATE_PROVIDER);
+    private static final ColorMappingStorage<FluidState> colorMappingsByFluidState = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.FLUID_STATE_PROVIDER);
     private static final ColorMappingStorage<Fluid> colorMappingsByFluidFog = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.FLUID_FOG_PROVIDER);
     private static final ColorMappingStorage<Identifier> skyFogColorMappings = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.SKY_FOG_PROVIDER);
     private static final ColorMappingStorage<Identifier> skyColorMappings = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.SKY_PROVIDER);
@@ -76,6 +78,12 @@ public final class BiomeColorMappings {
                 || colorMappingsByState.contains(state);
     }
 
+    public static boolean isFluidCustomColored(FluidState state) {
+        return colorMappingsByFluidFog.contains(state.getFluid())
+                || colorMappingsByFluidState.contains(state);
+    }
+
+
     public static boolean isItemCustomColored(BlockState state) {
         return colorMappingsByBlock.getFallbackColorMapping(state.getBlock()) != null
                 || colorMappingsByState.getFallbackColorMapping(state) != null;
@@ -94,6 +102,7 @@ public final class BiomeColorMappings {
             if(resolver == null) {
                 throw new IllegalArgumentException(String.valueOf(state));
             }
+
             return resolver.resolveExtendedColor(world, pos);
         } else {
             BiomeColorMapping colormap = colorMappingsByState.getFallbackColorMapping(state);

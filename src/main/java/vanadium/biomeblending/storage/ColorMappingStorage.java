@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 import vanadium.Vanadium;
-import vanadium.customcolors.ExtendedColorResolver;
+import vanadium.customcolors.VanadiumExtendedColorResolver;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.customcolors.interfaces.VanadiumResolverProvider;
 import vanadium.customcolors.mapping.BiomeColorMapping;
@@ -20,7 +20,7 @@ import java.util.Set;
 public class ColorMappingStorage<T> {
     private final Table<T, Identifier, BiomeColorMapping> colorMappings;
     private final Map<T, BiomeColorMapping> fallbackColorMappings;
-    private final Map<T, ExtendedColorResolver> resolvers;
+    private final Map<T, VanadiumExtendedColorResolver> resolvers;
     private final Map<T, VanadiumResolver> defaultResolvers;
     private final VanadiumResolverProvider<T> defaultResolverProvider;
 
@@ -47,7 +47,7 @@ public class ColorMappingStorage<T> {
     }
 
     @Nullable
-    public ExtendedColorResolver getExtendedResolver(T key) {
+    public VanadiumExtendedColorResolver getExtendedResolver(T key) {
         return this.resolvers.get(key);
     }
 
@@ -69,14 +69,14 @@ public class ColorMappingStorage<T> {
             keys
                     .forEach(key -> {
                         fallbackColorMappings.put(key, colorMapping);
-                        resolvers.put(key, new ExtendedColorResolver(this, key, defaultResolvers.computeIfAbsent(key, defaultResolverProvider::create)));
+                        resolvers.put(key, new VanadiumExtendedColorResolver(this, key, defaultResolvers.computeIfAbsent(key, defaultResolverProvider::create)));
                     });
                         return;
         }
 
         keys.forEach(key -> {
             biomes.forEach(b -> colorMappings.put(key, b, colorMapping));
-            resolvers.put(key, new ExtendedColorResolver(this, key, defaultResolvers.computeIfAbsent(key, defaultResolverProvider::create)));
+            resolvers.put(key, new VanadiumExtendedColorResolver(this, key, defaultResolvers.computeIfAbsent(key, defaultResolverProvider::create)));
         });
 
     }

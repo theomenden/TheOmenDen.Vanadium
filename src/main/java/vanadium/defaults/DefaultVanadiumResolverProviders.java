@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -14,6 +15,7 @@ import vanadium.mixin.coloring.BlockColorsAccessor;
 
 public final class DefaultVanadiumResolverProviders {
     public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER = DefaultVanadiumResolverProviders::byBlockState;
+    public static final VanadiumResolverProvider<FluidState> FLUID_STATE_PROVIDER = DefaultVanadiumResolverProviders::byFluidState;
     public static final VanadiumResolverProvider<Block> BLOCK_PROVIDER = DefaultVanadiumResolverProviders::byBlock;
     public static final VanadiumResolverProvider<Identifier> SKY_PROVIDER = DefaultVanadiumResolverProviders::bySky;
     public static final VanadiumResolverProvider<Identifier> SKY_FOG_PROVIDER = DefaultVanadiumResolverProviders::byFog;
@@ -32,6 +34,22 @@ public final class DefaultVanadiumResolverProviders {
             if (colorProvider != null) {
                 var world = MinecraftClient.getInstance().world;
                 return colorProvider.getColor(key, world, new BlockPos(coordinates.x(), coordinates.y(), coordinates.z()), 0);
+            }
+
+            return -1;
+        };
+    }
+
+    private static VanadiumResolver byFluidState(FluidState key) {
+        return (manager, biome, coordinates) -> {
+            var provider = ((BlockColorsAccessor)MinecraftClient.getInstance()
+                                                                    .getBlockColors())
+                    .getProviders()
+                    .get(Registries.FLUID.getRawId(key.getFluid()));
+
+            if(provider != null) {
+                var world = MinecraftClient.getInstance().world;
+                return provider.getColor(key.getBlockState(), world, new BlockPos(coordinates.x(), coordinates.y(), coordinates.z()), 0);
             }
 
             return -1;

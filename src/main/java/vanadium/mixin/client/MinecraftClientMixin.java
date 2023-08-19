@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import vanadium.customcolors.ExtendedColorResolver;
+import vanadium.customcolors.VanadiumExtendedColorResolver;
 import vanadium.defaults.DefaultColumns;
 
 @Mixin(MinecraftClient.class)
@@ -19,7 +19,7 @@ public abstract class MinecraftClientMixin {
                 ? null
                 : world.getRegistryManager();
 
-        ExtendedColorResolver.setRegistryManager(manager);
+        VanadiumExtendedColorResolver.setRegistryManager(manager);
         DefaultColumns.reloadDefaultColumnBoundaries(manager);
     }
 }

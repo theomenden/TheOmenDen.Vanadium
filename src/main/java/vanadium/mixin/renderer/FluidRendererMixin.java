@@ -19,9 +19,9 @@ public abstract class FluidRendererMixin {
             constant = @Constant(intValue = 0xFFFFFF)
     )
     private int calculateCustomColor(int original, BlockRenderView world, BlockPos pos, VertexConsumer consumer, BlockState blockState, FluidState fluidState) {
-        var canonicalBlockState = fluidState.getBlockState();
+        if(BiomeColorMappings.isFluidCustomColored(fluidState)) {
+            var canonicalBlockState = fluidState.getBlockState();
 
-        if(BiomeColorMappings.isCustomColored(canonicalBlockState)) {
             return BiomeColorMappings.getBiomeColorMapping(canonicalBlockState, world, pos);
         }
 

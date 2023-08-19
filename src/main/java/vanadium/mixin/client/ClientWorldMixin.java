@@ -22,7 +22,7 @@ import vanadium.biomeblending.blending.BlendingChunk;
 import vanadium.biomeblending.caching.BlendingCache;
 import vanadium.biomeblending.caching.ColorCache;
 import vanadium.biomeblending.caching.LocalCache;
-import vanadium.customcolors.ExtendedColorResolver;
+import vanadium.customcolors.VanadiumExtendedColorResolver;
 import vanadium.customcolors.blending.ColorBlending;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 import vanadium.models.NonBlockingThreadLocal;
@@ -132,7 +132,7 @@ public abstract class ClientWorldMixin extends World {
     private void reloadVanadiumColor(CallbackInfo ci) {
         this.colorCache
                 .entrySet()
-                .removeIf(entry -> entry.getKey() instanceof ExtendedColorResolver);
+                .removeIf(entry -> entry.getKey() instanceof VanadiumExtendedColorResolver);
     }
 
     @Inject(method = "resetChunkColor", at = @At("HEAD"))

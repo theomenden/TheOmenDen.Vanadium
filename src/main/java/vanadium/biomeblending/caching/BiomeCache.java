@@ -10,7 +10,6 @@ public final class BiomeCache extends SlicedCacheStrategy<BiomeSlice> {
 
     @Override
     public BiomeSlice createSlice(int size, int salt) {
-        BiomeSlice result = new BiomeSlice(size, salt);
-        return result;
+        return new BiomeSlice(size, salt);
     }
 }

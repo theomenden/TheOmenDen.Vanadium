@@ -14,18 +14,18 @@ import vanadium.models.records.Coordinates;
 import vanadium.models.NonBlockingThreadLocal;
 import vanadium.models.YCoordinate;
 
-public final class ExtendedColorResolver implements ColorResolver {
+public final class VanadiumExtendedColorResolver implements ColorResolver {
     @Nullable private static DynamicRegistryManager registryManager;
     private final ThreadLocal<YCoordinate> positionY;
     @Getter
     private final VanadiumResolver wrappedResolver;
 
-    public <T> ExtendedColorResolver(ColorMappingStorage<T> storage, T key, VanadiumResolver fallback) {
+    public <T> VanadiumExtendedColorResolver(ColorMappingStorage<T> storage, T key, VanadiumResolver fallback) {
         this.positionY = NonBlockingThreadLocal.withInitial(YCoordinate::new);
         this.wrappedResolver = createResolver(storage, key, fallback);
     }
 
-    public ExtendedColorResolver(VanadiumResolver wrappedResolver) {
+    public VanadiumExtendedColorResolver(VanadiumResolver wrappedResolver) {
         this.positionY = NonBlockingThreadLocal.withInitial(YCoordinate::new);
         this.wrappedResolver = wrappedResolver;
     }

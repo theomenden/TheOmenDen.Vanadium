@@ -10,7 +10,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import org.apache.commons.lang3.Range;
 import vanadium.Vanadium;
-import vanadium.customcolors.ExtendedColorResolver;
+import vanadium.customcolors.VanadiumExtendedColorResolver;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.models.ColorMappingProperties;
 import vanadium.models.records.ColumnBounds;
@@ -26,7 +26,7 @@ public class BiomeColorMapping implements VanadiumResolver {
     private final NativeImage imageColorMapping;
     @Getter
     private transient final int defaultColor;
-    private transient final ExtendedColorResolver resolver;
+    private transient final VanadiumExtendedColorResolver resolver;
 
     public BiomeColorMapping(ColorMappingProperties properties, NativeImage colorMapping) {
         this.properties = properties;
@@ -40,7 +40,7 @@ public class BiomeColorMapping implements VanadiumResolver {
            defaultColor = computeDefaultColor(properties);
         }
 
-        this.resolver = new ExtendedColorResolver(this);
+        this.resolver = new VanadiumExtendedColorResolver(this);
     }
 
     @Override
