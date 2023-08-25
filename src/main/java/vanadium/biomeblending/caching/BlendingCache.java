@@ -9,6 +9,8 @@ import vanadium.models.records.BiomeColorTypes;
 import vanadium.models.records.Coordinates;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
@@ -32,34 +34,40 @@ public class BlendingCache {
                 .forEach(availableChunks::push);
     }
 
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
     public void invalidateChunk(int chunkXCoord, int chunkZCoord) {
-        lock.lock();
+       lock.lock();
 
         ++invalidationCounter;
 
-        for(int z = -1; z <=1; ++z){
-            for(int x = -1; x <=1; ++x){
-                var key = ColorBlendingCache.getChunkCacheKey(new Coordinates(chunkXCoord + x, 0, chunkZCoord + z), BiomeColorTypes.INSTANCE.grass());
+        for (int z = -1; z <=1; ++z) {
+            for (int x = -1; x <=1; ++x) {
+                int finalX = x;
+                int finalZ = z;
 
-                BlendingChunk firstChunkToBlendAgainst = invalidatedHashedChunks.get(key);
+                executorService.submit(() -> {
+                    var key = ColorBlendingCache.getChunkCacheKey(new Coordinates(chunkXCoord + finalX,0, chunkZCoord + finalZ), BiomeColorTypes.INSTANCE.grass());
 
-                BlendingChunk current = firstChunkToBlendAgainst;
-                while (current!= null) {
-                    BlendingChunk nextChunkToBlendAgainst = current.next;
-                    hashedChunks.remove(current.invalidationKey);
-                    removeChunkFromInvalidation(current);
-                    releaseChunkWithoutLocking(current);
+                    invalidatedHashedChunks.computeIfPresent(key, (k, current) -> {
+                        while (current != null) {
+                            BlendingChunk nextChunkToBlendAgainst = current.next;
+                            hashedChunks.remove(current.invalidationKey);
+                            removeChunkFromInvalidation(current);
+                            releaseChunkWithoutLocking(current);
 
-                    current.markAsInvalidated();
+                            current.markAsInvalidated();
 
-                    current = nextChunkToBlendAgainst;
-                }
+                            current = nextChunkToBlendAgainst;
+                        }
+                        return null;
+                    });
+                });
             }
         }
-
         lock.unlock();
     }
-
+    
     public void invalidateAllChunks() {
         lock.lock();
 

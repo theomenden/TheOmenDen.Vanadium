@@ -17,7 +17,7 @@
       "update_checker": true
     },
     "sodium:options": {
-      "mixin.features.fast_biome_colors":false
+      "mixin.features.blending_radius":false
     }
   },
   "depends": {

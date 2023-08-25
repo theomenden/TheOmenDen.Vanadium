@@ -1,6 +1,5 @@
 package vanadium.defaults;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.registry.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
@@ -9,9 +8,9 @@ import org.apache.commons.lang3.Range;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.models.records.ColumnBounds;
+import vanadium.utils.SimpleBiomeRegistryUtils;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public final class DefaultColumns {
@@ -23,7 +22,7 @@ public final class DefaultColumns {
     private static final Map<Identifier, ColumnBounds> legacyColumns = createLegacyColumnBoundaries();
 
     private static final Map<Identifier, ColumnBounds> stableColumns = createStableColumnBoundaries();
-    private static final int TOTAL_VANILLA_BIOMES = 63;
+    private static final int TOTAL_VANILLA_BIOMES = SimpleBiomeRegistryUtils.getBIOME_KEYS().size();
     private static final int TOTAL_LEGACY_BIOMES = 176;
 
     private DefaultColumns(){}
@@ -57,14 +56,43 @@ public final class DefaultColumns {
         return currentBoundaries;
     }
 
+    public static ColumnBounds getOptifineBoundaries(RegistryKey<Biome> biomeResourceKey) {
+        var currentBoundaries = currentColumns.get(biomeResourceKey.getValue());
+        if(currentBoundaries == null) {
+            int rawId = SimpleBiomeRegistryUtils.getBiomeRawId(biomeResourceKey);
+            return new ColumnBounds(rawId, 1);
+        }
+        return currentBoundaries;
+    }
+
     public static ColumnBounds getOptifineBoundaries(RegistryKey<Biome> biomeResourceKey, Registry<Biome> biomeRegistry) {
         var currentBoundaries = currentColumns.get(biomeResourceKey.getValue());
 
         if(currentBoundaries == null) {
             int rawId = biomeRegistry.getRawId(biomeRegistry.get(biomeResourceKey));
+
             return new ColumnBounds(rawId, 1);
         }
         return currentBoundaries;
+    }
+
+    public static ColumnBounds getLegacyBoundaries(RegistryKey<Biome> biomeRegistryKey, boolean isUsingOptifine) {
+        var bounds = legacyColumns.get(biomeRegistryKey.getValue());
+
+        if(bounds == null && isUsingOptifine) {
+            int rawId = biomeRegistryKey.getValue().hashCode();
+            return new ColumnBounds((rawId - TOTAL_VANILLA_BIOMES + TOTAL_LEGACY_BIOMES), 1);
+        }
+
+        bounds = legacyColumns.get(vanillaBiomeApproximation(biomeRegistryKey));
+
+        if(bounds == null) {
+            var errorMessage = "Custom biome has no approximate to vanilla: " + biomeRegistryKey.getValue();
+            LOGGER.error(errorMessage);
+            throw  new IllegalStateException(errorMessage);
+        }
+
+        return bounds;
     }
 
     public static ColumnBounds getLegacyBoundaries(RegistryKey<Biome> biomeKey, Registry<Biome> biomeRegistry, boolean isUsingOptifine) {
@@ -147,22 +175,13 @@ public final class DefaultColumns {
     }
 
     private static Map<Identifier, ColumnBounds> createCurrentColumnBoundaries() {
-        var map = new HashMap<Identifier, ColumnBounds>();
+      Map<Identifier, ColumnBounds> result = new HashMap<>();
 
-        SimpleRegistry<Biome> simpleBiomeRegistry = new SimpleRegistry<>(RegistryKeys.BIOME, Lifecycle.stable());
+      for(var biomeRegistryKey : SimpleBiomeRegistryUtils.getBIOME_KEYS()) {
+         result.put(biomeRegistryKey.getValue(), new ColumnBounds(SimpleBiomeRegistryUtils.getBiomeRawId(biomeRegistryKey), 1) );
+        }
 
-        Iterator<Biome> it = simpleBiomeRegistry
-                .stream()
-                .iterator();
-        while (it.hasNext()) {
-    var biome = it.next();
-    var id = simpleBiomeRegistry.getId(biome);
-    var rawId = simpleBiomeRegistry.getRawId(biome);
-
-    map.put(id, new ColumnBounds(rawId,1));
-}
-        return map;
-
+      return result;
     }
 
     private static Map<Identifier, ColumnBounds> createLegacyColumnBoundaries() {

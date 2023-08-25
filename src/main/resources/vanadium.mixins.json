@@ -3,17 +3,26 @@
   "package": "vanadium.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
+
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
     "biome.BiomeColorsMixin",
     "client.ClientWorldMixin",
     "client.InGameHudMixin",
     "client.MinecraftClientMixin",
     "coloring.BlockColorsAccessor",
     "coloring.block.LeverBlockMixin",
+    "coloring.block.RedstoneWireBlockMixin",
+    "coloring.block.MaterialColorMixin",
     "coloring.dye.BannerBlockEntityRendererMixin",
     "coloring.dye.DyeColorMixin",
     "coloring.dye.SheepEntityMixin",
     "coloring.dye.WolfCollarFeatureRendererMixin",
     "coloring.item.ItemColorsMixin",
+    "coloring.item.ItemMixin",
     "coloring.model.BakedModelManagerMixin",
     "coloring.model.BakedQuadFactoryMixin",
     "coloring.model.JsonUnbakedModelMixin",
@@ -29,14 +38,10 @@
     "coloring.potions.StatusEffectMixin",
     "coloring.text.ChatFormatMixin",
     "compatibility.IdentifierMixin",
+    "compatibility.SimpleRegistryAccessor",
     "compatibility.TextureManagerMixin",
     "renderer.BackgroundRendererMixin",
     "renderer.FluidRendererMixin",
     "renderer.WorldRendererMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "mixins": [
   ]
 }

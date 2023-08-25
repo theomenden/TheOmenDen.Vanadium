@@ -16,6 +16,7 @@ import vanadium.mixin.coloring.BlockColorsAccessor;
 public final class DefaultVanadiumResolverProviders {
     public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER = DefaultVanadiumResolverProviders::byBlockState;
     public static final VanadiumResolverProvider<FluidState> FLUID_STATE_PROVIDER = DefaultVanadiumResolverProviders::byFluidState;
+    public static final VanadiumResolverProvider<Fluid> FLUID_PROVIDER = DefaultVanadiumResolverProviders::byFluid;
     public static final VanadiumResolverProvider<Block> BLOCK_PROVIDER = DefaultVanadiumResolverProviders::byBlock;
     public static final VanadiumResolverProvider<Identifier> SKY_PROVIDER = DefaultVanadiumResolverProviders::bySky;
     public static final VanadiumResolverProvider<Identifier> SKY_FOG_PROVIDER = DefaultVanadiumResolverProviders::byFog;
@@ -58,6 +59,10 @@ public final class DefaultVanadiumResolverProviders {
 
     private static VanadiumResolver byBlock(Block key) {
         return byBlockState(key.getDefaultState());
+    }
+
+    private static VanadiumResolver byFluid(Fluid key) {
+        return byFluidState(key.getDefaultState());
     }
 
     private static VanadiumResolver bySky(Identifier key) {

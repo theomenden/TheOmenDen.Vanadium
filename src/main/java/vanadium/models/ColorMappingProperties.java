@@ -99,6 +99,29 @@ public class ColorMappingProperties {
         }
     }
 
+    public ColumnBounds getColumn(RegistryKey<Biome> biomeRegistryKey) {
+        if (format == Format.GRID
+                && biomeRegistryKey != null) {
+            Identifier id = biomeRegistryKey.getValue();
+            if (columnsByBiome != null) {
+                ColumnBounds cb = columnsByBiome.get(id);
+
+                if (cb == null) {
+                    throw new IllegalArgumentException(id.toString());
+                }
+            } else {
+                return switch (layout) {
+                    case DEFAULT -> DefaultColumns.getDefaultBoundaries(biomeRegistryKey);
+                    case OPTIFINE -> DefaultColumns.getOptifineBoundaries(biomeRegistryKey);
+                    case LEGACY -> DefaultColumns.getLegacyBoundaries(biomeRegistryKey, this.isUsingOptfine);
+                    case STABLE -> DefaultColumns.getStableBoundaries(biomeRegistryKey);
+                };
+            }
+        }
+            throw new IllegalStateException(format.toString());
+    }
+
+
     public ColumnBounds getColumn(RegistryKey<Biome> biomeKey, Registry<Biome> biomeRegistry) {
         if(format == Format.GRID) {
             if(biomeKey != null) {
@@ -127,10 +150,13 @@ public class ColorMappingProperties {
     }
 
     public Set<Identifier> getApplicableBiomes() {
+        Set<Identifier> result;
         if (columnsByBiome == null || columnsByBiome.isEmpty()) {
-            return Sets.newHashSet();
+            result = Sets.newHashSet();
+        } else {
+            result = new HashSet<>(columnsByBiome.keySet());
         }
-        return new HashSet<>(columnsByBiome.keySet());
+        return result;
     }
 
     public Set<Block> getApplicableBlocks() {
@@ -223,6 +249,7 @@ public class ColorMappingProperties {
         }
         if (settings.source == null) {
             settings.source = makeSourceFromFileName(id);
+            LOGGER.info("{}: file", settings.source);
         }
         settings.source = GsonUtils.resolveRelativeResourceLocation(settings.source, id);
         return new ColorMappingProperties(id, settings);

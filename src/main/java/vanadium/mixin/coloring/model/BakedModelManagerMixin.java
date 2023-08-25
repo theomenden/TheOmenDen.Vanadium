@@ -1,15 +1,16 @@
 package vanadium.mixin.coloring.model;
 
 import net.minecraft.client.render.model.BakedModelManager;
+import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloader;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import vanadium.Vanadium;
+import vanadium.utils.VanadiumColormaticResolution;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -17,12 +18,11 @@ import java.util.concurrent.Executor;
 public abstract class BakedModelManagerMixin {
 
     @Inject(
-            method="reload",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/util/profiler/Profiler;startTick()V",
-            shift = At.Shift.AFTER)
+            method="reloadModels",
+            at = @At("HEAD")
     )
-    private void reloadVanadiumCustomBiomeColors(ResourceReloader.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
-        Vanadium.CUSTOM_BLOCK_COLORS.reload(manager);
+    private static void reloadVanadiumCustomBiomeColors(ResourceManager resourceManager, Executor executor, CallbackInfoReturnable<CompletableFuture<Map<Identifier, JsonUnbakedModel>>> cir) {
+        VanadiumColormaticResolution.CUSTOM_BLOCK_COLORS.reload(resourceManager);
+        VanadiumColormaticResolution.COLORMATIC_CUSTOM_BLOCK_COLORS.reload(resourceManager);
     }
 }

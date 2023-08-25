@@ -1,5 +1,6 @@
 package vanadium.utils;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.block.MapColor;
@@ -7,6 +8,9 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import vanadium.Vanadium;
 import vanadium.adapters.*;
 import vanadium.models.ApplicableBlockStates;
 import vanadium.models.ColorMappingProperties;
@@ -23,9 +27,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 
 public final class GsonUtils {
+    private static final Logger logger = LogManager.getLogger(Vanadium.MODID);
     public static final Gson PROPERTY_GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new StringIdentifiableTypeAdapterFactory())
             .registerTypeAdapter(Identifier.class, new IdentifierAdapter())
@@ -75,19 +79,13 @@ public final class GsonUtils {
         try(InputStream inputStream = resourceManager.getResourceOrThrow(properties.getSource()).getInputStream()) {
             NativeImage image = NativeImage.read(inputStream);
             if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
-                IntStream
-                        .range(0, image.getWidth())
-                        .forEach(xPixelCoord ->
-                                 IntStream
-                                         .range(0, image.getHeight())
-                                         .forEach(yPixelCoord -> {
-                                             int pixel = image.getColor(xPixelCoord, yPixelCoord);
-                                             int temporaryPixel = (pixel &0xff0000) >>16;
-                                             temporaryPixel |= (pixel &0x0000ff) <<16;
-                                             pixel &= ~(0xff0000 |0x0000ff);
-                                             pixel |= temporaryPixel;
-                                             image.setColor(xPixelCoord, yPixelCoord, pixel);
-                                         }));
+              for(int i = 0; i < image.getWidth(); i++) {
+                  for(int j = 0; j < image.getHeight(); j++) {
+                      int pixel = image.getColor(i, j);
+                      pixel = flipPixelColor(pixel);
+                      image.setColor(i, j, pixel);
+                  }
+              }
             }
 
             if(properties.getFormat() == Format.VANILLA
@@ -100,38 +98,27 @@ public final class GsonUtils {
         }
     }
 
+    private static int flipPixelColor(int pixel) {
+        int tmp = (pixel & 0xff0000) >> 16;
+        tmp |= (pixel & 0x0000ff) << 16;
+        pixel &= ~(0xff0000 | 0x0000ff);
+        pixel |= tmp;
+        return pixel;
+    }
+
     private static String toJsonString(Properties properties, Function<String, String> keyMappingFunction, Predicate<String> arrayValue) {
-       Map<String, Object> propertyMap = new HashMap<>();
-
-       properties.stringPropertyNames()
-               .forEach(property -> {
-                   String[] keys = property.split("\\:");
-
-                   Map<String, Object> nestedProperties = propertyMap;
-
-                   int i;
-                   for (i = 0; i < keys.length - 1; i++) {
-                       String key = keyMappingFunction.apply(keys[i]);
-                       nestedProperties = (Map<String, Object>) nestedProperties.computeIfAbsent(key, k -> new HashMap<>());
-                   }
-
-                   String key = keyMappingFunction.apply(keys[i]);
-                   String propertyValue = properties.getProperty(property);
-                   Object value = arrayValue.test(key) ? propertyValue.split("\\s+") : propertyValue;
-                   nestedProperties.merge(key, value, GsonUtils::mergeCompoundKeys);
-               });
-
-       /*
+        Map<String, Object> propertyMap = Maps.newHashMap();
        for (String property: properties.stringPropertyNames()) {
            String[] keys = property.split("\\:");
            Map<String, Object> nestedProperties = propertyMap;
            int i;
-           for(i = 0; i < keys.length -1; i++) {
+           int length = keys.length - 1;
+           for(i = 0; i < length; i++) {
                String key = keyMappingFunction.apply(keys[i]);
                Object temp = nestedProperties.computeIfAbsent(key, k -> new HashMap<>());
 
-               if(temp instanceof Map<?,?> nestedMap) {
-                   temp = nestedMap;
+               if(temp instanceof Map<?,?>) {
+                   nestedProperties = (Map<String,Object>)temp;
                    continue;
                }
                Map<String, Object> newNestedMap = new HashMap<>();
@@ -144,7 +131,6 @@ public final class GsonUtils {
            Object value = arrayValue.test(key) ? propertyValue.split("\\s+") : propertyValue;
            nestedProperties.merge(key, value, GsonUtils::mergeCompoundKeys);
        }
-        */
 
         return PROPERTY_GSON.toJson(propertyMap);
     }

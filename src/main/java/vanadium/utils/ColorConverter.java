@@ -23,7 +23,7 @@ public final class ColorConverter {
                 });
     }
 
-    private static int[] fp32_to_srgb8_tab4 = {
+    private static final int[] fp32_to_srgb8_tab4 = {
             0x0073000d, 0x007a000d, 0x0080000d, 0x0087000d, 0x008d000d, 0x0094000d, 0x009a000d, 0x00a1000d,
             0x00a7001a, 0x00b4001a, 0x00c1001a, 0x00ce001a, 0x00da001a, 0x00e7001a, 0x00f4001a, 0x0101001a,
             0x010e0033, 0x01280033, 0x01410033, 0x015b0033, 0x01750033, 0x018f0033, 0x01a80033, 0x01c20033,
@@ -50,10 +50,9 @@ public final class ColorConverter {
     }
 
     public static int getColorClamp(int red, int green, int blue) {
-        red = Range
-                .between(0,255).fit(red);
-        green = Range.between(0,255).fit(green);
-        blue = Range.between(0,255).fit(blue);
+        red = clampBetween0And255(red);
+        green = clampBetween0And255(green);
+        blue = clampBetween0And255(blue);
         return createColor(red, green, blue);
     }
 
@@ -161,8 +160,7 @@ public final class ColorConverter {
         return new byte[]{(byte) rByte, (byte) gByte, (byte) bByte};
     }
 
-    public static int convertOKLabsTosRGBAInt(float L, float a, float b)
-    {
+    public static int convertOKLabsTosRGBAInt(float L, float a, float b) {
         float l_ = L + 0.3963377774f * a + 0.2158037573f * b;
         float m_ = L - 0.1055613458f * a - 0.0638541728f * b;
         float s_ = L - 0.0894841775f * a - 1.2914855480f * b;
@@ -184,8 +182,7 @@ public final class ColorConverter {
         return rgbToArgb(color.rgb(), 1);
     }
 
-    public static void convertOKLabsTosRGBAInPlace(float L, float a, float b, int[] destination, int index)
-    {
+    public static void convertOKLabsTosRGBAInPlace(float L, float a, float b, int[] destination, int index) {
         float l_ = L + 0.3963377774f * a + 0.2158037573f * b;
         float m_ = L - 0.1055613458f * a - 0.0638541728f * b;
         float s_ = L - 0.0894841775f * a - 1.2914855480f * b;
@@ -357,5 +354,9 @@ public final class ColorConverter {
             return value * 12.92f;
         }
         return (float)(1.055 * Math.pow(value, MathUtils.INV_2_4) - 0.055);
+    }
+
+    private static int clampBetween0And255(int valueToClamp) {
+        return Range.between(0, 255).fit(valueToClamp);
     }
 }

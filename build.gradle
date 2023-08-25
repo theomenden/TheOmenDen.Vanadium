@@ -30,7 +30,7 @@ repositories {
 		content { includeGroup "maven.modrinth"	}
 	}
 	maven {	name 'modmenu'; url 'https://maven.terraformersmc.com/releases'	}
-	maven {	name 'cloth'; url = 'https://maven.shedaniel.me'	}
+	maven {	name 'cloth';   url = 'https://maven.shedaniel.me'	}
 	maven { name 'jitpack'; url 'https://jitpack.io'}
 }
 

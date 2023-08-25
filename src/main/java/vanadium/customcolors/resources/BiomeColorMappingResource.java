@@ -12,12 +12,15 @@ import vanadium.utils.GsonUtils;
 public class BiomeColorMappingResource implements SimpleSynchronousResourceReloadListener {
     private final Identifier identifier;
     private final Identifier optifineId;
+
+    private final Identifier colormaticId;
+
     private BiomeColorMapping mapping;
 
     public BiomeColorMappingResource(Identifier identifier) {
         this.identifier = new Identifier(identifier.getNamespace(), identifier.getPath() +".json");
         this.optifineId = new Identifier("minecraft", "optifine/" + identifier.getPath() +".properties");
-
+        this.colormaticId = new Identifier(identifier.getNamespace(), "colormatic/" + identifier.getPath() +".json");
     }
 
     @Override

@@ -4,17 +4,14 @@ import org.apache.commons.lang3.Range;
 
 public record VanadiumColor(int rgb) {
 
+    public VanadiumColor {
+        rgb |= 0xff000000;
+    }
+
     public VanadiumColor(int r, int g, int b) {
         this(r << 16 | g << 8 | b);
     }
 
-    public VanadiumColor(int a, int r, int g, int b) {
-        this(a << 24 | r << 16 | g << 8 | b);
-    }
-
-    public VanadiumColor(float h, float s, float l) {
-        this(hslToRgb(h, s, l));
-    }
 
     public VanadiumColor(String hex) {
         this(Integer.parseInt(hex, 16));

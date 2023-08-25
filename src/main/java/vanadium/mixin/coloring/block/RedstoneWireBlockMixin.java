@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import vanadium.Vanadium;
-import vanadium.utils.MathUtils;
+import vanadium.utils.ColorConverter;
 
 @Mixin(RedstoneWireBlock.class)
 public abstract class RedstoneWireBlockMixin extends Block {
@@ -27,7 +27,9 @@ public abstract class RedstoneWireBlockMixin extends Block {
     at=@At("HEAD"),
     cancellable = true)
     private static void injectWireColor(int power, CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(Vanadium.REDSTONE_COLORS.getColorAtIndex(power));
+        if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
+            cir.setReturnValue(Vanadium.REDSTONE_COLORS.getColorAtIndex(power));
+        }
     }
 
     @Inject(
@@ -41,20 +43,16 @@ public abstract class RedstoneWireBlockMixin extends Block {
             cancellable = true
     )
     private void onRandomDisplayTick(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci, int i) {
-        if(!Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
-            return;
+        if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
+            double x = pos.getX() + 0.5 + (random.nextFloat() - 0.5) * 0.2;
+            double y = (float) pos.getY() + 0.0625F;
+            double z = pos.getZ() + 0.5 + (random.nextFloat() - 0.5) * 0.2;
+            int color = Vanadium.REDSTONE_COLORS.getColorAtIndex(i);
+
+            var colorVector = ColorConverter.createColorVector(color);
+
+            world.addParticle(new DustParticleEffect(new Vector3f(colorVector), 1.0f), x, y, z, 0.0, 0.0, 0.0);
+            ci.cancel();
         }
-
-        double x = pos.getX() + 0.5 + (random.nextFloat() - 0.5) * 0.2;
-        double y = (float)pos.getY() + 0.0625F;
-        double z = pos.getZ() + 0.5 + (random.nextFloat() - 0.5) * 0.2;
-        int color = Vanadium.REDSTONE_COLORS.getColorAtIndex(i);
-
-        float red = ((color >> 16) & 0xff) * MathUtils.INV_255;
-        float green = ((color >> 8) & 0xff) * MathUtils.INV_255;
-        float blue = (color & 0xff) * MathUtils.INV_255;
-
-        world.addParticle(new DustParticleEffect(new Vector3f(red,green,blue), 1.0f), x, y, z, 0.0, 0.0, 0.0);
-        ci.cancel();
     }
 }

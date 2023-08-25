@@ -9,8 +9,6 @@ import vanadium.Vanadium;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.Map.entry;
-
 public final class BiomeTracingUtils {
     private static final Logger log = LogManager.getLogger(Vanadium.MODID);
     private static final Set<Identifier> REMOVED_BIOMES = createRemovedBiomeSet();

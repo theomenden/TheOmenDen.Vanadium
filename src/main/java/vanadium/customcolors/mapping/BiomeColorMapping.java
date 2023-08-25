@@ -1,14 +1,16 @@
 package vanadium.customcolors.mapping;
 
-import com.mojang.serialization.Lifecycle;
 import lombok.Getter;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.registry.*;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import org.apache.commons.lang3.Range;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import vanadium.Vanadium;
 import vanadium.customcolors.VanadiumExtendedColorResolver;
 import vanadium.customcolors.interfaces.VanadiumResolver;
@@ -16,11 +18,13 @@ import vanadium.models.ColorMappingProperties;
 import vanadium.models.records.ColumnBounds;
 import vanadium.models.records.Coordinates;
 import vanadium.models.records.VanadiumColor;
+import vanadium.utils.ColorConverter;
 
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
 
 public class BiomeColorMapping implements VanadiumResolver {
+    private static final Logger LOGGER = LogManager.getLogger(Vanadium.MODID);
     @Getter
     private final ColorMappingProperties properties;
     private final NativeImage imageColorMapping;
@@ -35,7 +39,7 @@ public class BiomeColorMapping implements VanadiumResolver {
         VanadiumColor colorAsHex = properties.getColor();
 
         if(colorAsHex != null) {
-            defaultColor = colorAsHex.rgb();
+            defaultColor = ColorConverter.rgbToArgb(colorAsHex.rgb(),1);
         } else {
            defaultColor = computeDefaultColor(properties);
         }
@@ -49,15 +53,17 @@ public class BiomeColorMapping implements VanadiumResolver {
             case VANILLA -> {
                 float temp = biome.getTemperature();
                 temp = Range
-                        .between(0.0F, 1.0F)
+                        .between(0.0f, 1.0f)
                         .fit(temp);
                 float rain = Range
-                        .between(0.0F, 1.0F)
+                        .between(0.0f, 1.0f)
                         .fit(biome.weather.downfall());
                 return getColorMap(temp, rain);
             }
             case GRID -> {
-                ColumnBounds columnBounds = properties.getColumn(Vanadium.getBiomeRegistryKey(manager, biome), manager.get(RegistryKeys.BIOME));
+                ColumnBounds columnBounds = properties.getColumn(
+                        Vanadium.getBiomeRegistryKey(manager, biome),
+                        manager.get(RegistryKeys.BIOME));
                 @SuppressWarnings({"removal", "deprecation"})
                 double fraction = Biome.FOLIAGE_NOISE.sample(coordinates.x() * 0.0225, coordinates.z() * 0.0225, false);
                 fraction = (fraction + 1.0) * 0.5;
@@ -82,13 +88,13 @@ public class BiomeColorMapping implements VanadiumResolver {
     }
 
     public static int getBiomeCurrentColorOrDefault(BlockRenderView world, BlockPos pos, BiomeColorMapping colormap) {
-        if(WorldOrPositionIsNull(world, pos)) {
+        if(worldOrPositionIsNull(world, pos)) {
             return colormap.getDefaultColor();
         }
         return colormap.resolver.resolveExtendedColor(world, pos);
     }
 
-    private static boolean WorldOrPositionIsNull(BlockRenderView world, BlockPos pos) {
+    private static boolean worldOrPositionIsNull(BlockRenderView world, BlockPos pos) {
         return world == null || pos == null;
     }
 
@@ -111,22 +117,15 @@ public class BiomeColorMapping implements VanadiumResolver {
             }
             case GRID -> {
                 try {
-                    var biomeRegistry = new SimpleRegistry<>(
-                            RegistryKeys.BIOME,
-                            Lifecycle.stable()
-                    )
-                            .freeze();
-
-                    int x = properties
-                            .getColumn(BiomeKeys.PLAINS,
-                                    biomeRegistry)
-                            .Column();
+                    int x =  properties.getColumn(BiomeKeys.PLAINS)
+                                       .Column();
                     int y = Range
                             .between(0, imageColorMapping.getHeight() - 1)
                             .fit(63 - properties.getYOffset());
 
                     return imageColorMapping.getColor(x, y);
                 } catch (IllegalArgumentException e) {
+                    LOGGER.error("Failed to parse color: " + e);
                     return 0xffffffff;
                 }
             }
