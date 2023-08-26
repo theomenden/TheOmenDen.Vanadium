@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vanadium.customcolors.VanadiumBlockStateColorProvider;
-import vanadium.customcolors.VanadiumExtendedColorResolver;
 import vanadium.customcolors.VanadiumFluidStateColorProvider;
 import vanadium.defaults.DefaultVanadiumResolverProviders;
 
@@ -30,7 +29,6 @@ public abstract class SodiumColorProviderRegistryMixin {
     @Shadow
     protected abstract void registerBlocks(ColorProvider<BlockState> resolver, Block... blocks);
 
-
     @Shadow
     @Final
     private Reference2ReferenceMap<Fluid, ColorProvider<FluidState>> fluids;
@@ -40,47 +38,27 @@ public abstract class SodiumColorProviderRegistryMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void postInit(BlockColors blockColors, CallbackInfo ci) {
+        ColorProvider<BlockState> lavaBlockProvider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.LAVA));
+        ColorProvider<FluidState> lavaFluidProvider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(Fluids.LAVA));
+        this.registerBlocks(lavaBlockProvider, Blocks.LAVA, Blocks.LAVA_CAULDRON);
+        this.registerFluids(lavaFluidProvider, Fluids.LAVA, Fluids.FLOWING_LAVA);
 
-        var extendedResolver = DefaultVanadiumResolverProviders.BLOCK_PROVIDER;
-        registerBlocks(
-                VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(new VanadiumExtendedColorResolver((DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.GRASS)))),
-                Blocks.GRASS_BLOCK,
-                Blocks.FERN,
-                Blocks.GRASS,
-                Blocks.POTTED_FERN,
-                Blocks.PINK_PETALS,
-                Blocks.SUGAR_CANE,
-                Blocks.LARGE_FERN,
-                Blocks.TALL_GRASS
-        );
+        blocks.keySet()
+                .stream()
+              .filter(b -> !(b.equals(Blocks.LAVA) || b.equals(Blocks.LAVA_CAULDRON)))
+                .forEach(block -> {
+                    var provider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(block));
+                    this.registerBlocks(provider, block);
+                });
 
-        registerBlocks(
-                VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(new VanadiumExtendedColorResolver(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.OAK_LEAVES))),
-                        Blocks.OAK_LEAVES
-        );
 
-        registerBlocks(VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(new VanadiumExtendedColorResolver(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.ACACIA_LEAVES))),
-                Blocks.ACACIA_LEAVES);
-
-        registerBlocks(
-                VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(new VanadiumExtendedColorResolver(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.WATER))),
-                Blocks.WATER_CAULDRON, Blocks.BUBBLE_COLUMN
-        );
-
-        registerBlocks(
-                VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(new VanadiumExtendedColorResolver(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.LAVA))),
-                Blocks.LAVA, Blocks.LAVA_CAULDRON, Blocks.FIRE, Blocks.MAGMA_BLOCK
-        );
-
-        registerFluids(
-                VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(Fluids.LAVA)),
-                Fluids.LAVA, Fluids.FLOWING_LAVA
-        );
-
-        registerFluids(
-                VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(Fluids.WATER)),
-                Fluids.WATER, Fluids.FLOWING_WATER);
-
+        fluids.keySet()
+              .stream()
+              .filter(f -> !(f.equals(Fluids.LAVA) || f.equals(Fluids.FLOWING_LAVA)))
+                .forEach(fluid -> {
+                    var provider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(fluid));
+                            this.registerFluids(provider, fluid);
+                });
     }
 
 }
