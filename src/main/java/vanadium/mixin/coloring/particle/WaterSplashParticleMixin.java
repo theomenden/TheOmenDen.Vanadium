@@ -3,14 +3,15 @@ package vanadium.mixin.coloring.particle;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.WaterSplashParticle;
 import net.minecraft.util.math.BlockPos;
+import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import vanadium.Vanadium;
 import vanadium.customcolors.mapping.BiomeColorMapping;
 import vanadium.utils.MathUtils;
+import vanadium.utils.VanadiumColormaticResolution;
 
 @Mixin(WaterSplashParticle.class)
 public abstract class WaterSplashParticleMixin extends SpriteBillboardParticle {
@@ -23,11 +24,11 @@ public abstract class WaterSplashParticleMixin extends SpriteBillboardParticle {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onConstructor(CallbackInfo ci) {
-        if(!Vanadium.WATER_COLORS.hasCustomColorMapping()) {
+        if(!VanadiumColormaticResolution.hasCustomWaterColors()) {
             return;
         }
 
-        BiomeColorMapping colorMapping = Vanadium.WATER_COLORS.getColorMapping();
+        BiomeColorMapping colorMapping = ObjectUtils.firstNonNull(VanadiumColormaticResolution.WATER_COLORS.getColorMapping(), VanadiumColormaticResolution.COLORMATIC_WATER_COLORS.getColorMapping());
 
         position.set(this.x, this.y, this.z);
 

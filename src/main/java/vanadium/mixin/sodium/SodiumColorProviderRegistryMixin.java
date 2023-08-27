@@ -40,24 +40,17 @@ public abstract class SodiumColorProviderRegistryMixin {
     private void postInit(BlockColors blockColors, CallbackInfo ci) {
         ColorProvider<BlockState> lavaBlockProvider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.LAVA));
         ColorProvider<FluidState> lavaFluidProvider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(Fluids.LAVA));
-        this.registerBlocks(lavaBlockProvider, Blocks.LAVA, Blocks.LAVA_CAULDRON);
+        ColorProvider<BlockState> waterBlockProvider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.WATER));
+        ColorProvider<FluidState> waterFluidProvider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(Fluids.WATER));
+        this.registerBlocks(lavaBlockProvider, Blocks.LAVA, Blocks.LAVA_CAULDRON,Blocks.MAGMA_BLOCK);
         this.registerFluids(lavaFluidProvider, Fluids.LAVA, Fluids.FLOWING_LAVA);
+        this.registerBlocks(waterBlockProvider, Blocks.WATER, Blocks.WATER_CAULDRON,Blocks.BUBBLE_COLUMN);
+        this.registerFluids(waterFluidProvider, Fluids.WATER, Fluids.FLOWING_WATER);
 
         blocks.keySet()
-                .stream()
-              .filter(b -> !(b.equals(Blocks.LAVA) || b.equals(Blocks.LAVA_CAULDRON)))
                 .forEach(block -> {
                     var provider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(block));
                     this.registerBlocks(provider, block);
-                });
-
-
-        fluids.keySet()
-              .stream()
-              .filter(f -> !(f.equals(Fluids.LAVA) || f.equals(Fluids.FLOWING_LAVA)))
-                .forEach(fluid -> {
-                    var provider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(fluid));
-                            this.registerFluids(provider, fluid);
                 });
     }
 

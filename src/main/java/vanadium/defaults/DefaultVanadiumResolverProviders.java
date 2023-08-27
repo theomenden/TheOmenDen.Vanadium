@@ -8,10 +8,12 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import org.apache.commons.lang3.ObjectUtils;
 import vanadium.Vanadium;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.customcolors.interfaces.VanadiumResolverProvider;
 import vanadium.mixin.coloring.BlockColorsAccessor;
+import vanadium.utils.VanadiumColormaticResolution;
 
 public final class DefaultVanadiumResolverProviders {
     public static final VanadiumResolverProvider<BlockState> BLOCK_STATE_PROVIDER = DefaultVanadiumResolverProviders::byBlockState;
@@ -42,19 +44,7 @@ public final class DefaultVanadiumResolverProviders {
     }
 
     private static VanadiumResolver byFluidState(FluidState key) {
-        return (manager, biome, coordinates) -> {
-            var provider = ((BlockColorsAccessor)MinecraftClient.getInstance()
-                                                                    .getBlockColors())
-                    .getProviders()
-                    .get(Registries.FLUID.getRawId(key.getFluid()));
-
-            if(provider != null) {
-                var world = MinecraftClient.getInstance().world;
-                return provider.getColor(key.getBlockState(), world, new BlockPos(coordinates.x(), coordinates.y(), coordinates.z()), 0);
-            }
-
-            return -1;
-        };
+        return byBlockState(key.getBlockState());
     }
 
     private static VanadiumResolver byBlock(Block key) {
@@ -69,9 +59,15 @@ public final class DefaultVanadiumResolverProviders {
         return (manager, biome, coordinates) -> {
             int color;
 
-            if(Vanadium.SKY_COLORS.hasCustomColorMapping()
+            if(VanadiumColormaticResolution.hasCustomSkyColors()
             && key.equals(Vanadium.OVERWORLD_ID)) {
-                color = Vanadium.SKY_COLORS.getColorMapping().getColorAtCoordinatesForBiome(manager, biome, coordinates);
+                var skyColors = ObjectUtils.firstNonNull(
+                        VanadiumColormaticResolution.SKY_COLORS,
+                        VanadiumColormaticResolution.COLORMATIC_SKY_COLORS
+                );
+                color = skyColors
+                        .getColorMapping()
+                        .getColorAtCoordinatesForBiome(manager, biome, coordinates);
             } else {
                 color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionSky(key);
 
@@ -87,9 +83,14 @@ public final class DefaultVanadiumResolverProviders {
         return (manager, biome, coordinates) -> {
           int color;
 
-          if(Vanadium.FOG_COLORS.hasCustomColorMapping()
+          if(VanadiumColormaticResolution.hasCustomFogColors()
           && key.equals(Vanadium.OVERWORLD_ID)) {
-              color = 0xff000000 | Vanadium.FOG_COLORS
+              var fogColors = ObjectUtils.firstNonNull(
+                      VanadiumColormaticResolution.FOG_COLORS,
+                      VanadiumColormaticResolution.COLORMATIC_FOG_COLORS
+              );
+
+              color = 0xff000000 | fogColors
                       .getColorMapping()
                       .getColorAtCoordinatesForBiome(manager, biome, coordinates);
           } else {

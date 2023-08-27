@@ -7,7 +7,10 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 
 @Mixin(FluidRenderer.class)
@@ -44,7 +47,5 @@ public abstract class FluidRendererMixin {
 
         return original;
     }
-
-
 
 }

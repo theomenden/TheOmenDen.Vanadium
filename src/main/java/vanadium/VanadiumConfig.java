@@ -25,18 +25,6 @@ public class VanadiumConfig implements ConfigData {
     @Tooltip()
     public double relativeBlockLightIntensity = -13.0;
 
-    @ConfigEntry.Category("customColors")
-    @Tooltip()
-    public boolean shouldAllowTooltipColors = false;
-
-    @ConfigEntry.Category("customColors")
-    @Tooltip()
-    public boolean shouldAllowTooltipBorderColors = false;
-
-    @ConfigEntry.Category("customColors")
-    @Tooltip()
-    public boolean shouldAllowTooltipBackgroundColors = false;
-
     @ConfigEntry.Category("biomeBlendRadius")
     @Tooltip()
     @ConfigEntry.BoundedDiscrete(min=0, max = 14)

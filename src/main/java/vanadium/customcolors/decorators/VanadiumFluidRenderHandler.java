@@ -26,9 +26,8 @@ public class VanadiumFluidRenderHandler implements FluidRenderHandler {
 
     @Override
     public int getFluidColor(@Nullable BlockRenderView view, @Nullable BlockPos pos, FluidState state) {
-
-        if(BiomeColorMappings.isFluidCustomColored(state)) {
-            var blockState = state.getBlockState();
+        var blockState = state.getBlockState();
+        if(BiomeColorMappings.isCustomColored(blockState)) {
            return BiomeColorMappings.getBiomeColorMapping(blockState, view, pos);
         }
         return this.delegate.getFluidColor(view, pos, state);

@@ -9,6 +9,9 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.CuboidBlockIterator;
 import net.minecraft.util.math.BlockPos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vanadium.Vanadium;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.mixin.sodium.SodiumWorldSliceAccessor;
 import vanadium.models.records.Coordinates;
@@ -16,6 +19,7 @@ import vanadium.models.records.Coordinates;
 import java.util.Arrays;
 
 public class VanadiumFluidStateColorProvider implements ColorProvider<FluidState> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Vanadium.MODID);
     private final VanadiumResolver resolver;
 
     private VanadiumFluidStateColorProvider(VanadiumResolver resolver) {
@@ -34,6 +38,7 @@ public class VanadiumFluidStateColorProvider implements ColorProvider<FluidState
     private static int resolve(WorldSlice world, BlockPos pos, FluidState fluidState, VanadiumResolver resolver) {
         final ClientWorld clientWorld = ((SodiumWorldSliceAccessor)(Object)world).getWorld();
         final DynamicRegistryManager manager = clientWorld.getRegistryManager().toImmutable();
+
         int i = MinecraftClient.getInstance().options.getBiomeBlendRadius().getValue();
         if (i == 0) {
             return resolver.getColorAtCoordinatesForBiome(manager, clientWorld.getBiome(pos).value(), new Coordinates(pos.getX(), pos.getY(), pos.getZ()));
@@ -51,6 +56,8 @@ public class VanadiumFluidStateColorProvider implements ColorProvider<FluidState
             l += (n & 0xFF00) >> 8;
             m += n & 0xFF;
         }
-        return  (k / j & 0xFF) << 16| (l / j & 0xFF) << 8 |  (m / j & 0xF);
+        var resultingColor = (k / j & 0xFF) << 16 | (l / j & 0xFF) << 8 | m / j & 0xFF;
+        LOGGER.info("Resulting {} color: {}", fluidState.getFluid(), Integer.toString(resultingColor, 16));
+        return resultingColor;
     }
 }

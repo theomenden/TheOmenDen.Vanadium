@@ -81,4 +81,60 @@ public final class VanadiumColormaticResolution {
         client.registerReloadListener(COLORMATIC_LIGHTMAP_PROPERTIES);
         client.registerReloadListener(COLORMATIC_LIGHTMAPS);
     }
+
+    public static boolean hasCustomWaterColors() {
+        return WATER_COLORS.hasCustomColorMapping() || COLORMATIC_WATER_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomPumpkinStemColors() {
+        return PUMPKIN_STEM_COLORS.hasCustomColorMapping() || COLORMATIC_PUMPKIN_STEM_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomMelonStemColors() {
+        return MELON_STEM_COLORS.hasCustomColorMapping() || COLORMATIC_MELON_STEM_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomRedstoneColors() {
+        return REDSTONE_COLORS.hasCustomColorMapping() || COLORMATIC_REDSTONE_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomXpOrbColors() {
+        return EXPERIENCE_ORB_COLORS.hasCustomColorMapping() || COLORMATIC_EXPERIENCE_ORB_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomLavaDropParticleColors() {
+        return LAVA_DROP_COLORS.hasCustomColorMapping() || COLORMATIC_LAVA_DROP_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomMyceliumParticleColors() {
+        return MYCELIUM_PARTICLE_COLORS.hasCustomColorMapping() || COLORMATIC_MYCELIUM_PARTICLE_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomUnderLavaColors() {
+        return UNDERLAVA_COLORS.hasCustomColorMapping() || COLORMATIC_UNDERLAVA_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomUnderWaterColors(){
+        return UNDERWATER_COLORS.hasCustomColorMapping() || COLORMATIC_UNDERWATER_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomSkyColors() {
+        return SKY_COLORS.hasCustomColorMapping() || COLORMATIC_SKY_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomFogColors() {
+        return FOG_COLORS.hasCustomColorMapping() || COLORMATIC_FOG_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomBirchColors() {
+        return BIRCH_COLORS.hasCustomColorMapping() || COLORMATIC_BIRCH_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomSpruceColors() {
+        return SPRUCE_COLORS.hasCustomColorMapping() || COLORMATIC_SPRUCE_COLORS.hasCustomColorMapping();
+    }
+
+    public static boolean hasCustomDurabilityColors() {
+        return DURABILITY_COLORS.hasCustomColorMapping() || COLORMATIC_DURABILITY_COLORS.hasCustomColorMapping();
+    }
 }

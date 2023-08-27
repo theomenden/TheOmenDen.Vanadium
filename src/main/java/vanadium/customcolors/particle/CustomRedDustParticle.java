@@ -2,10 +2,11 @@ package vanadium.customcolors.particle;
 
 
 import net.minecraft.particle.DustParticleEffect;
+import org.apache.commons.lang3.ObjectUtils;
 import org.joml.Vector3f;
-import vanadium.Vanadium;
 import vanadium.utils.ColorConverter;
 import vanadium.utils.MathUtils;
+import vanadium.utils.VanadiumColormaticResolution;
 
 public class CustomRedDustParticle extends DustParticleEffect {
     public CustomRedDustParticle(Vector3f color, float alpha) {
@@ -14,7 +15,7 @@ public class CustomRedDustParticle extends DustParticleEffect {
 
     @Override
     public Vector3f getColor() {
-        if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
+        if(VanadiumColormaticResolution.hasCustomRedstoneColors()) {
             var rgb = getFullPoweredColor();
             return ColorConverter.createColorVector(rgb);
         }
@@ -23,13 +24,17 @@ public class CustomRedDustParticle extends DustParticleEffect {
 
     @Override
     public float getScale() {
-        if(Vanadium.REDSTONE_COLORS.hasCustomColorMapping()) {
+        if(VanadiumColormaticResolution.hasCustomRedstoneColors()) {
             return ((getFullPoweredColor() >> 24) & 0xff) * MathUtils.INV_255;
         }
         return super.getScale();
     }
 
     private int getFullPoweredColor() {
-        return Vanadium.REDSTONE_COLORS.getColorAtIndex(15);
+        var redstoneColors = ObjectUtils.firstNonNull(
+                VanadiumColormaticResolution.REDSTONE_COLORS,
+                VanadiumColormaticResolution.COLORMATIC_REDSTONE_COLORS
+        );
+        return redstoneColors.getColorAtIndex(15);
     }
 }

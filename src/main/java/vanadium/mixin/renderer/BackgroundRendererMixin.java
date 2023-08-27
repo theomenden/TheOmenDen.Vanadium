@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeCoords;
+import org.apache.commons.lang3.ObjectUtils;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +25,7 @@ import vanadium.customcolors.mapping.BiomeColorMapping;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 import vanadium.customcolors.resources.BiomeColorMappingResource;
 import vanadium.models.records.Coordinates;
+import vanadium.utils.VanadiumColormaticResolution;
 
 @Mixin(BackgroundRenderer.class)
 public abstract class BackgroundRendererMixin {
@@ -70,10 +72,17 @@ public abstract class BackgroundRendererMixin {
 
         if(submersionType == CameraSubmersionType.LAVA) {
             fluid = Fluids.LAVA;
-            colorMappingResource = Vanadium.UNDERLAVA_COLORS;
+
+            colorMappingResource = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.UNDERLAVA_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_UNDERLAVA_COLORS
+            );
         } else {
             fluid = Fluids.WATER;
-            colorMappingResource = Vanadium.UNDERWATER_COLORS;
+            colorMappingResource = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.UNDERWATER_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_UNDERWATER_COLORS
+            );
         }
 
         int color = 0;
@@ -208,7 +217,7 @@ public abstract class BackgroundRendererMixin {
         return submersionType == CameraSubmersionType.LAVA
                 && (
                 BiomeColorMappings.isFluidFogCustomColored(Fluids.LAVA)
-                || Vanadium.UNDERLAVA_COLORS.hasCustomColorMapping()
+                || VanadiumColormaticResolution.hasCustomUnderLavaColors()
                 );
     }
 }

@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import vanadium.customcolors.decorators.VanadiumFluidRenderHandler;
-
 @Mixin(value = FluidRenderHandlerRegistryImpl.class, remap = false)
 public abstract class FluidRendererHandlerRegistryMixin {
     @ModifyVariable(method = "register", at = @At(value = "HEAD"), ordinal = 0, argsOnly = true)

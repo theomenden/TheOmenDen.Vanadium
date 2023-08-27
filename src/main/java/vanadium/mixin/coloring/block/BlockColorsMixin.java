@@ -7,6 +7,7 @@ import net.minecraft.block.StemBlock;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
+import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.Vanadium;
 import vanadium.customcolors.mapping.BiomeColorMapping;
 import vanadium.customcolors.mapping.BiomeColorMappings;
+import vanadium.utils.VanadiumColormaticResolution;
 
 @Mixin(BlockColors.class)
 public abstract class BlockColorsMixin {
@@ -22,8 +24,12 @@ public abstract class BlockColorsMixin {
     @Dynamic("Birch foliage lambda")
     @Inject(method = "method_1687", at = @At("HEAD"), cancellable = true)
     private static void onBirchColoring(BlockState state, BlockRenderView world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
-        if(Vanadium.BIRCH_COLORS.hasCustomColorMapping()) {
-            int color = BiomeColorMapping.getBiomeCurrentColorOrDefault(world, pos, Vanadium.BIRCH_COLORS.getColorMapping());
+        if(VanadiumColormaticResolution.hasCustomBirchColors()) {
+            var birchColors = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.BIRCH_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_BIRCH_COLORS
+            );
+            int color = BiomeColorMapping.getBiomeCurrentColorOrDefault(world, pos, birchColors.getColorMapping());
             cir.setReturnValue(color);
         }
     }
@@ -33,8 +39,12 @@ public abstract class BlockColorsMixin {
     at = @At("HEAD"),
     cancellable = true)
     private static void onSpruceColoring(BlockState state, BlockRenderView world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
-        if(Vanadium.SPRUCE_COLORS.hasCustomColorMapping()) {
-            int color = BiomeColorMapping.getBiomeCurrentColorOrDefault(world, pos, Vanadium.SPRUCE_COLORS.getColorMapping());
+        if(VanadiumColormaticResolution.hasCustomSpruceColors()) {
+            var spruceColors = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.SPRUCE_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_SPRUCE_COLORS
+            );
+            int color = BiomeColorMapping.getBiomeCurrentColorOrDefault(world, pos, spruceColors.getColorMapping());
             cir.setReturnValue(color);
         }
     }
@@ -47,11 +57,18 @@ public abstract class BlockColorsMixin {
         Block block = state.getBlock();
 
         if(block == Blocks.ATTACHED_PUMPKIN_STEM &&
-        Vanadium.PUMPKIN_STEM_COLORS.hasCustomColorMapping()) {
-            cir.setReturnValue(Vanadium.PUMPKIN_STEM_COLORS.getColorAtIndex(Integer.MAX_VALUE));
+                VanadiumColormaticResolution.hasCustomPumpkinStemColors()) {
+            var pumpkinStemColors = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.PUMPKIN_STEM_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_PUMPKIN_STEM_COLORS);
+            cir.setReturnValue(pumpkinStemColors.getColorAtIndex(Integer.MAX_VALUE));
         } else if(block == Blocks.ATTACHED_MELON_STEM
-        && Vanadium.MELON_STEM_COLORS.hasCustomColorMapping()) {
-            cir.setReturnValue(Vanadium.MELON_STEM_COLORS.getColorAtIndex(Integer.MAX_VALUE));
+        && VanadiumColormaticResolution.hasCustomMelonStemColors()) {
+            var melonStemColors = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.MELON_STEM_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_MELON_STEM_COLORS
+            );
+            cir.setReturnValue(melonStemColors.getColorAtIndex(Integer.MAX_VALUE));
         }
     }
 
@@ -63,13 +80,24 @@ public abstract class BlockColorsMixin {
         Block block = state.getBlock();
 
         if(block == Blocks.PUMPKIN_STEM
-        && Vanadium.PUMPKIN_STEM_COLORS.hasCustomColorMapping()) {
+        && VanadiumColormaticResolution.hasCustomPumpkinStemColors()) {
             int age = state.get(StemBlock.AGE);
-            cir.setReturnValue(Vanadium.PUMPKIN_STEM_COLORS.getColorAtIndex(age));
+
+            var pumpkinStemColors = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.PUMPKIN_STEM_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_PUMPKIN_STEM_COLORS
+            );
+
+            cir.setReturnValue(pumpkinStemColors.getColorAtIndex(age));
         } else if(block == Blocks.MELON_STEM
-        && Vanadium.MELON_STEM_COLORS.hasCustomColorMapping()) {
+        && VanadiumColormaticResolution.hasCustomMelonStemColors()) {
             int age = state.get(StemBlock.AGE);
-            cir.setReturnValue(Vanadium.MELON_STEM_COLORS.getColorAtIndex(age));
+
+            var melonStemColors = ObjectUtils.firstNonNull(
+                    VanadiumColormaticResolution.MELON_STEM_COLORS,
+                    VanadiumColormaticResolution.COLORMATIC_MELON_STEM_COLORS
+            );
+            cir.setReturnValue(melonStemColors.getColorAtIndex(age));
         }
     }
 
