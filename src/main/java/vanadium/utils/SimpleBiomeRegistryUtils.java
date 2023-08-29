@@ -53,10 +53,9 @@ public final class SimpleBiomeRegistryUtils {
     }
 
     private static int getBiomeRawId(Biome biome) {
-        var rawId= ((SimpleRegistryAccessor<Biome>) SimpleBiomeRegistryUtils.BUILT_IN_BIOMES)
+        return ((SimpleRegistryAccessor<Biome>) SimpleBiomeRegistryUtils.BUILT_IN_BIOMES)
                 .getEntryToRawId()
                 .getOrDefault(biome, -1);
-        return rawId;
     }
 
 }

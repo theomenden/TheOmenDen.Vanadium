@@ -34,7 +34,7 @@ public class BiomeColorMappingResource implements SimpleSynchronousResourceReloa
 
     public BiomeColorMapping getColorMapping() {
         if(this.mapping == null) {
-            throw new IllegalStateException("No custom color mapping found" + getFabricId());
+            throw new IllegalStateException("No custom color mapping found " + getFabricId());
         }
         return this.mapping;
     }
@@ -48,15 +48,29 @@ public class BiomeColorMappingResource implements SimpleSynchronousResourceReloa
         }
     }
 
+    @Nullable
+    private PropertyImage checkForColormaticColorMapping(ResourceManager manager) {
+        try {
+            return GsonUtils.loadColorMapping(manager, this.colormaticId, false);
+        } catch (InvalidColorMappingException e) {
+            return null;
+        }
+    }
+
+
     @Override
     public void reload(ResourceManager resourceManager) {
         PropertyImage propertyImage;
 
         try {
-            propertyImage = GsonUtils.loadColorMapping(resourceManager, this.identifier, false);
+            propertyImage = checkForColormaticColorMapping(resourceManager);
+            if(propertyImage == null) {
+                GsonUtils.loadColorMapping(resourceManager, this.identifier, false);
+            }
         } catch(InvalidColorMappingException e) {
             propertyImage = checkForOptifineColorMap(resourceManager);
         }
+
         this.mapping = propertyImage != null
                 ? new BiomeColorMapping(propertyImage.properties(), propertyImage.nativeImage())
                 : null;

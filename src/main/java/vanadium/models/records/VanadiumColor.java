@@ -44,8 +44,7 @@ public record VanadiumColor(int rgb) {
     public VanadiumColor adjustBrightness(float factor) {
         int r = Range.between(0,255).fit((int)(((rgb >> 16) & 0xFF)* factor));
         int g = Range.between(0,255).fit((int)(((rgb >> 8) & 0xFF)* factor));
-        int b = Range
-                .between(0,255).fit((int)((rgb & 0xFF)* factor));
+        int b = Range.between(0,255).fit((int)((rgb & 0xFF)* factor));
 
         return new VanadiumColor((rgb & 0xFF000000) | (r << 16) | (g << 8) | b);
     }

@@ -4,6 +4,7 @@ import me.jellysquid.mods.sodium.client.model.color.ColorProvider;
 import me.jellysquid.mods.sodium.client.model.quad.ModelQuadView;
 import me.jellysquid.mods.sodium.client.world.WorldSlice;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.block.FluidRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -12,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vanadium.Vanadium;
+import vanadium.customcolors.decorators.VanadiumFluidRenderHandler;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.mixin.sodium.SodiumWorldSliceAccessor;
 import vanadium.models.records.Coordinates;
@@ -43,6 +45,7 @@ public class VanadiumFluidStateColorProvider implements ColorProvider<FluidState
         if (i == 0) {
             return resolver.getColorAtCoordinatesForBiome(manager, clientWorld.getBiome(pos).value(), new Coordinates(pos.getX(), pos.getY(), pos.getZ()));
         }
+
         int j = (i * 2 + 1) * (i * 2 + 1);
         int k = 0;
         int l = 0;
@@ -56,7 +59,7 @@ public class VanadiumFluidStateColorProvider implements ColorProvider<FluidState
             l += (n & 0xFF00) >> 8;
             m += n & 0xFF;
         }
-        var resultingColor = (k / j & 0xFF) << 16 | (l / j & 0xFF) << 8 | m / j & 0xFF;
+        var resultingColor = m / j << 16 | (l / j & 0xFF) << 8 | (k / j)  & 0xFF;
         LOGGER.info("Resulting {} color: {}", fluidState.getFluid(), Integer.toString(resultingColor, 16));
         return resultingColor;
     }

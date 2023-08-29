@@ -3,6 +3,7 @@ package vanadium.defaults;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.Registries;
@@ -44,7 +45,20 @@ public final class DefaultVanadiumResolverProviders {
     }
 
     private static VanadiumResolver byFluidState(FluidState key) {
-        return byBlockState(key.getBlockState());
+        return (manager, biome, coordinates) -> {
+            final MinecraftClient client = MinecraftClient.getInstance();
+            var colorProvider = ((BlockColorsAccessor) client
+                    .getBlockColors())
+                    .getProviders()
+                    .get(Registries.FLUID.getRawId(key.getFluid()));
+
+            if (colorProvider != null) {
+                ClientWorld clientWorld = client.world;
+                return colorProvider.getColor(key.getBlockState(), clientWorld, new BlockPos(coordinates.x(), coordinates.y(), coordinates.z()), 0);
+            }
+
+            return -1;
+        };
     }
 
     private static VanadiumResolver byBlock(Block key) {

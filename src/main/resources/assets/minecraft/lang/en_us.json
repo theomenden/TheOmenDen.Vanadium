@@ -1,8 +1,8 @@
 {
   "text.autoconfig.vanadium.title": "Vanadium Configuration",
   "text.autoconfig.vanadium.subtitle": "Vanadium Options",
-  "text.autoconfig.vanadium.category.customColors": "Vanadium Custom Color Configuration",
-  "text.autoconfig.vanadium.category.biomeBlendRadius" : "Vanadium Biome Blending",
+  "text.autoconfig.vanadium.category.customColors": "Custom Color Configuration",
+  "text.autoconfig.vanadium.category.biomeBlendRadius" : "Biome Blending",
   "text.autoconfig.vanadium.option.shouldClearSky": "Clear Skies",
   "text.autoconfig.vanadium.option.shouldClearSky.@Tooltip": "Use the sky color for fog.",
   "text.autoconfig.vanadium.option.shouldClearVoid": "Clear Void",

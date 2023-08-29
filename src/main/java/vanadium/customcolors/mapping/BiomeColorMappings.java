@@ -52,9 +52,9 @@ public final class BiomeColorMappings {
                 .forEach((key, value) -> {
                     switch (key
                             .toString()) {
-                        case "colormatic:sky" -> skyColorMappings.addColorMapping(biomeColorMap, value, biomes);
-                        case "colormatic:sky_fog" -> skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
-                        case "colormatic:fluid_fog" -> {
+                        case "vanadium:sky", "colormatic:sky" -> skyColorMappings.addColorMapping(biomeColorMap, value, biomes);
+                        case "vanadium:sky_fog", "colormatic:sky_fog" -> skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
+                        case "vanadium:fluid_fog", "colormatic:fluid_fog" -> {
                             Collection<Fluid> fluids = value
                                     .stream()
                                     .map(Registries.FLUID::get)
@@ -108,6 +108,30 @@ public final class BiomeColorMappings {
             BiomeColorMapping colormap = colorMappingsByState.getFallbackColorMapping(state);
             if(colormap == null) {
                 colormap = colorMappingsByBlock.getFallbackColorMapping(state.getBlock());
+            }
+            if(colormap != null) {
+                return colormap.getDefaultColor();
+            } else {
+                return 0xffffff;
+            }
+        }
+    }
+
+    public static int getBiomeColorMapping(FluidState state, BlockRenderView world, BlockPos pos) {
+        if(world != null && pos != null) {
+            var resolver = colorMappingsByFluidState.getExtendedResolver(state);
+            if(resolver == null) {
+                resolver = colorMappingsByFluidFog.getExtendedResolver(state.getFluid());
+            }
+            if(resolver == null) {
+                throw new IllegalArgumentException(String.valueOf(state));
+            }
+
+            return resolver.resolveExtendedColor(world, pos);
+        } else {
+            BiomeColorMapping colormap = colorMappingsByFluidState.getFallbackColorMapping(state);
+            if(colormap == null) {
+                colormap = colorMappingsByFluidFog.getFallbackColorMapping(state.getFluid());
             }
             if(colormap != null) {
                 return colormap.getDefaultColor();

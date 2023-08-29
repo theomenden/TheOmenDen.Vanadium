@@ -42,7 +42,7 @@ public abstract class SodiumColorProviderRegistryMixin {
         ColorProvider<FluidState> lavaFluidProvider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(Fluids.LAVA));
         ColorProvider<BlockState> waterBlockProvider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(Blocks.WATER));
         ColorProvider<FluidState> waterFluidProvider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.FLUID_PROVIDER.create(Fluids.WATER));
-        this.registerBlocks(lavaBlockProvider, Blocks.LAVA, Blocks.LAVA_CAULDRON,Blocks.MAGMA_BLOCK);
+        this.registerBlocks(lavaBlockProvider, Blocks.LAVA, Blocks.LAVA_CAULDRON);
         this.registerFluids(lavaFluidProvider, Fluids.LAVA, Fluids.FLOWING_LAVA);
         this.registerBlocks(waterBlockProvider, Blocks.WATER, Blocks.WATER_CAULDRON,Blocks.BUBBLE_COLUMN);
         this.registerFluids(waterFluidProvider, Fluids.WATER, Fluids.FLOWING_WATER);
@@ -52,6 +52,13 @@ public abstract class SodiumColorProviderRegistryMixin {
                     var provider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(block));
                     this.registerBlocks(provider, block);
                 });
+
+        fluids.keySet()
+                .forEach(fluid -> {
+                    var provider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_STATE_PROVIDER.create(fluid.getDefaultState()
+                                                                                                                                                                .getBlockState()));
+                    this.registerFluids(provider, fluid);
+        });
     }
 
 }
