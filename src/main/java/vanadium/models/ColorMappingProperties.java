@@ -5,15 +5,13 @@ import com.google.gson.JsonSyntaxException;
 import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vanadium.Vanadium;
 import vanadium.defaults.DefaultColumns;
 import vanadium.models.enums.ColumnLayout;
@@ -32,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public class ColorMappingProperties {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Vanadium.MODID);
     private final Identifier id;
     private transient final boolean isUsingOptfine;
     @Getter
