@@ -130,9 +130,9 @@ public abstract class BackgroundRendererMixin {
             return self.getFogColor();
         }
 
-        var dimId = Vanadium.getDimensionid(world);
+        var dimensionid = Vanadium.getDimensionid(world);
 
-        VanadiumResolver resolver = BiomeColorMappings.getTotalSkyFog(dimId);
+        VanadiumResolver resolver = BiomeColorMappings.getTotalSkyFog(dimensionid);
         return resolver
                 .getColorAtCoordinatesForBiome(world.getRegistryManager(), self, new Coordinates(BiomeCoords.toBlock(x), BiomeCoords.toBlock(y),BiomeCoords.toBlock(z)));
     }
@@ -158,9 +158,9 @@ public abstract class BackgroundRendererMixin {
         && world.getDimension().hasSkyLight()) {
             Vec3d color = world.getSkyColor(camera.getPos(), partialTicks);
 
-            red = (float)color.x;
-            green = (float)color.y;
-            blue = (float)color.z;
+            BackgroundRendererMixin.red = (float)color.x;
+            BackgroundRendererMixin.green = (float)color.y;
+            BackgroundRendererMixin.blue = (float)color.z;
         }
     }
 
@@ -203,7 +203,7 @@ public abstract class BackgroundRendererMixin {
     @ModifyVariable(
             method = "render",
             at = @At(value = "STORE", ordinal = 2),
-            index=7
+            index = 7
     )
     private static float modifyVoidColor(float scale) {
         if(Vanadium.configuration.shouldClearVoid) {

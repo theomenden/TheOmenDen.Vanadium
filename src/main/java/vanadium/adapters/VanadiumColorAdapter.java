@@ -31,6 +31,7 @@ public class VanadiumColorAdapter extends TypeAdapter<VanadiumColor> {
 
         String readColor = jsonReader.nextString().trim();
         try {
+            readColor = readColor.replace("#","").trim();
             return new VanadiumColor(readColor);
         } catch (NumberFormatException e) {
             throw new JsonSyntaxException(e);

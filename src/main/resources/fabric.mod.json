@@ -26,6 +26,7 @@
     "fabric-api": "*",
     "sodium": ">=0.5.0",
     "modmenu": ">=7.2.1",
+    "cloth-config": ">=11.1.106",
     "java": ">=17"
   },
   "description": "A simple custom colors implementation with some level of naive caching.",
