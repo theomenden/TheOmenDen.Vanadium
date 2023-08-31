@@ -5,6 +5,7 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
@@ -20,6 +21,7 @@ import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.customcolors.resources.GlobalColorResource;
+import vanadium.utils.DebugUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
 @Environment(EnvType.CLIENT)
@@ -81,6 +83,8 @@ public class Vanadium implements ClientModInitializer {
 
         ResourceManagerHelper client = ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES);
         VanadiumColormaticResolution.registerResources(client);
+        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) ->
+                DebugUtils.registerDebugCommands(dispatcher)));
         logger.info("Vanadium initialized, we're adding some color to your world");
     }
 }

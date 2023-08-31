@@ -17,14 +17,15 @@
       "update_checker": true
     },
     "sodium:options": {
-      "mixin.features.blending_radius":false
+      "quality.biome_blend":false
     }
   },
   "depends": {
     "fabricloader": ">=${loader_version}",
     "minecraft": "^1.20.1",
     "fabric-api": "*",
-    "sodium": ">=0.5.0",
+    "sodium": ">=0.5.2",
+    "indium":">=1.0.25",
     "modmenu": ">=7.2.1",
     "cloth-config": ">=11.1.106",
     "java": ">=17"
