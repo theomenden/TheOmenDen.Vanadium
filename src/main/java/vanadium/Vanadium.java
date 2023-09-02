@@ -21,6 +21,7 @@ import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.customcolors.resources.GlobalColorResource;
+import vanadium.customcolors.resources.LinearColorMappingResource;
 import vanadium.utils.DebugUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
@@ -33,6 +34,8 @@ public class Vanadium implements ClientModInitializer {
     public static final Identifier OVERWORLD_ID = Identifier.of("minecraft", "overworld");
 
     public static final GlobalColorResource COLOR_PROPERTIES = new GlobalColorResource(new Identifier(MODID, "color"));
+
+    public static final LinearColorMappingResource ITEMGUI_COLORS = new LinearColorMappingResource(new Identifier(MODID, "gui"));
 
     public static Identifier getDimensionid(World world) {
         DimensionType type = world.getDimension();

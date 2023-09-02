@@ -5,7 +5,6 @@
   "plugin": "vanadium.mixin.sodium.SodiumMixinFilterPlugin",
   "client": [
     "SodiumBiomeAccessAccessor",
-    "SodiumBiomeColorCacheMixin",
     "SodiumGameOptionsMixin",
     "SodiumClientWorldMixin",
     "SodiumColorProviderRegistryMixin",

@@ -15,16 +15,16 @@ import java.util.Arrays;
 
 public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory {
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked,redundant")
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
         Class<? super T> cls = typeToken.getRawType();
         if(cls.isEnum()) {
             Class<?>[] implemented = cls.getInterfaces();
 
-            if (Arrays
-                    .stream(implemented)
-                    .anyMatch(iface -> iface == StringIdentifiable.class)) {
-                return (TypeAdapter<T>)new StringIdentifiableTypeAdapter<>(cls);
+            for (Class<?> iface : implemented) {
+                if (iface == StringIdentifiable.class) {
+                    return (TypeAdapter<T>) new StringIdentifiableTypeAdapter<>(cls);
+                }
             }
         }
         return null;

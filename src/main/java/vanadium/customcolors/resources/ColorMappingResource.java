@@ -43,15 +43,13 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
             int[] resultingNamespaceLoad;
 
             try {
-                   resultingNamespaceLoad = RawTextureDataLoader.loadRawTextureData(manager, identifier);
+                resultingNamespaceLoad = attemptToLoadFromColormaticNamespace(manager);
+                if(resultingNamespaceLoad == null) {
+                    resultingNamespaceLoad = RawTextureDataLoader.loadRawTextureData(manager, identifier);
+                }
             }
             catch(IOException e) {
-
-                resultingNamespaceLoad = attemptToLoadFromColormaticNamespace(manager);
-
-                if(resultingNamespaceLoad == null) {
                  resultingNamespaceLoad =  attemptToLoadFromOptifineDirectory(manager);
-                }
             }
             return resultingNamespaceLoad;
         }, executor);

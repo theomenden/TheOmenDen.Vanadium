@@ -37,6 +37,7 @@
     "coloring.potions.PotionUtilMixin",
     "coloring.potions.StatusEffectMixin",
     "coloring.text.ChatFormatMixin",
+    "coloring.xp.ExperienceOrbRendererMixin",
     "compatibility.IdentifierMixin",
     "compatibility.SimpleRegistryAccessor",
     "compatibility.TextureManagerMixin",

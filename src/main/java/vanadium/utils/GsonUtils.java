@@ -15,6 +15,7 @@ import vanadium.adapters.*;
 import vanadium.models.ApplicableBlockStates;
 import vanadium.models.ColorMappingProperties;
 import vanadium.models.GridEntry;
+import vanadium.models.ItemsGrid;
 import vanadium.models.enums.Format;
 import vanadium.models.exceptions.InvalidColorMappingException;
 import vanadium.models.records.PropertyImage;
@@ -38,6 +39,7 @@ public final class GsonUtils {
             .registerTypeAdapter(MapColor.class, new MaterialColorAdapter())
             .registerTypeAdapter(Formatting.class, new ChatFormatAdapter())
             .registerTypeAdapter(GridEntry.class, new GridEntryAdapter())
+            .registerTypeAdapter(ItemsGrid.class, new ItemsAdapter())
             .create();
 
     public static String resolveRelativeResourceLocation(String path, Identifier identifier) {

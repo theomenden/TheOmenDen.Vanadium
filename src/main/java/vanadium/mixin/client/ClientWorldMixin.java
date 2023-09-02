@@ -60,6 +60,74 @@ public abstract class ClientWorldMixin extends World {
         if(this.colorCache.get(colorResolver) == null) {
             this.colorCache.put(colorResolver, new BiomeColorCache(pos1 -> this.calculateColor(pos1, colorResolver)));
         }
+        /*
+        final Coordinates blockPosCoordinates = new Coordinates(pos.getX(), pos.getY(), pos.getZ());
+        final Coordinates chunkCoordinates = new Coordinates(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+        final Coordinates blockCoordinates = new Coordinates(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
+
+        LocalCache localCache = vanadium$threadLocalCache.get();
+        BlendingChunk chunk = null;
+        int colorType;
+
+        if(localCache.latestColorResolver == colorResolver) {
+            colorType = localCache.lastColorType;
+            long key = ColorCachingUtils.getChunkKey(chunkCoordinates,colorType);
+
+            if(localCache.lastBlendedChunk.key == key) {
+                chunk = localCache.lastBlendedChunk;
+            }
+        } else {
+            if(colorResolver == BiomeColors.GRASS_COLOR) {
+                colorType = BiomeColorTypes.INSTANCE.grass();
+            }
+            else if(colorResolver == BiomeColors.WATER_COLOR) {
+                colorType = BiomeColorTypes.INSTANCE.water();
+            }
+            else if(colorResolver == BiomeColors.FOLIAGE_COLOR) {
+                colorType = BiomeColorTypes.INSTANCE.foliage();
+            }
+            else {
+                colorType = CustomColorCompatibility.getColorType(colorResolver);
+
+                if(colorType >= localCache.blendedChunksCount) {
+                    localCache.reallocateBlendedChunkyArray(colorType);
+                }
+            }
+
+            long key = ColorCachingUtils.getChunkKey(chunkCoordinates, colorType);
+
+            BlendingChunk cachedChunk = localCache.blendedChunks[colorType];
+
+            if(cachedChunk.key == key) {
+                chunk = cachedChunk;
+            }
+        }
+
+        DebugUtils.countThreadLocalChunks(chunk);
+
+        if(chunk == null) {
+            chunk = vanadium$blendingColorCache.getOrInitializeChunk(chunkCoordinates, colorType);
+
+            localCache.putChunkInBlendedCache(vanadium$blendingColorCache, chunk, colorType, colorResolver);
+        }
+
+        int index = ColorCachingUtils.getArrayIndex(16, blockCoordinates);
+
+        int color = chunk.data[index];
+
+        if(color == 0) {
+            ColorBlending.generateColors(
+                    this,
+                    colorResolver,
+                    colorType,
+                    vanadium$chunkColorCache,
+                    chunk,
+                    blockPosCoordinates
+            );
+        }
+
+        cir.setReturnValue(color);
+         */
     }
 
 
