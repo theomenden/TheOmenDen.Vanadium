@@ -16,3 +16,11 @@ jobs:
         uses: JetBrains/qodana-action@v2023.2
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+  mc-publish:
+      runs-on: ubuntu-latest
+      steps:
+        - name: 'MC Publish'
+          uses: Kir-Antipov/mc-publish@v3.3
+          with:
+            modrinth-id: lS2PKjpV
+            modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
