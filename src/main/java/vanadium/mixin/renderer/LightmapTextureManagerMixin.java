@@ -161,21 +161,26 @@ public abstract class LightmapTextureManagerMixin {
         }
     }
 
-    @Inject(
-            method = "update",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getSkyBrightness(F)F", ordinal = 0)
+    @ModifyVariable(
+            method="update",
+            at = @At(
+                    value = "STORE",
+                    ordinal = 1
+            ),
+            ordinal = 1
     )
-    private void modifySkyAmbience(float delta, CallbackInfo ci) {
+    private float modifySkyAmbience(float delta) {
         if(Vanadium.configuration.shouldBlendSkyLight) {
             delta = (int)(delta * 16) * MathUtils.INV_16F;
         }
+        return delta;
     }
 
     @ModifyVariable(
             method = "update",
             at = @At(
                     value = "STORE",
-                    ordinal = 0
+                    ordinal = 1
             ),
             index = 16
     )

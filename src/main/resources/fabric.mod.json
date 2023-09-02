@@ -1,4 +1,7 @@
 {
+  "schemaVersion": 1,
+  "name": "Vanadium",
+  "version": "${version}",
   "accessWidener": "vanadium.accesswidener",
   "authors": [
     "The Omen Den",
@@ -26,9 +29,11 @@
     "fabric-api": "*",
     "sodium": ">=0.5.2",
     "indium":">=1.0.25",
-    "modmenu": ">=7.2.1",
     "cloth-config": ">=11.1.106",
     "java": ">=17"
+  },
+  "breaks": {
+    "optifabric": "*"
   },
   "description": "A simple custom colors implementation with some level of naive caching.",
   "environment": "client",
@@ -47,8 +52,5 @@
     "vanadium.mixins.json",
     "vanadium.sodium.mixins.json",
     "vanadium.fabric.mixins.json"
-  ],
-  "name": "Vanadium",
-  "schemaVersion": 1,
-  "version": "${version}"
+  ]
 }
