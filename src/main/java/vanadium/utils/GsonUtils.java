@@ -3,11 +3,11 @@ package vanadium.utils;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.block.MapColor;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.ChatFormatting;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.material.MapColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.Vanadium;
@@ -33,16 +33,16 @@ public final class GsonUtils {
     private static final Logger logger = LogManager.getLogger(Vanadium.MODID);
     public static final Gson PROPERTY_GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new StringIdentifiableTypeAdapterFactory())
-            .registerTypeAdapter(Identifier.class, new IdentifierAdapter())
+            .registerTypeAdapter(ResourceLocation.class, new ResourceLocationAdapter())
             .registerTypeAdapter(ApplicableBlockStates.class, new ApplicableBlockStatesAdapter())
             .registerTypeAdapter(VanadiumColor.class, new VanadiumColorAdapter())
             .registerTypeAdapter(MapColor.class, new MaterialColorAdapter())
-            .registerTypeAdapter(Formatting.class, new ChatFormatAdapter())
+            .registerTypeAdapter(ChatFormatting.class, new ChatFormatAdapter())
             .registerTypeAdapter(GridEntry.class, new GridEntryAdapter())
             .registerTypeAdapter(ItemsGrid.class, new ItemsAdapter())
             .create();
 
-    public static String resolveRelativeResourceLocation(String path, Identifier identifier) {
+    public static String resolveRelativeResourceLocation(String path, ResourceLocation identifier) {
         if(path.startsWith("./")) {
             String thisPath = identifier.toString();
             path = thisPath.substring(0, thisPath.lastIndexOf('/')) + path.substring(1);
@@ -56,7 +56,7 @@ public final class GsonUtils {
     }
 
     public static Reader getJsonReader(InputStream inputStream,
-                                       Identifier identifier,
+                                       ResourceLocation identifier,
                                        Function<String, String> keyMapper,
                                        Predicate<String> arrayValues) throws IOException {
         if (!identifier
@@ -71,21 +71,21 @@ public final class GsonUtils {
 
     }
 
-    public static PropertyImage loadColorMapping(ResourceManager resourceManager, Identifier identifier, boolean isCustom) {
+    public static PropertyImage loadColorMapping(ResourceManager resourceManager, ResourceLocation identifier, boolean isCustom) {
         ColorMappingProperties properties = ColorMappingProperties.load(resourceManager, identifier,isCustom);
 
         if(properties.getFormat() == Format.FIXED) {
             return new PropertyImage(properties, null);
         }
 
-        try(InputStream inputStream = resourceManager.getResourceOrThrow(properties.getSource()).getInputStream()) {
+        try(InputStream inputStream = resourceManager.getResourceOrThrow(properties.getSource()).open()) {
             NativeImage image = NativeImage.read(inputStream);
             if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
               for(int i = 0; i < image.getWidth(); i++) {
                   for(int j = 0; j < image.getHeight(); j++) {
-                      int pixel = image.getColor(i, j);
+                      int pixel = image.getPixelRGBA(i, j);
                       pixel = flipPixelColor(pixel);
-                      image.setColor(i, j, pixel);
+                      image.setPixelRGBA(i, j, pixel);
                   }
               }
             }

@@ -1,14 +1,13 @@
 package vanadium.defaults;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import org.apache.commons.lang3.ObjectUtils;
 import vanadium.Vanadium;
 import vanadium.customcolors.interfaces.VanadiumResolver;
@@ -21,55 +20,42 @@ public final class DefaultVanadiumResolverProviders {
     public static final VanadiumResolverProvider<FluidState> FLUID_STATE_PROVIDER = DefaultVanadiumResolverProviders::byFluidState;
     public static final VanadiumResolverProvider<Fluid> FLUID_PROVIDER = DefaultVanadiumResolverProviders::byFluid;
     public static final VanadiumResolverProvider<Block> BLOCK_PROVIDER = DefaultVanadiumResolverProviders::byBlock;
-    public static final VanadiumResolverProvider<Identifier> SKY_PROVIDER = DefaultVanadiumResolverProviders::bySky;
-    public static final VanadiumResolverProvider<Identifier> SKY_FOG_PROVIDER = DefaultVanadiumResolverProviders::byFog;
+    public static final VanadiumResolverProvider<ResourceLocation> SKY_PROVIDER = DefaultVanadiumResolverProviders::bySky;
+    public static final VanadiumResolverProvider<ResourceLocation> SKY_FOG_PROVIDER = DefaultVanadiumResolverProviders::byFog;
     public static final VanadiumResolverProvider<Fluid> FLUID_FOG_PROVIDER = key -> (manager, biome, coordinates) -> -1;
 
     private DefaultVanadiumResolverProviders(){}
 
     private static VanadiumResolver byBlockState(BlockState key) {
         return (manager, biome, coordinates) -> {
-            var colorProvider = ((BlockColorsAccessor) MinecraftClient
+            var colorProvider = ((BlockColorsAccessor) Minecraft
                     .getInstance()
                     .getBlockColors())
-                    .getProviders()
-                    .get(Registries.BLOCK.getRawId(key.getBlock()));
+                    .getBlockColors()
+                    .byId(BuiltInRegistries.BLOCK.getId(key.getBlock()));
 
-            if (colorProvider != null) {
-                var world = MinecraftClient.getInstance().world;
+            if(colorProvider != null) {
+                var world = Minecraft.getInstance().level;
                 return colorProvider.getColor(key, world, new BlockPos(coordinates.x(), coordinates.y(), coordinates.z()), 0);
+            } else {
+                return -1;
             }
-
-            return -1;
         };
     }
 
     private static VanadiumResolver byFluidState(FluidState key) {
-        return (manager, biome, coordinates) -> {
-            final MinecraftClient client = MinecraftClient.getInstance();
-            var colorProvider = ((BlockColorsAccessor) client
-                    .getBlockColors())
-                    .getProviders()
-                    .get(Registries.FLUID.getRawId(key.getFluid()));
-
-            if (colorProvider != null) {
-                ClientWorld clientWorld = client.world;
-                return colorProvider.getColor(key.getBlockState(), clientWorld, new BlockPos(coordinates.x(), coordinates.y(), coordinates.z()), 0);
-            }
-
-            return -1;
-        };
+        return byBlockState(key.createLegacyBlock());
     }
 
     private static VanadiumResolver byBlock(Block key) {
-        return byBlockState(key.getDefaultState());
+        return byBlockState(key.defaultBlockState());
     }
 
     private static VanadiumResolver byFluid(Fluid key) {
-        return byFluidState(key.getDefaultState());
+        return byFluidState(key.defaultFluidState());
     }
 
-    private static VanadiumResolver bySky(Identifier key) {
+    private static VanadiumResolver bySky(ResourceLocation key) {
         return (manager, biome, coordinates) -> {
             int color;
 
@@ -83,7 +69,11 @@ public final class DefaultVanadiumResolverProviders {
                         .getColorMapping()
                         .getColorAtCoordinatesForBiome(manager, biome, coordinates);
             } else {
-                color = Vanadium.COLOR_PROPERTIES.getProperties().getDimensionSky(key);
+                var colorProperties = ObjectUtils.firstNonNull(
+                        VanadiumColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                        VanadiumColormaticResolution.COLOR_PROPERTIES
+                );
+                color = colorProperties.getProperties().getDimensionSky(key);
 
                 if(color == 0) {
                     color = biome.getSkyColor();
@@ -93,7 +83,7 @@ public final class DefaultVanadiumResolverProviders {
         };
     }
 
-    private static VanadiumResolver byFog(Identifier key) {
+    private static VanadiumResolver byFog(ResourceLocation key) {
         return (manager, biome, coordinates) -> {
           int color;
 
@@ -108,7 +98,11 @@ public final class DefaultVanadiumResolverProviders {
                       .getColorMapping()
                       .getColorAtCoordinatesForBiome(manager, biome, coordinates);
           } else {
-              color = Vanadium.COLOR_PROPERTIES.getProperties()
+              var colorProperties = ObjectUtils.firstNonNull(
+                      VanadiumColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                      VanadiumColormaticResolution.COLOR_PROPERTIES
+              );
+              color = colorProperties.getProperties()
                                                .getDimensionFog(key);
 
               if(color == 0) {

@@ -1,8 +1,8 @@
 package vanadium.models.enums;
 
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
-public enum InternalEventType implements StringIdentifiable {
+public enum InternalEventType implements StringRepresentable {
     COLOR("Color Generation"),
     SUBEVENT("Sub Event");
 
@@ -12,8 +12,9 @@ public enum InternalEventType implements StringIdentifiable {
 
     private final String name;
 
+
     @Override
-    public String asString() {
-        return this.name();
+    public String getSerializedName() {
+        return this.name;
     }
 }

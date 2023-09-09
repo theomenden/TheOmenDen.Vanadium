@@ -2,11 +2,11 @@ package vanadium.utils;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,24 +40,24 @@ public final class DebugUtils {
     public static AtomicLong blendingCacheHit = new AtomicLong();
     public static AtomicLong blendingCacheMiss = new AtomicLong();
 
-    public static void registerDebugCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
-        LiteralArgumentBuilder<ServerCommandSource> benchmarkCommands = CommandManager
+    public static void registerDebugCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralArgumentBuilder<CommandSourceStack> benchmarkCommands = Commands
                 .literal("vanadium")
-                .then(CommandManager.literal("toggleBenchmark")
+                .then(Commands.literal("toggleBenchmark")
                 .executes(
                         context -> {
                             boolean isBenchmarking = DebugUtils.toggle();
-                            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+                            Player player = Minecraft.getInstance().player;
 
                             if(isBenchmarking) {
                                 if(player != null) {
-                                    player.sendMessage(
-                                            Text.literal("Benchmark started. Stop with /vanadium toggleBenchmark"), false);
+                                    player.displayClientMessage(
+                                            Component.literal("Benchmark started. Stop with /vanadium toggleBenchmark"), false);
                                 }
                             }
                             else {
                                 if(player != null) {
-                                    player.sendMessage(Text.literal("Stopped benchmark"), false);
+                                    player.displayClientMessage(Component.literal("Stopped benchmark"), false);
                                 }
 
                                 Summary summary = DebugUtils.collateDebuggingResults();
@@ -65,7 +65,7 @@ public final class DebugUtils {
                                 StringBuilder sb = getSummary(summary);
 
                                 if(player != null) {
-                                    player.sendMessage(Text.literal(sb.toString()), false);
+                                    player.displayClientMessage(Component.literal(sb.toString()), false);
                                 }
 
                                 DebugUtils.teardown();

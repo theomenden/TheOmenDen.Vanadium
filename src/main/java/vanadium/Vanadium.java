@@ -7,21 +7,19 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import vanadium.customcolors.resources.GlobalColorResource;
-import vanadium.customcolors.resources.LinearColorMappingResource;
 import vanadium.utils.DebugUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
@@ -31,18 +29,13 @@ public class Vanadium implements ClientModInitializer {
     public static VanadiumConfig configuration;
     public static final String MODID = "vanadium";
     public static final String COLORMATIC_ID = "colormatic";
-    public static final Identifier OVERWORLD_ID = Identifier.of("minecraft", "overworld");
+    public static final ResourceLocation OVERWORLD_ID = ResourceLocation.tryBuild("minecraft", "overworld");
+    public static ResourceLocation getDimensionId(Level level) {
+        DimensionType type = level.dimensionType();
 
-    public static final GlobalColorResource COLOR_PROPERTIES = new GlobalColorResource(new Identifier(MODID, "color"));
-
-    public static final LinearColorMappingResource ITEMGUI_COLORS = new LinearColorMappingResource(new Identifier(MODID, "gui"));
-
-    public static Identifier getDimensionid(World world) {
-        DimensionType type = world.getDimension();
-
-        Identifier id = world.getRegistryManager()
-                .get(RegistryKeys.DIMENSION_TYPE)
-                .getId(type);
+        ResourceLocation id = level.registryAccess()
+                                   .registryOrThrow(Registries.DIMENSION_TYPE)
+                                   .getKey(type);
 
         if(id == null) {
             id = OVERWORLD_ID;
@@ -51,24 +44,26 @@ public class Vanadium implements ClientModInitializer {
         return id;
     }
 
-    public static RegistryKey<Biome> getBiomeRegistryKey(DynamicRegistryManager manager, Biome biome) {
-        return manager.get(RegistryKeys.BIOME)
-                      .getKey(biome)
-                      .orElse(BiomeKeys.PLAINS);
+    public static ResourceKey<Biome> getBiomeResourceKey(RegistryAccess registryAccess, Biome biome) {
+        return registryAccess.registryOrThrow(Registries.BIOME)
+                             .getResourceKey(biome)
+                             .orElse(Biomes.PLAINS);
     }
 
-    public static Identifier getBiomeIdentifier(DynamicRegistryManager manager, Biome biome) {
-        var id = manager.get(RegistryKeys.BIOME)
-                .getId(biome);
+    public static ResourceLocation getBiomeIdentifier(RegistryAccess manager, Biome biome) {
+        var resourceLocation = manager
+                .registryOrThrow(Registries.BIOME)
+                .getKey(biome);
 
-        if(id == null) {
-            id = BiomeKeys.PLAINS.getValue();
+        if(resourceLocation == null) {
+            resourceLocation = Biomes.PLAINS.location();
         }
-        return id;
+
+        return resourceLocation;
     }
 
-    public static <T> T getRegistryValue(Registry<T> registry, RegistryEntry<T> entry) {
-        var keyHolder = entry.getKey();
+    public static <T> T getRegistryValue(Registry<T> registry, Holder<T> entry) {
+        var keyHolder = entry.unwrapKey();
 
         if(keyHolder.isPresent()) {
             return registry.get(keyHolder.get());
@@ -76,7 +71,6 @@ public class Vanadium implements ClientModInitializer {
 
         return entry.value();
     }
-
     @Override
     public void onInitializeClient() {
         AutoConfig.register(VanadiumConfig.class, GsonConfigSerializer::new);
@@ -84,7 +78,7 @@ public class Vanadium implements ClientModInitializer {
                 .getConfigHolder(VanadiumConfig.class)
                 .getConfig();
 
-        ResourceManagerHelper client = ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES);
+        ResourceManagerHelper client = ResourceManagerHelper.get(PackType.CLIENT_RESOURCES);
         VanadiumColormaticResolution.registerResources(client);
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) ->
                 DebugUtils.registerDebugCommands(dispatcher)));

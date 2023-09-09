@@ -1,7 +1,7 @@
 package vanadium.mixin.coloring.particle;
 
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SuspendParticle;
+import net.minecraft.client.particle.SuspendedTownParticle;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.utils.MathUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
-@Mixin(SuspendParticle.MyceliumFactory.class)
+@Mixin(SuspendedTownParticle.Provider.class)
 public abstract class MyceliumParticleFactoryMixin {
-    @Inject(method = "createParticle(Lnet/minecraft/particle/ParticleEffect;Lnet/minecraft/client/world/ClientWorld;DDDDDD)Lnet/minecraft/client/particle/Particle;",
+    @Inject(method = "createParticle(Lnet/minecraft/core/particles/SimpleParticleType;Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDD)Lnet/minecraft/client/particle/Particle;",
     at = @At("RETURN"))
     private void onCreateParticle(CallbackInfoReturnable<Particle> cir) {
         if(VanadiumColormaticResolution.hasCustomMyceliumParticleColors()) {

@@ -5,7 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import vanadium.models.ItemsGrid;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemsAdapter extends TypeAdapter<ItemsGrid> {
-    private final IdentifierAdapter identifierAdapter = new IdentifierAdapter();
+    private final ResourceLocationAdapter resourceLocationAdapter = new ResourceLocationAdapter();
 
     @Override
     public void write(JsonWriter jsonWriter, ItemsGrid itemsGrid) {
@@ -28,7 +28,7 @@ public class ItemsAdapter extends TypeAdapter<ItemsGrid> {
                 throw new JsonSyntaxException("Null value not allowed");
             }
             case STRING -> {
-                var itemIdentifier = this.identifierAdapter.read(jsonReader);
+                var itemIdentifier = this.resourceLocationAdapter.read(jsonReader);
                 var gridEntry= new ItemsGrid();
                 gridEntry.items = ImmutableList.of(itemIdentifier);
                 return gridEntry;
@@ -56,11 +56,11 @@ public class ItemsAdapter extends TypeAdapter<ItemsGrid> {
         return gridEntry;
     }
 
-    private List<Identifier> readItems(JsonReader in) throws IOException {
-        List<Identifier> items = new ArrayList<>();
+    private List<ResourceLocation> readItems(JsonReader in) throws IOException {
+        List<ResourceLocation> items = new ArrayList<>();
         in.beginArray();
         while (in.hasNext()) {
-            items.add(this.identifierAdapter.read(in));
+            items.add(this.resourceLocationAdapter.read(in));
         }
         in.endArray();
         return items;

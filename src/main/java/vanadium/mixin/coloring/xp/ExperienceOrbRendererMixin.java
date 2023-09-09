@@ -1,12 +1,12 @@
 package vanadium.mixin.coloring.xp;
 
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.ExperienceOrbEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.ExperienceOrbRenderer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ExperienceOrb;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vanadium.utils.MathUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
-@Mixin(ExperienceOrbEntityRenderer.class)
-public abstract class ExperienceOrbRendererMixin extends EntityRenderer<ExperienceOrbEntity> {
+@Mixin(ExperienceOrbRenderer.class)
+public abstract class ExperienceOrbRendererMixin extends EntityRenderer<ExperienceOrb> {
     private ExperienceOrbRendererMixin() {
         super(null);
     }
@@ -35,8 +35,10 @@ public abstract class ExperienceOrbRendererMixin extends EntityRenderer<Experien
     @Unique
     private static int customBlue;
 
-    @Inject(method="render(Lnet/minecraft/entity/ExperienceOrbEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at=@At("HEAD"))
-    private void onRender(ExperienceOrbEntity entity, float eh, float partialTicks, MatrixStack matrixStack, VertexConsumerProvider provider, int int1, CallbackInfo info) {
+    @Inject(
+            method="render(Lnet/minecraft/world/entity/ExperienceOrb;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at=@At("HEAD"))
+    private void onRender(ExperienceOrb entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
         if(VanadiumColormaticResolution.hasCustomXpOrbColors()) {
             isCustom = true;
             var colorProperties = ObjectUtils.firstNonNull(
@@ -45,7 +47,7 @@ public abstract class ExperienceOrbRendererMixin extends EntityRenderer<Experien
             );
 
             float ticksPerCycle = colorProperties.getProperties().getXpOrbTime() * MathUtils.INV_50F;
-            float fractionalRepresentation = (1 - MathHelper.cos(entity.age + partialTicks) * (float)(MathUtils.PI2)/ticksPerCycle) * 0.5f;
+            float fractionalRepresentation = (1 - Mth.cos(((ExperienceOrbAccessor)(Object)entity).getAge() + partialTicks) * (float)(MathUtils.PI2)/ticksPerCycle) * 0.5f;
 
             var xpOrbColors = ObjectUtils.firstNonNull(
                     VanadiumColormaticResolution.EXPERIENCE_ORB_COLORS,
@@ -65,16 +67,16 @@ public abstract class ExperienceOrbRendererMixin extends EntityRenderer<Experien
     @Redirect(
             method = "vertex",
             at = @At(
-                    value="INVOKE",
-                    target="Lnet/minecraft/client/render/VertexConsumer;color(IIII)Lnet/minecraft/client/render/VertexConsumer;"
+                    value = "INVOKE",
+                    target="Lcom/mojang/blaze3d/vertex/VertexConsumer;color(IIII)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
             )
     )
-    private static VertexConsumer proxyColor(VertexConsumer self, int r, int g, int b, int a) {
+    private static VertexConsumer proxyVertexColorCalculation(VertexConsumer instance, int r, int g, int b, int a) {
         if(isCustom) {
             r = customRed;
             g = customGreen;
             b = customBlue;
         }
-        return self.color(r, g, b, a);
+        return instance.color(r, g, b,a);
     }
 }

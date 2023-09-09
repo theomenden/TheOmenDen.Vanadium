@@ -1,14 +1,14 @@
 package vanadium.customcolors.particle;
 
 
-import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.core.particles.DustParticleOptions;
 import org.apache.commons.lang3.ObjectUtils;
 import org.joml.Vector3f;
 import vanadium.utils.ColorConverter;
 import vanadium.utils.MathUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
-public class CustomRedDustParticle extends DustParticleEffect {
+public class CustomRedDustParticle extends DustParticleOptions {
     public CustomRedDustParticle(Vector3f color, float alpha) {
         super(color, alpha);
     }

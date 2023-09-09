@@ -1,6 +1,6 @@
 package vanadium.biomeblending.caching;
 
-import net.minecraft.world.biome.ColorResolver;
+import net.minecraft.world.level.ColorResolver;
 import vanadium.biomeblending.blending.BlendingChunk;
 
 import java.util.stream.IntStream;

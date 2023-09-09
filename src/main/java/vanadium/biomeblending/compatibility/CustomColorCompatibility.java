@@ -1,6 +1,7 @@
 package vanadium.biomeblending.compatibility;
 
-import net.minecraft.world.biome.ColorResolver;
+
+import net.minecraft.world.level.ColorResolver;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.models.records.BiomeColorTypes;
 

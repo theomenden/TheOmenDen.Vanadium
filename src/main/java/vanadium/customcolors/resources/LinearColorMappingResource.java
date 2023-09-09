@@ -1,12 +1,12 @@
 package vanadium.customcolors.resources;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.random.RandomGenerator;
 
 public class LinearColorMappingResource extends ColorMappingResource {
 
-    public LinearColorMappingResource(Identifier identifier) {
+    public LinearColorMappingResource(ResourceLocation identifier) {
         super(identifier);
     }
 

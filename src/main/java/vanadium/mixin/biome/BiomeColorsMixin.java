@@ -1,8 +1,9 @@
 package vanadium.mixin.biome;
 
-import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
+
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,8 +14,8 @@ import vanadium.utils.VanadiumColormaticResolution;
 
 @Mixin(BiomeColors.class)
 public abstract class BiomeColorsMixin {
-    @Inject(method = "getWaterColor", at  = @At("HEAD"), cancellable = true)
-    private static void onColoringWater(BlockRenderView world, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "getAverageWaterColor", at  = @At("HEAD"), cancellable = true)
+    private static void onColoringWater(BlockAndTintGetter world, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if(VanadiumColormaticResolution.hasCustomWaterColors()) {
             var colormap = ObjectUtils.firstNonNull(
                     VanadiumColormaticResolution.WATER_COLORS.getColorMapping(),

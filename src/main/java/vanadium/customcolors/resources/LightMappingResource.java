@@ -1,11 +1,11 @@
 package vanadium.customcolors.resources;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.customcolors.mapping.LightMappings;
@@ -18,32 +18,30 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public class LightMappingResource implements SimpleResourceReloadListener<Map<Identifier, NativeImage>> {
+public class LightMappingResource implements SimpleResourceReloadListener<Map<ResourceLocation, NativeImage>> {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final Identifier identifier;
-    private final Identifier optifineResourceLocation;
+    private final ResourceLocation identifier;
+    private final ResourceLocation optifineResourceLocation;
 
-    public LightMappingResource(Identifier identifier) {
+    public LightMappingResource(ResourceLocation identifier) {
         this.identifier = identifier;
-        this.optifineResourceLocation = new Identifier("minecraft", "optifine/" + identifier.getPath());
+        this.optifineResourceLocation = new ResourceLocation("minecraft", "optifine/" + identifier.getPath());
     }
-
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return identifier;
     }
-
-    private static Map<Identifier, NativeImage> getLightMappings(ResourceManager manager, Identifier directoryResourceLocation) {
-        Map<Identifier, Resource> filesToMap = manager
-                .findResources(directoryResourceLocation.getPath(),
+    private static Map<ResourceLocation, NativeImage> getLightMappings(ResourceManager manager, ResourceLocation directoryResourceLocation) {
+        Map<ResourceLocation, Resource> filesToMap = manager
+                .listResources(directoryResourceLocation.getPath(),
                         s -> s.getPath().endsWith(".png")
-                && s.getNamespace().equals(directoryResourceLocation.getNamespace()));
+                                && s.getNamespace().equals(directoryResourceLocation.getNamespace()));
 
-        Map<Identifier, NativeImage> resolvedLightMappings = new HashMap<>(filesToMap.size());
+        Map<ResourceLocation, NativeImage> resolvedLightMappings = new HashMap<>(filesToMap.size());
 
         filesToMap
                 .forEach((key, value) -> {
-                    try (InputStream inputStream = value.getInputStream()) {
+                    try (InputStream inputStream = value.open()) {
                         int directoryLength = directoryResourceLocation
                                 .getPath()
                                 .length();
@@ -54,7 +52,7 @@ public class LightMappingResource implements SimpleResourceReloadListener<Map<Id
 
                         String fixedDimensionResourceLocation = fixOptifineDimensionResourceLocation(dimensionResourceLocation);
 
-                        Identifier dimensionId = Identifier.tryParse(fixedDimensionResourceLocation);
+                        ResourceLocation dimensionId = ResourceLocation.tryParse(fixedDimensionResourceLocation);
 
                         if (dimensionId != null) {
                             resolvedLightMappings.put(key, NativeImage.read(inputStream));
@@ -67,7 +65,6 @@ public class LightMappingResource implements SimpleResourceReloadListener<Map<Id
                 });
         return resolvedLightMappings;
     }
-
     private static String fixOptifineDimensionResourceLocation(String dimensionResourceLocation) {
         return switch(dimensionResourceLocation){
             case "world0" -> "minecraft:overworld";
@@ -76,21 +73,19 @@ public class LightMappingResource implements SimpleResourceReloadListener<Map<Id
             default -> dimensionResourceLocation;
         };
     }
-
     @Override
-    public CompletableFuture<Map<Identifier, NativeImage>> load(ResourceManager manager, Profiler profiler, Executor executor) {
+    public CompletableFuture<Map<ResourceLocation, NativeImage>> load(ResourceManager manager, ProfilerFiller profiler, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
-            Map<Identifier, NativeImage> lightMappings = getLightMappings(manager, optifineResourceLocation);
+            Map<ResourceLocation, NativeImage> lightMappings = getLightMappings(manager, optifineResourceLocation);
             lightMappings.putAll(getLightMappings(manager, identifier));
             return lightMappings;
         }, executor);
     }
-
     @Override
-    public CompletableFuture<Void> apply(Map<Identifier, NativeImage> data, ResourceManager manager, Profiler profiler, Executor executor) {
+    public CompletableFuture<Void> apply(Map<ResourceLocation, NativeImage> data, ResourceManager manager, ProfilerFiller profiler, Executor executor) {
         return CompletableFuture.runAsync(() -> {
             LightMappings.clearLightMaps();
-            for (Map.Entry<Identifier, NativeImage> entry : data.entrySet()) {
+            for (Map.Entry<ResourceLocation, NativeImage> entry : data.entrySet()) {
                 NativeImage image = entry.getValue();
                 if(image.getWidth() < 2
                         || (image.getHeight() != 32

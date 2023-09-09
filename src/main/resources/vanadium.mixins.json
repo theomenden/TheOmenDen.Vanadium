@@ -3,26 +3,22 @@
   "package": "vanadium.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "mixins": [
     "biome.BiomeColorsMixin",
     "client.ClientWorldMixin",
     "client.InGameHudMixin",
     "client.MinecraftClientMixin",
     "coloring.BlockColorsAccessor",
+    "coloring.block.BlockColorsMixin",
     "coloring.block.LeverBlockMixin",
-    "coloring.block.RedstoneWireBlockMixin",
     "coloring.block.MaterialColorMixin",
+    "coloring.block.RedstoneWireBlockMixin",
     "coloring.dye.BannerBlockEntityRendererMixin",
     "coloring.dye.DyeColorMixin",
     "coloring.dye.SheepEntityMixin",
     "coloring.dye.WolfCollarFeatureRendererMixin",
     "coloring.item.ItemColorsMixin",
     "coloring.item.ItemMixin",
+    "coloring.item.SpawnEggItemMixin",
     "coloring.model.BakedModelManagerMixin",
     "coloring.model.BakedQuadFactoryMixin",
     "coloring.model.JsonUnbakedModelMixin",
@@ -37,12 +33,18 @@
     "coloring.potions.PotionUtilMixin",
     "coloring.potions.StatusEffectMixin",
     "coloring.text.ChatFormatMixin",
+    "coloring.xp.ExperienceOrbAccessor",
     "coloring.xp.ExperienceOrbRendererMixin",
     "compatibility.IdentifierMixin",
-    "compatibility.SimpleRegistryAccessor",
     "compatibility.TextureManagerMixin",
     "renderer.BackgroundRendererMixin",
     "renderer.FluidRendererMixin",
-    "renderer.WorldRendererMixin"
+    "renderer.WorldRendererMixin",
+    "renderer.LightmapTextureManagerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
   ]
 }

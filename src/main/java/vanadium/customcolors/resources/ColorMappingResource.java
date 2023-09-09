@@ -1,10 +1,10 @@
 package vanadium.customcolors.resources;
 
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
-import net.minecraft.client.util.RawTextureDataLoader;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.client.resources.LegacyStuffWrapper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -16,15 +16,15 @@ import java.util.concurrent.Executor;
 
 public class ColorMappingResource implements SimpleResourceReloadListener<int[]> {
     private static final Logger logger = LogManager.getLogger();
-    private final Identifier identifier;
-    private final Identifier optifineIdentifier;
-    private final Identifier colormaticIdentifier;
+    private final ResourceLocation identifier;
+    private final ResourceLocation optifineIdentifier;
+    private final ResourceLocation colormaticIdentifier;
     protected int[] colorMapping = null;
 
-    public ColorMappingResource(Identifier identifier) {
+    public ColorMappingResource(ResourceLocation identifier) {
         this.identifier = identifier;
-        this.optifineIdentifier = new Identifier("minecraft", "optifine/" + identifier.getPath());
-        this.colormaticIdentifier = new Identifier(Vanadium.COLORMATIC_ID, identifier.getPath());
+        this.optifineIdentifier = new ResourceLocation("minecraft", "optifine/" + identifier.getPath());
+        this.colormaticIdentifier = new ResourceLocation(Vanadium.COLORMATIC_ID, identifier.getPath());
     }
 
     @Override
@@ -33,56 +33,58 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
     }
 
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return identifier;
     }
 
-    @Override
-    public CompletableFuture<int[]> load(ResourceManager manager, Profiler profiler, Executor executor) {
-        return CompletableFuture.supplyAsync(() -> {
-            int[] resultingNamespaceLoad;
-
-            try {
-                resultingNamespaceLoad = attemptToLoadFromColormaticNamespace(manager);
-                if(resultingNamespaceLoad == null) {
-                    resultingNamespaceLoad = RawTextureDataLoader.loadRawTextureData(manager, identifier);
-                }
-            }
-            catch(IOException e) {
-                 resultingNamespaceLoad =  attemptToLoadFromOptifineDirectory(manager);
-            }
-            return resultingNamespaceLoad;
-        }, executor);
-    }
-
-    @Override
-    public CompletableFuture<Void> apply(int[] data, ResourceManager manager, Profiler profiler, Executor executor) {
-        return CompletableFuture.runAsync(() -> colorMapping = data, executor);
-    }
 
     public boolean hasCustomColorMapping() {
         return colorMapping != null;
     }
 
+    @SuppressWarnings("deprecation")
     @Nullable
     private int[] attemptToLoadFromColormaticNamespace(ResourceManager manager) {
         try{
-          return RawTextureDataLoader.loadRawTextureData(manager, colormaticIdentifier);
+          return LegacyStuffWrapper.getPixels(manager, colormaticIdentifier);
         }
         catch (IOException e) {
             logger.error("Failed to load color mapping from Colormatic directory", e);
             return null;
         }
     }
-
-    @Nullable
-    private int[] attemptToLoadFromOptifineDirectory(ResourceManager manager) {
+    @SuppressWarnings("deprecation")
+    private int @Nullable [] attemptToLoadFromOptifineDirectory(ResourceManager manager) {
         try {
-            return RawTextureDataLoader.loadRawTextureData(manager, optifineIdentifier);
+
+            return LegacyStuffWrapper.getPixels(manager, optifineIdentifier);
         } catch (IOException e) {
             logger.error("Failed to load color mapping from Optifine directory", e);
             return null;
         }
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public CompletableFuture<int[]> load(ResourceManager manager, ProfilerFiller profiler, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> {
+            int[] resultingNamespaceLoad;
+
+            try {
+                resultingNamespaceLoad = attemptToLoadFromColormaticNamespace(manager);
+                if(resultingNamespaceLoad == null) {
+                    resultingNamespaceLoad = LegacyStuffWrapper.getPixels(manager, identifier);
+                }
+            }
+            catch(IOException e) {
+                resultingNamespaceLoad =  attemptToLoadFromOptifineDirectory(manager);
+            }
+            return resultingNamespaceLoad;
+        }, executor);
+    }
+
+    @Override
+    public CompletableFuture<Void> apply(int[] data, ResourceManager manager, ProfilerFiller profiler, Executor executor) {
+        return CompletableFuture.runAsync(() -> colorMapping = data, executor);
+    }
 }

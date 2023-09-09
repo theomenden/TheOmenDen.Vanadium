@@ -1,11 +1,11 @@
 package vanadium.customcolors;
 
 import lombok.Getter;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.ColorResolver;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 import vanadium.biomeblending.storage.ColorMappingStorage;
 import vanadium.customcolors.interfaces.VanadiumResolver;
@@ -15,7 +15,7 @@ import vanadium.models.NonBlockingThreadLocal;
 import vanadium.models.YCoordinate;
 
 public final class VanadiumExtendedColorResolver implements ColorResolver {
-    @Nullable private static DynamicRegistryManager registryManager;
+    @Nullable private static RegistryAccess registryManager;
     private final ThreadLocal<YCoordinate> positionY;
     @Getter
     private final VanadiumResolver wrappedResolver;
@@ -30,18 +30,18 @@ public final class VanadiumExtendedColorResolver implements ColorResolver {
         this.wrappedResolver = wrappedResolver;
     }
 
-    public int resolveExtendedColor(BlockRenderView world, BlockPos position) {
+    public int resolveExtendedColor(BlockAndTintGetter world, BlockPos position) {
         this.positionY.get().Y = position.getY();
-        return world.getColor(position, this);
+        return world.getBlockTint(position, this);
     }
 
     @Override
-    public int getColor(Biome biome,double x, double z) {
+    public int getColor(Biome biome, double x, double z) {
         var coordinates = new Coordinates((int)x, this.positionY.get().Y, (int)z);
         return 0xfffefefe & wrappedResolver.getColorAtCoordinatesForBiome(registryManager, biome, coordinates);
     }
 
-    public static void setRegistryManager(@Nullable DynamicRegistryManager manager) {
+    public static void setRegistryManager(@Nullable RegistryAccess manager) {
         registryManager = manager;
     }
 

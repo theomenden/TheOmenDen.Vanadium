@@ -1,18 +1,18 @@
 package vanadium.mixin.compatibility;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(Identifier.class)
+@Mixin(ResourceLocation.class)
 public abstract class IdentifierMixin {
     @ModifyArg(method="<init>(Ljava/lang/String;Ljava/lang/String;)V",
     index = 0,
     at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/util/Identifier;validatePath(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+            target = "Lnet/minecraft/resources/ResourceLocation;assertValidPath(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
     ))
     private static String skipValidationForVanadium(String namespace, String path) {
         return checkForOptifineNamespace(namespace, path)

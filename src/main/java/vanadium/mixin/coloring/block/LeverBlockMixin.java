@@ -1,8 +1,8 @@
 package vanadium.mixin.coloring.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LeverBlock;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,14 +14,14 @@ public abstract class LeverBlockMixin extends Block {
     private LeverBlockMixin(){super(null);}
 
     @Redirect(
-            method = "spawnParticles",
+            method="makeParticle",
             at = @At(
                     value = "NEW",
-                    target="(Lorg/joml/Vector3f;F)Lnet/minecraft/particle/DustParticleEffect;",
+                    target="(Lorg/joml/Vector3f;F)Lnet/minecraft/core/particles/DustParticleOptions;",
                     ordinal = 0
             )
     )
-            private static DustParticleEffect proxyRedDust(Vector3f color, float a) {
-                return new CustomRedDustParticle(color, a);
+    private static DustParticleOptions proxyRedDust(Vector3f color, float alpha) {
+        return new CustomRedDustParticle(color, alpha);
     }
 }

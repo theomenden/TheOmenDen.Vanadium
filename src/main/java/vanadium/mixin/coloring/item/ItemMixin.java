@@ -1,7 +1,7 @@
 package vanadium.mixin.coloring.item;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,13 +13,13 @@ import vanadium.utils.VanadiumColormaticResolution;
 public abstract class ItemMixin {
 
     @Inject(
-            method = "getItemBarColor",
+            method = "getBarColor",
             at = @At("RETURN"),
             cancellable = true
     )
     private void onGetItemBar(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
         if(VanadiumColormaticResolution.hasCustomDurabilityColors()) {
-            float damage = stack.getDamage();
+            float damage = stack.getDamageValue();
             float maxDamage = stack.getMaxDamage();
             float durability = Math.max(0.0f, (maxDamage - damage) / maxDamage);
             var durabilityColors = ObjectUtils.firstNonNull(

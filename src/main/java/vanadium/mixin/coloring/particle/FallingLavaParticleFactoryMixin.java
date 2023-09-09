@@ -1,6 +1,6 @@
 package vanadium.mixin.coloring.particle;
 
-import net.minecraft.client.particle.BlockLeakParticle;
+import net.minecraft.client.particle.DripParticle;
 import net.minecraft.client.particle.Particle;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vanadium.utils.MathUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
-@Mixin(BlockLeakParticle.class)
+@Mixin(DripParticle.class)
 public abstract class FallingLavaParticleFactoryMixin {
-    @Inject(method = "createFallingLava", at = @At("RETURN"))
+    @Inject(method = "createLavaFallParticle", at = @At("RETURN"))
     private static void onCreateParticle(CallbackInfoReturnable<Particle> cir) {
         if(VanadiumColormaticResolution.hasCustomLavaDropParticleColors()) {
             Particle particle = cir.getReturnValue();

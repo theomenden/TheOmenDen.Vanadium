@@ -5,12 +5,12 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.predicate.block.BlockStatePredicate;
-import net.minecraft.registry.Registries;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vanadium.Vanadium;
@@ -47,18 +47,18 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
         try {
             if(parts.length > 1
             && parts[1].indexOf('=') < 0) {
-                Identifier id = new Identifier(parts[0], parts[1]);
+                ResourceLocation id = new ResourceLocation(parts[0], parts[1]);
 
                 if(parts[0].equals(Vanadium.MODID)
                 || parts[0].equals(Vanadium.COLORMATIC_ID)) {
                     initializeSpecialBlockStates(applicableBlockStates, id, parts);
                     return applicableBlockStates;
                 } else {
-                    block = Registries.BLOCK.get(id);
+                    block = BuiltInRegistries.BLOCK.get(id);
                 }
                 beginningIndex = 2;
             } else {
-                block = Registries.BLOCK.get(new Identifier(parts[0]));
+                block = BuiltInRegistries.BLOCK.get(new ResourceLocation(parts[0]));
                 beginningIndex = 1;
             }
         } catch (Exception e) {
@@ -76,7 +76,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
             String propertyName = parts[i].substring(0, splitIndex);
 
             Property<?> propertyState = block
-                    .getDefaultState()
+                    .defaultBlockState()
                     .getProperties()
                     .stream()
                     .filter(readableProperty -> readableProperty.getName().equals(propertyName))
@@ -94,14 +94,13 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
                     .stream(propertyValues)
                     .forEach(s -> putPropertyValue(container, propertyState, s));
 
-            predicate = predicate.with(propertyState, container::contains);
+            predicate = predicate.where(propertyState, container::contains);
         }
 
         applicableBlockStates.states = new ArrayList<>();
         boolean isExcluded = false;
 
-        for(BlockState state: block.getStateManager()
-                                   .getStates()) {
+        for(BlockState state: block.getStateDefinition().getPossibleStates()) {
             if(predicate.test(state)) {
                 applicableBlockStates.states.add(state);
             } else {
@@ -115,7 +114,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
         return applicableBlockStates;
     }
 
-    private static void initializeSpecialBlockStates(ApplicableBlockStates states, Identifier identifier, String[] parts) {
+    private static void initializeSpecialBlockStates(ApplicableBlockStates states, ResourceLocation identifier, String[] parts) {
         states.specialKey = identifier;
 
         if(parts.length != 3) {
@@ -134,7 +133,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
                         Arrays
                                 .stream(propertyValues)
                                 .forEach(propertyValue -> {
-                                    Identifier value = Identifier.tryParse(propertyValue.replaceFirst("/", ":"));
+                                    ResourceLocation value = ResourceLocation.tryParse(propertyValue.replaceFirst("/", ":"));
 
                                     if (value == null) {
                                         throw new JsonSyntaxException("Invalid identifier value: " + propertyValue);
@@ -147,7 +146,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
     }
 
     private static <T extends Comparable<T>> void putPropertyValue(List<? super T> container, Property<T> propertyState, String propertyValue) {
-        Optional<T> value = propertyState.parse(propertyValue);
+        Optional<T> value = propertyState.getValue(propertyValue);
 
         value.ifPresentOrElse(container::add, () -> {
             throw new JsonSyntaxException("Invalid property value: " + propertyValue);});

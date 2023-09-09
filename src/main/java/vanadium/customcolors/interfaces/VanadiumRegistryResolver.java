@@ -1,10 +1,10 @@
 package vanadium.customcolors.interfaces;
 
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.biome.Biome;
 import vanadium.models.records.Coordinates;
 
 @FunctionalInterface
 public interface VanadiumRegistryResolver {
-    int getColorRegistryForPosition(DynamicRegistryManager registryManager, Biome biome, Coordinates coordinates);
+    int getColorRegistryForPosition(RegistryAccess registryManager, Biome biome, Coordinates coordinates);
 }

@@ -3,9 +3,9 @@ package vanadium.biomeblending.storage;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 import vanadium.Vanadium;
 import vanadium.customcolors.VanadiumExtendedColorResolver;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ColorMappingStorage<T> {
-    private final Table<T, Identifier, BiomeColorMapping> colorMappings;
+    private final Table<T, ResourceLocation, BiomeColorMapping> colorMappings;
     private final Map<T, BiomeColorMapping> fallbackColorMappings;
     private final Map<T, VanadiumExtendedColorResolver> resolvers;
     private final Map<T, VanadiumResolver> defaultResolvers;
@@ -33,7 +33,7 @@ public class ColorMappingStorage<T> {
     }
 
     @Nullable
-    public BiomeColorMapping getColorMapping(DynamicRegistryManager manager, T key, Biome biome) {
+    public BiomeColorMapping getColorMapping(RegistryAccess manager, T key, Biome biome) {
         var resultingMapping = this.colorMappings.get(key, Vanadium.getBiomeIdentifier(manager, biome));
 
         return resultingMapping == null
@@ -64,14 +64,14 @@ public class ColorMappingStorage<T> {
         return !colorMappings.row(key).isEmpty() || fallbackColorMappings.containsKey(key);
     }
 
-    public void addColorMapping(BiomeColorMapping colorMapping, Collection<? extends T> keys, Set<? extends Identifier> biomes) {
+    public void addColorMapping(BiomeColorMapping colorMapping, Collection<? extends T> keys, Set<? extends ResourceLocation> biomes) {
         if(biomes.isEmpty()){
             keys
                     .forEach(key -> {
                         fallbackColorMappings.put(key, colorMapping);
                         resolvers.put(key, new VanadiumExtendedColorResolver(this, key, defaultResolvers.computeIfAbsent(key, defaultResolverProvider::create)));
                     });
-                        return;
+            return;
         }
 
         keys.forEach(key -> {

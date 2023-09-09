@@ -1,15 +1,15 @@
 package vanadium.customcolors.mapping;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import vanadium.biomeblending.storage.ColorMappingStorage;
 import vanadium.customcolors.interfaces.VanadiumResolver;
 import vanadium.defaults.DefaultVanadiumResolverProviders;
@@ -24,40 +24,39 @@ public final class BiomeColorMappings {
     private static final ColorMappingStorage<BlockState> colorMappingsByState = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.BLOCK_STATE_PROVIDER);
     private static final ColorMappingStorage<FluidState> colorMappingsByFluidState = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.FLUID_STATE_PROVIDER);
     private static final ColorMappingStorage<Fluid> colorMappingsByFluidFog = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.FLUID_FOG_PROVIDER);
-    private static final ColorMappingStorage<Identifier> skyFogColorMappings = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.SKY_FOG_PROVIDER);
-    private static final ColorMappingStorage<Identifier> skyColorMappings = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.SKY_PROVIDER);
+    private static final ColorMappingStorage<ResourceLocation> skyFogColorMappings = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.SKY_FOG_PROVIDER);
+    private static final ColorMappingStorage<ResourceLocation> skyColorMappings = new ColorMappingStorage<>(DefaultVanadiumResolverProviders.SKY_PROVIDER);
 
     private BiomeColorMappings() {
     }
 
-    public static VanadiumResolver getTotalSky(Identifier dimensionId) {
+    public static VanadiumResolver getTotalSky(ResourceLocation dimensionId) {
         return skyColorMappings.getVanadiumResolver(dimensionId);
     }
 
-    public static VanadiumResolver getTotalSkyFog(Identifier dimensionId) {
+    public static VanadiumResolver getTotalSkyFog(ResourceLocation dimensionId) {
         return skyFogColorMappings.getVanadiumResolver(dimensionId);
     }
 
-    public static BiomeColorMapping getFluidFog(DynamicRegistryManager manager, Fluid fluid, Biome biome) {
+    public static BiomeColorMapping getFluidFog(RegistryAccess manager, Fluid fluid, Biome biome) {
         return colorMappingsByFluidFog.getColorMapping(manager, fluid, biome);
     }
 
     public static void addBiomeColorMapping(BiomeColorMapping biomeColorMap) {
         ColorMappingProperties props = biomeColorMap.getProperties();
-        Set<Identifier> biomes = props.getApplicableBiomes();
+        Set<ResourceLocation> biomes = props.getApplicableBiomes();
         colorMappingsByState.addColorMapping(biomeColorMap, props.getApplicableBlockStates(), biomes);
         colorMappingsByBlock.addColorMapping(biomeColorMap, props.getApplicableBlocks(), biomes);
         props
                 .getApplicableSpecialIds()
                 .forEach((key, value) -> {
-                    switch (key
-                            .toString()) {
+                    switch (key.toString()) {
                         case "vanadium:sky", "colormatic:sky" -> skyColorMappings.addColorMapping(biomeColorMap, value, biomes);
                         case "vanadium:sky_fog", "colormatic:sky_fog" -> skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
                         case "vanadium:fluid_fog", "colormatic:fluid_fog" -> {
                             Collection<Fluid> fluids = value
                                     .stream()
-                                    .map(Registries.FLUID::get)
+                                    .map(BuiltInRegistries.FLUID::get)
                                     .collect(Collectors.toList());
                             colorMappingsByFluidFog.addColorMapping(biomeColorMap, fluids, biomes);
                         }
@@ -79,7 +78,7 @@ public final class BiomeColorMappings {
     }
 
     public static boolean isFluidCustomColored(FluidState state) {
-        return colorMappingsByFluidFog.contains(state.getFluid())
+        return colorMappingsByFluidFog.contains(state.getType())
                 || colorMappingsByFluidState.contains(state);
     }
 
@@ -93,7 +92,7 @@ public final class BiomeColorMappings {
         return colorMappingsByFluidFog.contains(fluid);
     }
 
-    public static int getBiomeColorMapping(BlockState state, BlockRenderView world, BlockPos pos) {
+    public static int getBiomeColorMapping(BlockState state, BlockAndTintGetter world, BlockPos pos) {
         if(world != null && pos != null) {
             var resolver = colorMappingsByState.getExtendedResolver(state);
             if(resolver == null) {
@@ -108,30 +107,6 @@ public final class BiomeColorMappings {
             BiomeColorMapping colormap = colorMappingsByState.getFallbackColorMapping(state);
             if(colormap == null) {
                 colormap = colorMappingsByBlock.getFallbackColorMapping(state.getBlock());
-            }
-            if(colormap != null) {
-                return colormap.getDefaultColor();
-            } else {
-                return 0xffffff;
-            }
-        }
-    }
-
-    public static int getBiomeColorMapping(FluidState state, BlockRenderView world, BlockPos pos) {
-        if(world != null && pos != null) {
-            var resolver = colorMappingsByFluidState.getExtendedResolver(state);
-            if(resolver == null) {
-                resolver = colorMappingsByFluidFog.getExtendedResolver(state.getFluid());
-            }
-            if(resolver == null) {
-                throw new IllegalArgumentException(String.valueOf(state));
-            }
-
-            return resolver.resolveExtendedColor(world, pos);
-        } else {
-            BiomeColorMapping colormap = colorMappingsByFluidState.getFallbackColorMapping(state);
-            if(colormap == null) {
-                colormap = colorMappingsByFluidFog.getFallbackColorMapping(state.getFluid());
             }
             if(colormap != null) {
                 return colormap.getDefaultColor();

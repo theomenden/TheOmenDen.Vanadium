@@ -1,30 +1,30 @@
 package vanadium.customcolors.resources;
 
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.Nullable;
 import vanadium.customcolors.mapping.BiomeColorMapping;
-import vanadium.models.records.PropertyImage;
 import vanadium.models.exceptions.InvalidColorMappingException;
+import vanadium.models.records.PropertyImage;
 import vanadium.utils.GsonUtils;
 
 public class BiomeColorMappingResource implements SimpleSynchronousResourceReloadListener {
-    private final Identifier identifier;
-    private final Identifier optifineId;
+    private final ResourceLocation identifier;
+    private final ResourceLocation optifineId;
 
-    private final Identifier colormaticId;
+    private final ResourceLocation colormaticId;
 
     private BiomeColorMapping mapping;
 
-    public BiomeColorMappingResource(Identifier identifier) {
-        this.identifier = new Identifier(identifier.getNamespace(), identifier.getPath() +".json");
-        this.optifineId = new Identifier("minecraft", "optifine/" + identifier.getPath() +".properties");
-        this.colormaticId = new Identifier(identifier.getNamespace(), "colormatic/" + identifier.getPath() +".json");
+    public BiomeColorMappingResource(ResourceLocation identifier) {
+        this.identifier = new ResourceLocation(identifier.getNamespace(), identifier.getPath() +".json");
+        this.optifineId = new ResourceLocation("minecraft", "optifine/" + identifier.getPath() +".properties");
+        this.colormaticId = new ResourceLocation(identifier.getNamespace(), "colormatic/" + identifier.getPath() +".json");
     }
 
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return this.identifier;
     }
 
@@ -57,9 +57,8 @@ public class BiomeColorMappingResource implements SimpleSynchronousResourceReloa
         }
     }
 
-
     @Override
-    public void reload(ResourceManager resourceManager) {
+    public void onResourceManagerReload(ResourceManager resourceManager) {
         PropertyImage propertyImage;
 
         try {

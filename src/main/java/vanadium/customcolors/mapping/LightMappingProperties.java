@@ -1,8 +1,8 @@
 package vanadium.customcolors.mapping;
 
 import com.google.gson.JsonParseException;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vanadium.utils.GsonUtils;
@@ -18,9 +18,9 @@ public record LightMappingProperties() {
         this();
     }
 
-    public static LightMappingProperties loadPropertiesForIdentifier(ResourceManager manager, Identifier identifier) {
+    public static LightMappingProperties loadPropertiesForIdentifier(ResourceManager manager, ResourceLocation identifier) {
         LightmapSettings settings;
-        try(Reader reader = new InputStreamReader(manager.getResourceOrThrow(identifier).getInputStream())) {
+        try(Reader reader = new InputStreamReader(manager.getResourceOrThrow(identifier).open())) {
             settings = GsonUtils.PROPERTY_GSON.fromJson(reader, LightmapSettings.class);
         }catch(JsonParseException e) {
             LOGGER.error("Failed to load lightmapping settings for {}: {}", identifier, e.getMessage());

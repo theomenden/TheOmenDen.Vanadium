@@ -1,8 +1,8 @@
 package vanadium.mixin.coloring.particle;
 
-import net.minecraft.client.particle.SpriteBillboardParticle;
-import net.minecraft.client.particle.WaterSplashParticle;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.particle.SplashParticle;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.core.BlockPos;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,11 +13,11 @@ import vanadium.customcolors.mapping.BiomeColorMapping;
 import vanadium.utils.MathUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
-@Mixin(WaterSplashParticle.class)
-public abstract class WaterSplashParticleMixin extends SpriteBillboardParticle {
+@Mixin(SplashParticle.class)
+public abstract class WaterSplashParticleMixin extends TextureSheetParticle {
 
     @Unique
-    private static final BlockPos.Mutable position = new BlockPos.Mutable();
+    private static final BlockPos.MutableBlockPos position = new BlockPos.MutableBlockPos();
     private WaterSplashParticleMixin() {
         super(null, 0.0, 0.0, 0.0);
     }
@@ -32,10 +32,10 @@ public abstract class WaterSplashParticleMixin extends SpriteBillboardParticle {
 
         position.set(this.x, this.y, this.z);
 
-        int color = BiomeColorMapping.getBiomeCurrentColorOrDefault(this.world, position, colorMapping);
+        int color = BiomeColorMapping.getBiomeCurrentColorOrDefault(this.level, position, colorMapping);
 
-        this.red = ((color >> 16) & 0xff) * MathUtils.INV_255;
-        this.green = ((color >> 8) & 0xff) * MathUtils.INV_255 ;
-        this.blue = (color & 0xff) * MathUtils.INV_255;
+        this.rCol = ((color >> 16) & 0xff) * MathUtils.INV_255;
+        this.gCol = ((color >> 8) & 0xff) * MathUtils.INV_255 ;
+        this.bCol = (color & 0xff) * MathUtils.INV_255;
     }
 }

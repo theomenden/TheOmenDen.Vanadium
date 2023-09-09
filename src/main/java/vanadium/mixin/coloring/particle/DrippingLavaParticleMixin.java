@@ -1,7 +1,7 @@
 package vanadium.mixin.coloring.particle;
 
-import net.minecraft.client.particle.BlockLeakParticle;
-import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.particle.DripParticle;
+import net.minecraft.client.particle.TextureSheetParticle;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import vanadium.utils.MathUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
-@Mixin(BlockLeakParticle.class)
-public abstract class DrippingLavaParticleMixin extends SpriteBillboardParticle {
+@Mixin(DripParticle.class)
+public abstract class DrippingLavaParticleMixin extends TextureSheetParticle {
 
     @Unique
     private int age;
@@ -42,7 +42,7 @@ public abstract class DrippingLavaParticleMixin extends SpriteBillboardParticle 
     }
 
     @Inject(
-            method="updateAge",
+            method="preMoveUpdate",
             at = @At(
                     value = "RETURN",
                     shift = At.Shift.BY,

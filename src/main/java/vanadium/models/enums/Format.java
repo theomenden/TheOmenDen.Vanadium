@@ -1,8 +1,8 @@
 package vanadium.models.enums;
 
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
-public enum Format implements StringIdentifiable {
+public enum Format implements StringRepresentable {
     FIXED("fixed"),
     VANILLA("vanilla"),
     GRID("grid");
@@ -13,8 +13,9 @@ public enum Format implements StringIdentifiable {
         this.name = s;
     }
 
+
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.name;
     }
 }

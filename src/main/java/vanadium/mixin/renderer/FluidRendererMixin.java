@@ -1,50 +1,28 @@
 package vanadium.mixin.renderer;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.FluidRenderer;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.block.LiquidBlockRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 
-@Mixin(FluidRenderer.class)
+@Mixin(LiquidBlockRenderer.class)
 public abstract class FluidRendererMixin {
-
-
-    @ModifyConstant(
-            method = "render",
-            constant = @Constant(intValue = 0xFFFFFF)
-    )
-    private int calculateCustomColor(int original, BlockRenderView world, BlockPos pos, VertexConsumer consumer, BlockState blockState, FluidState fluidState) {
-        if(BiomeColorMappings.isFluidCustomColored(fluidState)) {
-            var canonicalBlockState = fluidState.getBlockState();
-
-            return BiomeColorMappings.getBiomeColorMapping(canonicalBlockState, world, pos);
-        }
-
-        return original;
-    }
-
     @ModifyVariable(
-            method = "render",
-            at = @At(
-                    target = "Lnet/minecraft/client/color/world/BiomeColors;getWaterColor(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;)I",
-                    value = "STORE"
-            )
+            method = "tesselate(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V",
+            at = @At(value = "STORE"),
+            ordinal = 0
     )
-    private int calculateCustomColorVariable(int original, BlockRenderView world, BlockPos pos, VertexConsumer consumer, BlockState blockState, FluidState fluidState) {
-        if(BiomeColorMappings.isFluidCustomColored(fluidState)) {
-            var canonicalBlockState = fluidState.getBlockState();
-
-            return BiomeColorMappings.getBiomeColorMapping(canonicalBlockState, world, pos);
+    private int calculateFluidColor(int original, BlockAndTintGetter level, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
+        var canonicalBlockState = fluidState.createLegacyBlock();
+        if(BiomeColorMappings.isCustomColored(canonicalBlockState)) {
+            return BiomeColorMappings.getBiomeColorMapping(canonicalBlockState, level, pos);
         }
-
         return original;
     }
 

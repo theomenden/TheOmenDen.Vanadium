@@ -1,12 +1,12 @@
 package vanadium.mixin.sodium;
 
 import me.jellysquid.mods.sodium.client.world.BiomeSeedProvider;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.world.World;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(ClientWorld.class)
-public abstract class SodiumClientWorldMixin extends World implements BiomeSeedProvider {
+@Mixin(ClientLevel.class)
+public abstract class SodiumClientWorldMixin extends Level implements BiomeSeedProvider {
     private SodiumClientWorldMixin() {
         super(
                 null,
@@ -23,6 +23,6 @@ public abstract class SodiumClientWorldMixin extends World implements BiomeSeedP
 
     @Override
     public long sodium$getBiomeSeed() {
-        return ((SodiumBiomeAccessAccessor)this.getBiomeAccess()).getSeed();
+        return ((SodiumBiomeAccessAccessor)this.getBiomeManager()).getBiomeZoomSeed();
     }
 }

@@ -3,12 +3,12 @@ package vanadium.customcolors;
 import me.jellysquid.mods.sodium.client.model.color.ColorProvider;
 import me.jellysquid.mods.sodium.client.model.quad.ModelQuadView;
 import me.jellysquid.mods.sodium.client.world.WorldSlice;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.CuboidBlockIterator;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Cursor3D;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.material.FluidState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vanadium.Vanadium;
@@ -36,10 +36,10 @@ public class VanadiumFluidStateColorProvider implements ColorProvider<FluidState
     }
 
     private static int resolve(WorldSlice world, BlockPos pos, FluidState fluidState, VanadiumResolver resolver) {
-        final ClientWorld clientWorld = ((SodiumWorldSliceAccessor)(Object)world).getWorld();
-        final DynamicRegistryManager manager = clientWorld.getRegistryManager().toImmutable();
+        final ClientLevel clientWorld = ((SodiumWorldSliceAccessor)(Object)world).getWorld();
+        final RegistryAccess manager = clientWorld.registryAccess();
 
-        int i = MinecraftClient.getInstance().options.getBiomeBlendRadius().getValue();
+        int i = Minecraft.getInstance().options.biomeBlendRadius().get();
         if (i == 0) {
             return resolver.getColorAtCoordinatesForBiome(manager, clientWorld.getBiome(pos).value(), new Coordinates(pos.getX(), pos.getY(), pos.getZ()));
         }
@@ -48,10 +48,10 @@ public class VanadiumFluidStateColorProvider implements ColorProvider<FluidState
         int k = 0;
         int l = 0;
         int m = 0;
-        CuboidBlockIterator cuboidBlockIterator = new CuboidBlockIterator(pos.getX() - i, pos.getY(), pos.getZ() - i, pos.getX() + i, pos.getY(), pos.getZ() + i);
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
-        while (cuboidBlockIterator.step()) {
-            mutable.set(cuboidBlockIterator.getX(), cuboidBlockIterator.getY(), cuboidBlockIterator.getZ());
+        Cursor3D cuboidBlockIterator = new Cursor3D(pos.getX() - i, pos.getY(), pos.getZ() - i, pos.getX() + i, pos.getY(), pos.getZ() + i);
+        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
+        while (cuboidBlockIterator.advance()) {
+            mutable.set(cuboidBlockIterator.nextX(), cuboidBlockIterator.nextY(), cuboidBlockIterator.nextZ());
             int n = resolver.getColorAtCoordinatesForBiome(manager, clientWorld.getBiome(mutable).value(), new Coordinates(mutable.getX(), mutable.getY(), mutable.getZ()));
             k += (n & 0xFF0000) >> 16;
             l += (n & 0xFF00) >> 8;

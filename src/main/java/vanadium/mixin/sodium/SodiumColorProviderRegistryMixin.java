@@ -3,13 +3,13 @@ package vanadium.mixin.sodium;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
 import me.jellysquid.mods.sodium.client.model.color.ColorProvider;
 import me.jellysquid.mods.sodium.client.model.color.ColorProviderRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -52,13 +52,6 @@ public abstract class SodiumColorProviderRegistryMixin {
                     var provider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(block));
                     this.registerBlocks(provider, block);
                 });
-
-        fluids.keySet()
-                .forEach(fluid -> {
-                    var provider = VanadiumFluidStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_STATE_PROVIDER.create(fluid.getDefaultState()
-                                                                                                                                                                .getBlockState()));
-                    this.registerFluids(provider, fluid);
-        });
     }
 
 }

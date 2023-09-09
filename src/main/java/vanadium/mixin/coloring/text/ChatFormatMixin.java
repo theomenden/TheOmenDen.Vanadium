@@ -1,13 +1,14 @@
 package vanadium.mixin.coloring.text;
 
-import net.minecraft.text.Style;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import vanadium.Vanadium;
+import vanadium.utils.VanadiumColormaticResolution;
 
 @Mixin(Style.class)
 public abstract class ChatFormatMixin {
@@ -17,13 +18,17 @@ public abstract class ChatFormatMixin {
     private void useCustomTextColor(CallbackInfoReturnable<TextColor> cir){
         if(cir.getReturnValue() != null) {
             String name = cir.getReturnValue()
-                             .getName();
+                             .toString();
 
             if(name != null) {
-                Formatting formatting = Formatting.byName(name);
+                ChatFormatting formatting = ChatFormatting.getByName(name);
 
                 if(formatting != null) {
-                    TextColor color = Vanadium.COLOR_PROPERTIES
+                    var colorProperties = ObjectUtils.firstNonNull(
+                            VanadiumColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                            VanadiumColormaticResolution.COLOR_PROPERTIES
+                    );
+                    TextColor color = colorProperties
                             .getProperties()
                             .getText(formatting);
 

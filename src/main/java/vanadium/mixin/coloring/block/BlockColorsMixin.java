@@ -1,19 +1,19 @@
 package vanadium.mixin.coloring.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.StemBlock;
+
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.StemBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import vanadium.Vanadium;
 import vanadium.customcolors.mapping.BiomeColorMapping;
 import vanadium.customcolors.mapping.BiomeColorMappings;
 import vanadium.utils.VanadiumColormaticResolution;
@@ -23,7 +23,7 @@ public abstract class BlockColorsMixin {
 
     @Dynamic("Birch foliage lambda")
     @Inject(method = "method_1687", at = @At("HEAD"), cancellable = true)
-    private static void onBirchColoring(BlockState state, BlockRenderView world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
+    private static void onBirchColoring(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
         if(VanadiumColormaticResolution.hasCustomBirchColors()) {
             var birchColors = ObjectUtils.firstNonNull(
                     VanadiumColormaticResolution.BIRCH_COLORS,
@@ -38,7 +38,7 @@ public abstract class BlockColorsMixin {
     @Inject(method = "method_1695",
     at = @At("HEAD"),
     cancellable = true)
-    private static void onSpruceColoring(BlockState state, BlockRenderView world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
+    private static void onSpruceColoring(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
         if(VanadiumColormaticResolution.hasCustomSpruceColors()) {
             var spruceColors = ObjectUtils.firstNonNull(
                     VanadiumColormaticResolution.SPRUCE_COLORS,
@@ -49,11 +49,11 @@ public abstract class BlockColorsMixin {
         }
     }
 
-    @Dynamic("attached stem foliage lambda")
-    @Inject(method = "method_1698",
+   @Inject(
+    method = "method_1698",
     at = @At("HEAD"),
     cancellable = true)
-    private static void onAttachedStemColoring(BlockState state, BlockRenderView world, Block pos, int tintIndex, CallbackInfoReturnable<Integer> cir) {
+    private static void onAttachedStemColoring(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIndex, CallbackInfoReturnable<Integer> cir) {
         Block block = state.getBlock();
 
         if(block == Blocks.ATTACHED_PUMPKIN_STEM &&
@@ -76,12 +76,12 @@ public abstract class BlockColorsMixin {
     @Inject(method = "method_1696",
     at = @At("HEAD"),
     cancellable = true)
-    private static void onStemColoring(BlockState state, BlockRenderView world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
+    private static void onStemColoring(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
         Block block = state.getBlock();
 
         if(block == Blocks.PUMPKIN_STEM
         && VanadiumColormaticResolution.hasCustomPumpkinStemColors()) {
-            int age = state.get(StemBlock.AGE);
+            int age = state.getValue(StemBlock.AGE);
 
             var pumpkinStemColors = ObjectUtils.firstNonNull(
                     VanadiumColormaticResolution.PUMPKIN_STEM_COLORS,
@@ -91,7 +91,7 @@ public abstract class BlockColorsMixin {
             cir.setReturnValue(pumpkinStemColors.getColorAtIndex(age));
         } else if(block == Blocks.MELON_STEM
         && VanadiumColormaticResolution.hasCustomMelonStemColors()) {
-            int age = state.get(StemBlock.AGE);
+            int age = state.getValue(StemBlock.AGE);
 
             var melonStemColors = ObjectUtils.firstNonNull(
                     VanadiumColormaticResolution.MELON_STEM_COLORS,
@@ -106,7 +106,11 @@ public abstract class BlockColorsMixin {
     at = @At("HEAD"),
     cancellable = true)
     private static void onLilyPadColoring(CallbackInfoReturnable<Integer> cir) {
-        int color = Vanadium.COLOR_PROPERTIES.getProperties()
+        var colorProperties = ObjectUtils.firstNonNull(
+                VanadiumColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                VanadiumColormaticResolution.COLOR_PROPERTIES
+        );
+        int color = colorProperties.getProperties()
                                              .getLilyPad();
 
         if(color != 0) {
@@ -115,11 +119,11 @@ public abstract class BlockColorsMixin {
     }
 
     @Inject(
-            method = "getColor(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;I)I",
+            method = "getColor(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;I)I",
             at = @At("HEAD"),
             cancellable = true
     )
-    private void onColorMultiplier(BlockState state, BlockRenderView world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
+    private void onColorMultiplier(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIdx, CallbackInfoReturnable<Integer> cir) {
         if(world != null
         && pos != null
         && BiomeColorMappings.isCustomColored(state)) {

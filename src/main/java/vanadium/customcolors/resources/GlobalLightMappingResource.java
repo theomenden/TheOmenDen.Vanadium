@@ -1,30 +1,27 @@
 package vanadium.customcolors.resources;
 
+import lombok.Getter;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import vanadium.customcolors.mapping.LightMappingProperties;
 
 public class GlobalLightMappingResource implements SimpleSynchronousResourceReloadListener {
-    private final Identifier identifier;
+    private final ResourceLocation identifier;
+    @Getter
     private LightMappingProperties properties;
 
-    public GlobalLightMappingResource(Identifier identifier) {
+    public GlobalLightMappingResource(ResourceLocation identifier) {
         this.identifier = identifier;
     }
 
-    public LightMappingProperties getProperties() {
-        return this.properties;
-    }
-
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return this.identifier;
     }
 
     @Override
-    public void reload(ResourceManager resourceManager) {
-
+    public void onResourceManagerReload(ResourceManager resourceManager) {
         properties = LightMappingProperties.loadPropertiesForIdentifier(resourceManager, this.identifier);
     }
 }

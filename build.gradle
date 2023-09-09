@@ -6,19 +6,10 @@ plugins {
 	id 'com.modrinth.minotaur' version '2.+'
 	id "io.freefair.lombok" version "8.3"
 	id "com.github.johnrengelman.shadow" version '8.1.1'
-  	id "org.sonarqube" version '4.3.0.3225'
 }
 
 version = project.mod_version
 group = project.maven_group
-
-sonar {
-  properties {
-    property "sonar.projectKey", "theomenden_TheOmenDen.Vanadium"
-    property "sonar.organization", "theomenden"
-    property "sonar.host", "https://sonarcloud.io"
-  }
-}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -26,12 +17,13 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-	maven {	name "Modrinth"; url "https://api.modrinth.com/maven"
+	maven {	name = "Modrinth"; url = "https://api.modrinth.com/maven";
 		content { includeGroup "maven.modrinth"	}
 	}
-	maven {	name 'modmenu'; url 'https://maven.terraformersmc.com/releases'	}
-	maven {	name 'cloth';   url = 'https://maven.shedaniel.me'	}
-	maven { name 'jitpack'; url 'https://jitpack.io'}
+	maven { name = 'ParchmentMC'; url = 'https://maven.parchmentmc.org'}
+	maven {	name = 'modmenu'; url = 'https://maven.terraformersmc.com/releases'	}
+	maven {	name = 'cloth';   url = 'https://maven.shedaniel.me'	}
+	maven { name = 'jitpack'; url = 'https://jitpack.io'}
 }
 
 loom {
@@ -41,13 +33,15 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.layered() {
+		officialMojangMappings()
+		parchment("org.parchmentmc.data:parchment-1.20.1:${project.parchment_mappings}@zip")
+	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modApi( "maven.modrinth:sodium:${project.sodium_version}") {
 		exclude(group: 'net.fabricmc.fabric.fabric-api')
 	}
-	modCompileOnly modRuntimeOnly('maven.modrinth:indium:1.0.25+mc1.20.1')
 	modApi ("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
 		exclude(group: 'net.fabricmc.fabric.fabric-api')
 	}
@@ -57,6 +51,7 @@ dependencies {
 	implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2';
 	runtimeOnly "org.joml:joml:1.10.2"
 
+	modCompileOnly modRuntimeOnly('maven.modrinth:indium:1.0.25+mc1.20.1')
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"

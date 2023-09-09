@@ -1,6 +1,6 @@
 package vanadium.customcolors;
 
-import net.minecraft.world.biome.ColorResolver;
+import net.minecraft.world.level.ColorResolver;
 import vanadium.models.records.BiomeColorTypes;
 
 import java.util.concurrent.ConcurrentHashMap;

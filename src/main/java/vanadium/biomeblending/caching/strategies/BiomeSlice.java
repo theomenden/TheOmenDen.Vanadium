@@ -1,6 +1,7 @@
 package vanadium.biomeblending.caching.strategies;
 
-import net.minecraft.world.biome.Biome;
+
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.Arrays;
 

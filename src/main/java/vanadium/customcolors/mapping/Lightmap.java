@@ -1,6 +1,6 @@
 package vanadium.customcolors.mapping;
 
-import net.minecraft.client.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
 import vanadium.Vanadium;
 
 public class Lightmap {
@@ -44,24 +44,24 @@ public class Lightmap {
 
     private int getPixelAtPositionWithGivenLightLevel(int x, int y, float nightVision) {
         if(nightVision <=0.0f) {
-            return lightmap.getColor(x, y);
+            return lightmap.getPixelRGBA(x, y);
         }
         if(nightVision >=1.0f) {
             if (lightmap.getHeight() != 64) {
                 return getRationalizedValue(x, y);
             }  else {
-                return lightmap.getColor(x, y +32);
+                return lightmap.getPixelRGBA(x, y +32);
             }
         }
-        int normalColor = lightmap.getColor(x, y);
+        int normalColor = lightmap.getPixelRGBA(x, y);
         int nightVisionColor = (lightmap.getHeight() !=64)
                 ? getRationalizedValue(x, y)
-                : lightmap.getColor(x, y +32);
+                : lightmap.getPixelRGBA(x, y +32);
         return mergeColorsBasedOnNightVisionFactors(normalColor, nightVisionColor, nightVision);
     }
 
     private int getRationalizedValue(int x, int y) {
-        int color = lightmap.getColor(x, y);
+        int color = lightmap.getPixelRGBA(x, y);
         int red = (color >>16) &0xff;
         int green = (color >>8) &0xff;
         int blue = color & 0xff;
@@ -77,22 +77,18 @@ public class Lightmap {
     }
 
     private int mergeColorsBasedOnNightVisionFactors(int color1, int color2, float nightVision) {
-        float nightVisionFactor = 1.0f - nightVision;
-
-        int tempColor1 = color1 &0xff;
-        int tempColor2 = color2 &0xff;
-        int resolvedColor = (int)((tempColor1 * nightVision) + (tempColor2 * nightVisionFactor));
-
-        tempColor1 = (color1 >>8) &0xff;
-        tempColor2 = (color2 >>8) &0xff;
-        resolvedColor |= (int)((tempColor1 * nightVision) + (tempColor2 * nightVisionFactor)) <<8;
-
-        tempColor1 = (color1 >>16) &0xff;
-        tempColor2 = (color2 >>16) &0xff;
-        resolvedColor |= (int)((tempColor1 * nightVision) + (tempColor2 * nightVisionFactor)) <<16;
-
-        resolvedColor |=0xff000000;
-
+        float oneMinusAweight = 1 - nightVision;
+        int cha, chb;
+        int resolvedColor = 0xff000000;
+        cha = ((color1 >> 16) & 0xff);
+        chb = ((color2 >> 16) & 0xff);
+        resolvedColor |= (int)(cha * nightVision + chb * oneMinusAweight) << 16;
+        cha = ((color1 >> 8) & 0xff);
+        chb = ((color2>> 8) & 0xff);
+        resolvedColor |= (int)(cha * nightVision + chb * oneMinusAweight) << 8;
+        cha = color1 & 0xff;
+        chb = color2 & 0xff;
+        resolvedColor |= (int)(cha * nightVision + chb * oneMinusAweight);
         return resolvedColor;
     }
 }

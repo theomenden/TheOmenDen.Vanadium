@@ -1,21 +1,21 @@
 package vanadium.customcolors.resources;
 
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import vanadium.Vanadium;
 import vanadium.defaults.GlobalColorProperties;
 
 public class GlobalColorResource implements SimpleSynchronousResourceReloadListener {
-    private final Identifier identifier;
-    private final Identifier optifineId;
-    private final Identifier colormaticId;
+    private final ResourceLocation identifier;
+    private final ResourceLocation optifineId;
+    private final ResourceLocation colormaticId;
     private GlobalColorProperties globalColorProperties = GlobalColorProperties.DEFAULT;
 
-    public GlobalColorResource(Identifier identifier) {
-        this.identifier = new Identifier(identifier.getNamespace(), identifier.getPath() + ".json");
-        this.optifineId = new Identifier("minecraft", "optifine/" + identifier.getPath() + ".properties");
-        this.colormaticId = new Identifier(Vanadium.COLORMATIC_ID, identifier.getPath());
+    public GlobalColorResource(ResourceLocation identifier) {
+        this.identifier = new ResourceLocation(identifier.getNamespace(), identifier.getPath() + ".json");
+        this.optifineId = new ResourceLocation("minecraft", "optifine/" + identifier.getPath() + ".properties");
+        this.colormaticId = new ResourceLocation(Vanadium.COLORMATIC_ID, identifier.getPath());
     }
 
     public GlobalColorProperties getProperties() {
@@ -23,12 +23,13 @@ public class GlobalColorResource implements SimpleSynchronousResourceReloadListe
     }
 
     @Override
-    public Identifier getFabricId() {
+    public ResourceLocation getFabricId() {
         return identifier;
     }
 
+
     @Override
-    public void reload(ResourceManager resourceManager) {
+    public void onResourceManagerReload(ResourceManager resourceManager) {
         GlobalColorProperties properties = GlobalColorProperties.load(resourceManager, identifier, false);
 
         if(properties == null) {

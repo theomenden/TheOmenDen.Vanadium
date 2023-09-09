@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
             Class<?>[] implemented = cls.getInterfaces();
 
             for (Class<?> iface : implemented) {
-                if (iface == StringIdentifiable.class) {
+                if (iface == StringRepresentable.class) {
                     return (TypeAdapter<T>) new StringIdentifiableTypeAdapter<>(cls);
                 }
             }
@@ -30,7 +30,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
         return null;
     }
 
-    private static class StringIdentifiableTypeAdapter<T extends Enum<T> & StringIdentifiable> extends TypeAdapter<T> {
+    private static class StringIdentifiableTypeAdapter<T extends Enum<T> & StringRepresentable> extends TypeAdapter<T> {
         private final T[] values;
 
         @SuppressWarnings({"ConstantConditions", "unchecked"})
@@ -43,7 +43,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
             if(value == null) {
                 jsonWriter.nullValue();
             } else {
-                jsonWriter.value(value.asString());
+                jsonWriter.value(value.getSerializedName());
             }
         }
 
@@ -56,7 +56,7 @@ public class StringIdentifiableTypeAdapterFactory implements TypeAdapterFactory 
             String name = jsonReader.nextString();
 
             return Arrays.stream(values)
-                    .filter(t -> t.asString().equals(name))
+                    .filter(t -> t.getSerializedName().equals(name))
                     .findFirst()
                     .orElseThrow();
         }

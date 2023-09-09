@@ -3,13 +3,14 @@ package vanadium.models;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 import lombok.Getter;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vanadium.Vanadium;
@@ -20,6 +21,7 @@ import vanadium.models.records.ColumnBounds;
 import vanadium.models.records.VanadiumColor;
 import vanadium.utils.BiomeTracingUtils;
 import vanadium.utils.GsonUtils;
+import vanadium.utils.VanadiumColormaticResolution;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,13 +33,13 @@ import java.util.stream.Collectors;
 @Getter
 public class ColorMappingProperties {
     private static final Logger LOGGER = LoggerFactory.getLogger(Vanadium.MODID);
-    private final Identifier id;
+    private final ResourceLocation id;
     private transient final boolean isUsingOptfine;
     @Getter
     private final Format format;
     private final Collection<ApplicableBlockStates> blocks;
     @Getter
-    private final Identifier source;
+    private final ResourceLocation source;
     @Getter
     private final VanadiumColor color;
     private final ColumnLayout layout;
@@ -45,22 +47,21 @@ public class ColorMappingProperties {
     private final int yVariance;
     @Getter
     private final int yOffset;
-    private final Map<Identifier, ColumnBounds> columnsByBiome;
-
+    private final Map<ResourceLocation, ColumnBounds> columnsByBiome;
     private static final ColumnBounds DEFAULT_BOUNDS = new ColumnBounds(0, 1);
 
-    private ColorMappingProperties(Identifier id, Settings settings) {
+    private ColorMappingProperties(ResourceLocation id, Settings settings) {
         this.id = id;
         this.isUsingOptfine = this.id
                 .getPath()
                 .endsWith(".properties");
         this.format = settings.format;
         this.blocks = settings.blocks;
-        Identifier source = Identifier.tryParse(settings.source);
+        ResourceLocation source = ResourceLocation.tryParse(settings.source);
 
         if (source == null) {
             LOGGER.error("{}: Invalid source location '{}', using file name as fallback", id, settings.source);
-            source = new Identifier(makeSourceFromFileName(id));
+            source = new ResourceLocation(makeSourceFromFileName(id));
         }
 
         this.source = source;
@@ -89,7 +90,7 @@ public class ColorMappingProperties {
             this.columnsByBiome = new HashMap<>();
             settings.biomes
                     .forEach((key, value) -> {
-                        Identifier updated = BiomeTracingUtils.updateBiomeName(key, this.id);
+                        ResourceLocation updated = BiomeTracingUtils.updateBiomeName(key, this.id);
                         if (updated != null) {
                             columnsByBiome.put(updated, new ColumnBounds(value, 1));
                         }
@@ -98,34 +99,10 @@ public class ColorMappingProperties {
             this.columnsByBiome = null;
         }
     }
-
-    public ColumnBounds getColumn(RegistryKey<Biome> biomeRegistryKey) {
-        if (format == Format.GRID
-                && biomeRegistryKey != null) {
-            Identifier id = biomeRegistryKey.getValue();
-            if (columnsByBiome != null) {
-                ColumnBounds cb = columnsByBiome.get(id);
-
-                if (cb == null) {
-                    throw new IllegalArgumentException(id.toString());
-                }
-            } else {
-                return switch (layout) {
-                    case DEFAULT -> DefaultColumns.getDefaultBoundaries(biomeRegistryKey);
-                    case OPTIFINE -> DefaultColumns.getOptifineBoundaries(biomeRegistryKey);
-                    case LEGACY -> DefaultColumns.getLegacyBoundaries(biomeRegistryKey, this.isUsingOptfine);
-                    case STABLE -> DefaultColumns.getStableBoundaries(biomeRegistryKey);
-                };
-            }
-        }
-            throw new IllegalStateException(format.toString());
-    }
-
-
-    public ColumnBounds getColumn(RegistryKey<Biome> biomeKey, Registry<Biome> biomeRegistry) {
+    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, ResourceKey<Registry<Biome>> biomeRegistry) {
         if(format == Format.GRID) {
             if(biomeKey != null) {
-                Identifier id = biomeKey.getValue();
+                ResourceLocation id = biomeKey.location();
                 if(columnsByBiome != null) {
                     ColumnBounds cb = columnsByBiome.get(id);
 
@@ -148,9 +125,8 @@ public class ColorMappingProperties {
             throw new IllegalStateException(format.toString());
         }
     }
-
-    public Set<Identifier> getApplicableBiomes() {
-        Set<Identifier> result;
+    public Set<ResourceLocation> getApplicableBiomes() {
+        Set<ResourceLocation> result;
         if (columnsByBiome == null || columnsByBiome.isEmpty()) {
             result = Sets.newHashSet();
         } else {
@@ -158,7 +134,6 @@ public class ColorMappingProperties {
         }
         return result;
     }
-
     public Set<Block> getApplicableBlocks() {
         return blocks
                 .stream()
@@ -166,7 +141,6 @@ public class ColorMappingProperties {
                 .map(a -> a.block)
                 .collect(Collectors.toSet());
     }
-
     public Set<BlockState> getApplicableBlockStates() {
         return blocks
                 .stream()
@@ -174,14 +148,12 @@ public class ColorMappingProperties {
                 .flatMap(a -> a.states.stream())
                 .collect(Collectors.toSet());
     }
-
-    public Map<Identifier, Collection<Identifier>> getApplicableSpecialIds() {
+    public Map<ResourceLocation, Collection<ResourceLocation>> getApplicableSpecialIds() {
        return blocks
                 .stream()
                 .filter(a -> a.specialKey != null)
                 .collect(Collectors.toMap(a -> a.specialKey, a -> a.specialIds, (a1, b) -> b));
     }
-
     @Override
     public String toString() {
         return String.format("ColormapProperties { format=%s, blocks=%s, source=%s, color=%x, yVariance=%x, yOffset=%x }",
@@ -192,11 +164,10 @@ public class ColorMappingProperties {
                 yVariance,
                 yOffset);
     }
-
-    public static ColorMappingProperties load(ResourceManager manager, Identifier id, boolean custom) {
+    public static ColorMappingProperties load(ResourceManager manager, ResourceLocation id, boolean custom) {
         try (InputStream in = manager
                 .getResourceOrThrow(id)
-                .getInputStream();
+                .open();
              Reader r = GsonUtils
                      .getJsonReader(in, id, k -> k, "blocks"::equals)) {
             return loadFromJson(r, id, custom);
@@ -204,8 +175,7 @@ public class ColorMappingProperties {
             return loadFromJson(new StringReader("{}"), id, custom);
         }
     }
-
-    private static ColorMappingProperties loadFromJson(Reader json, Identifier id, boolean custom) {
+    private static ColorMappingProperties loadFromJson(Reader json, ResourceLocation id, boolean custom) {
         Settings settings;
         try {
             settings = GsonUtils.PROPERTY_GSON.fromJson(json, Settings.class);
@@ -217,13 +187,17 @@ public class ColorMappingProperties {
             LOGGER.error("Error loading {}: {}", id, e.getMessage());
             settings = new Settings();
         }
+        var colorProperties = ObjectUtils.firstNonNull(
+                VanadiumColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                VanadiumColormaticResolution.COLOR_PROPERTIES
+        );
         if (settings.format == null) {
-            settings.format = Vanadium.COLOR_PROPERTIES
+            settings.format = colorProperties
                     .getProperties()
                     .getDefaultFormat();
         }
         if (settings.layout == null) {
-            settings.layout = Vanadium.COLOR_PROPERTIES
+            settings.layout = colorProperties
                     .getProperties()
                     .getDefaultColumnLayout();
         }
@@ -254,13 +228,11 @@ public class ColorMappingProperties {
         settings.source = GsonUtils.resolveRelativeResourceLocation(settings.source, id);
         return new ColorMappingProperties(id, settings);
     }
-
-    private static String makeSourceFromFileName(Identifier id) {
+    private static String makeSourceFromFileName(ResourceLocation id) {
         String path = id.toString();
         path = path.substring(0, path.lastIndexOf('.')) + ".png";
         return path;
     }
-
     private static class Settings {
         Format format = null;
         Collection<ApplicableBlockStates> blocks = null;
@@ -269,7 +241,7 @@ public class ColorMappingProperties {
         ColumnLayout layout = null;
         int yVariance = 0;
         int yOffset = 0;
-        Map<Identifier, Integer> biomes = null;
+        Map<ResourceLocation, Integer> biomes = null;
         List<GridEntry> grid = null;
     }
 }

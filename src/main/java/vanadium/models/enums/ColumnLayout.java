@@ -1,8 +1,8 @@
 package vanadium.models.enums;
 
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
-public enum ColumnLayout implements StringIdentifiable {
+public enum ColumnLayout implements StringRepresentable {
     DEFAULT("default"),
     OPTIFINE("optifine"),
     LEGACY("legacy"),
@@ -14,8 +14,9 @@ public enum ColumnLayout implements StringIdentifiable {
         this.name = name;
     }
 
+
     @Override
-    public String asString() {
-        return name;
+    public String getSerializedName() {
+        return this.name;
     }
 }

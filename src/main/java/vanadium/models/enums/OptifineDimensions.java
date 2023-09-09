@@ -1,8 +1,8 @@
 package vanadium.models.enums;
 
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.StringRepresentable;
 
-public enum OptifineDimensions implements StringIdentifiable {
+public enum OptifineDimensions implements StringRepresentable {
     OVERWORLD("world0"),
     NETHER("world-1"),
     END("world1");
@@ -13,8 +13,9 @@ public enum OptifineDimensions implements StringIdentifiable {
         this.name = name;
     }
 
+
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.name;
     }
 }

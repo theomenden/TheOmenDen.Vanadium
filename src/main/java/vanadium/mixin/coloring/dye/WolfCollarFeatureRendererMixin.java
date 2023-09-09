@@ -1,36 +1,41 @@
 package vanadium.mixin.coloring.dye;
 
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.render.entity.feature.WolfCollarFeatureRenderer;
-import net.minecraft.client.render.entity.model.WolfEntityModel;
-import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.util.DyeColor;
+import net.minecraft.client.model.WolfModel;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.layers.WolfCollarLayer;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.item.DyeColor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import vanadium.Vanadium;
+import vanadium.utils.VanadiumColormaticResolution;
 
 
-@Mixin(WolfCollarFeatureRenderer.class)
-public abstract class WolfCollarFeatureRendererMixin extends FeatureRenderer<WolfEntity, WolfEntityModel<WolfEntity>> {
+@Mixin(WolfCollarLayer.class)
+public abstract class WolfCollarFeatureRendererMixin extends RenderLayer<Wolf, WolfModel<Wolf>> {
     private WolfCollarFeatureRendererMixin() {
         super(null);
     }
 
     @Redirect(
-            method= "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/passive/WolfEntity;FFFFFF)V",
+            method= "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/animal/Wolf;FFFFFF)V",
             at = @At(
                     value = "INVOKE",
-                    target= "Lnet/minecraft/util/DyeColor;getColorComponents()[F"
+                    target= "Lnet/minecraft/world/item/DyeColor;getTextureDiffuseColors()[F"
             )
     )
-    private float[] proxyGetColorComponents(DyeColor self) {
-        float[] rgb = Vanadium.COLOR_PROPERTIES
+    private float[] proxyGetColorComponents(DyeColor instance) {
+        var colorProperties = ObjectUtils.firstNonNull(
+                VanadiumColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                VanadiumColormaticResolution.COLOR_PROPERTIES
+        );
+        float[] rgb = colorProperties
                 .getProperties()
-                .getCollarRgb(self);
+                .getCollarRgb(instance);
 
         return rgb != null
                 ? rgb
-                : self.getColorComponents();
+                : instance.getTextureDiffuseColors();
     }
 }
