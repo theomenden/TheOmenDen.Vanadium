@@ -51,7 +51,7 @@ dependencies {
 	implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2';
 	runtimeOnly "org.joml:joml:1.10.2"
 
-	modCompileOnly modRuntimeOnly('maven.modrinth:indium:1.0.25+mc1.20.1')
+	modCompileOnly modRuntimeOnly('maven.modrinth:indium:1.0.27+mc1.20.1')
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
