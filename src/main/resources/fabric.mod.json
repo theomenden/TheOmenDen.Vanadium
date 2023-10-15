@@ -18,9 +18,6 @@
         "modmenu.discord": "https://discord.gg/GWshtCqEx4"
       },
       "update_checker": true
-    },
-    "sodium:options": {
-      "quality.biome_blend":false
     }
   },
   "depends": {

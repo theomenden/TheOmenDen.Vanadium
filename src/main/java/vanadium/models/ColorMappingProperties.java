@@ -223,7 +223,6 @@ public class ColorMappingProperties {
         }
         if (settings.source == null) {
             settings.source = makeSourceFromFileName(id);
-            LOGGER.info("{}: file", settings.source);
         }
         settings.source = GsonUtils.resolveRelativeResourceLocation(settings.source, id);
         return new ColorMappingProperties(id, settings);

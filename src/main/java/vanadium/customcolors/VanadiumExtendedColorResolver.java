@@ -6,6 +6,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.biome.Biome;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vanadium.biomeblending.storage.ColorMappingStorage;
 import vanadium.customcolors.interfaces.VanadiumResolver;
@@ -36,7 +37,7 @@ public final class VanadiumExtendedColorResolver implements ColorResolver {
     }
 
     @Override
-    public int getColor(Biome biome, double x, double z) {
+    public int getColor(@NotNull Biome biome, double x, double z) {
         var coordinates = new Coordinates((int)x, this.positionY.get().Y, (int)z);
         return 0xfffefefe & wrappedResolver.getColorAtCoordinatesForBiome(registryManager, biome, coordinates);
     }

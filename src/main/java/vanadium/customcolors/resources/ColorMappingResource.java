@@ -49,7 +49,6 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
           return LegacyStuffWrapper.getPixels(manager, colormaticIdentifier);
         }
         catch (IOException e) {
-            logger.error("Failed to load color mapping from Colormatic directory", e);
             return null;
         }
     }
@@ -59,7 +58,6 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
 
             return LegacyStuffWrapper.getPixels(manager, optifineIdentifier);
         } catch (IOException e) {
-            logger.error("Failed to load color mapping from Optifine directory", e);
             return null;
         }
     }

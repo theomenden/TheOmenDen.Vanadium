@@ -49,7 +49,7 @@ public abstract class SodiumColorProviderRegistryMixin {
 
         blocks.keySet()
                 .forEach(block -> {
-                    var provider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(block));
+                    ColorProvider<BlockState> provider = VanadiumBlockStateColorProvider.adaptVanadiumColorProvider(DefaultVanadiumResolverProviders.BLOCK_PROVIDER.create(block));
                     this.registerBlocks(provider, block);
                 });
     }

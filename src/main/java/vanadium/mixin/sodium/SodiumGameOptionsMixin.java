@@ -37,7 +37,7 @@ public abstract class SodiumGameOptionsMixin {
                               .add(OptionImpl
                                       .createBuilder(int.class, vanillaOpts)
                                       .setName(Component.translatable("text.autoconfig.vanadium.option.blendingRadius"))
-                                      .setTooltip(Component.translatable("text.autoconfig.vanadium.option.blendingRadius.tooltip"))
+                                      .setTooltip(Component.translatable("text.autoconfig.vanadium.option.blendingRadius.@Tooltip"))
                                       .setControl(option -> new SliderControl(option, 0, 14, 1, ControlValueFormatter.biomeBlend()))
                                       .setBinding((opts, value) -> Vanadium.configuration.blendingRadius = value, opts -> Vanadium.configuration.blendingRadius)
                                       .setImpact(OptionImpact.LOW)

@@ -3,22 +3,38 @@ package vanadium.utils;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Lifecycle;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import vanadium.Vanadium;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
+@NoArgsConstructor
 public final class SimpleBiomeRegistryUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Vanadium.class);
+
     @Getter
     private static final List<ResourceKey<Biome>> BIOME_KEYS;
 
     @Getter
     private static final MappedRegistry<Biome> BUILT_IN_BIOMES;
+
+    @Getter
+    @Setter
+    private static @Nullable RegistryAccess dynamicAccess;
 
     static {
         BIOME_KEYS = Lists.newArrayList(
@@ -41,16 +57,34 @@ public final class SimpleBiomeRegistryUtils {
         BUILT_IN_BIOMES = builtInBiomeRegistry;
     }
 
-    private SimpleBiomeRegistryUtils(){}
-
     public static int getBiomeRawId(ResourceKey<Biome> biomeRegistryKey) {
 
-        Biome lookedUpBiome =BUILT_IN_BIOMES
-                .createRegistrationLookup()
-                .getOrThrow(biomeRegistryKey)
-                .value();
+        if(dynamicAccess != null) {
+            var biome = dynamicAccess.registryOrThrow(Registries.BIOME)
+                    .getHolder(biomeRegistryKey)
+                    .get();
+           return dynamicAccess.registryOrThrow(Registries.BIOME)
+                    .asHolderIdMap()
+                    .getId(biome);
+        }
 
-        return getBiomeRawId(lookedUpBiome);
+        var lookedUpBiome =BUILT_IN_BIOMES
+                .createRegistrationLookup()
+                .get(biomeRegistryKey);
+
+        if(lookedUpBiome.isEmpty()) {
+            var biomeRegistryHolder = VanillaRegistries
+                    .createLookup()
+                    .asGetterLookup()
+                    .lookupOrThrow(Registries.BIOME);
+
+            lookedUpBiome = biomeRegistryHolder.get(biomeRegistryKey);
+
+            BUILT_IN_BIOMES
+                    .register(biomeRegistryKey, biomeRegistryHolder.getOrThrow(biomeRegistryKey).value(), Lifecycle.stable());
+        }
+
+        return getBiomeRawId(lookedUpBiome.get().value());
     }
 
     private static int getBiomeRawId(Biome biome) {
@@ -58,3 +92,4 @@ public final class SimpleBiomeRegistryUtils {
     }
 
 }
+

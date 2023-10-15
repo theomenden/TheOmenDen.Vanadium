@@ -26,6 +26,10 @@ jobs:
           modrinth-id: lS2PKjpV
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-featured: true
+          curseforge-id: 912192
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-generate-changelog: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
   qodana:
     runs-on: ubuntu-latest
     steps:

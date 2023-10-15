@@ -19,13 +19,15 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vanadium.utils.DebugUtils;
+import vanadium.utils.SimpleBiomeRegistryUtils;
 import vanadium.utils.VanadiumColormaticResolution;
 
 @Environment(EnvType.CLIENT)
 public class Vanadium implements ClientModInitializer {
-    private static final Logger logger = LogManager.getLogger(Vanadium.class);
+    private static final Logger logger = LoggerFactory.getLogger(Vanadium.class);
     public static VanadiumConfig configuration;
     public static final String MODID = "vanadium";
     public static final String COLORMATIC_ID = "colormatic";
